@@ -5,6 +5,12 @@ const CANVAS_WIDTH = innerWidth * 3 / 4;
 const CANVAS_HEIGHT = innerHeight * 3 / 4;
 
 const gray = 18 / 255;
+const WHITE  = [1.0, 1.0, 1.0];
+const YELLOW = [1.0, 1.0, 0.0];
+const GREEN  = [0.0, 1.0, 0.0];
+const BLUE   = [0.0, 0.0, 1.0];
+const RED    = [1.0, 0.0, 0.0];
+const ORANGE = [1.0, 0.5, 0.0];
 
 let canvas;
 let gl;
@@ -15,8 +21,8 @@ let fragment_shader;
 let program;
 
 let vertices = [];
-let vertices1d;
 let vertice_indices = [];
+let vertices1d;
 let sorted_vertices;
 
 let vertex_buffer_object;
@@ -40,7 +46,7 @@ let identity_matrix;
 
 let angle = 0;
 
-let is_running = true;
+let is_running = false;
 
 // FPS
     
@@ -53,139 +59,30 @@ let timeMeasurements = [];
 
 let fps = 0;
 
-// Real Cube;
+// Cube
 
-const RUBIK_SIZE_X = 3;
-const RUBIK_SIZE_Y = 1;
-const RUBIK_SIZE_Z = 2;
-const RUBIK_LENGTH = 0.75;
-const CAMERA_POSITION = { x: 0, y: 0, z: -2 * RUBIK_SIZE_Z / RUBIK_LENGTH };
-const RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2;
+let RUBIK_SIZE_X;
+let RUBIK_SIZE_Y;
+let RUBIK_SIZE_Z;
+let RUBIK_LENGTH;
+let CAMERA_POSITION;
+let RUBIK_HALF_LENGTH;
+let END_X   ;
+let START_X ;
+let END_Y   ;
+let START_Y ;
+let END_Z   ;
+let START_Z ;
 
-const END_X   = (RUBIK_SIZE_X - 1) / 2;
-const START_X = -END_X;
-const END_Y   = (RUBIK_SIZE_Y - 1) / 2;
-const START_Y = -END_Y;
-const END_Z   = (RUBIK_SIZE_Z - 1) / 2;
-const START_Z = -END_Z;
-
-init_vertices = () => {
-	for (let i = START_X; i <= END_X; i += 1) {
-		for (let j = START_Y; j <= END_Y; j += 1) {
-			for (let k = START_Z; k <= END_Z; k += 1) {
-	
-				for (let i2 = -1; i2 < 2; i2 += 2) {
-					for (let j2 = -1; j2 < 2; j2 += 2) {
-						for (let k2 = -1; k2 < 2; k2 += 2) {
-	
-							if (i2 == -1)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									1.0, 0.5, 0.0, 1.0, // Orange
-									"orange", vertices.length
-								]);
-							
-							if (i2 == 1)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									1.0, 0.0, 0.0, 1.0, // Red
-									"red", vertices.length
-								]);
-							
-							if (j2 == -1)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									1.0, 1.0, 0.0, 1.0, // Yellow
-									"yellow", vertices.length
-								]);
-							
-							if (j2 == 1)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									0.7, 0.7, 0.7, 1.0, // White
-									"white", vertices.length
-								]);
-							
-							if (k2 == -1)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									0.0, 0.0, 1.0, 1.0, // Blue
-									"blue", vertices.length
-								]);
-							
-							if (k2 == 1)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									0.0, 1.0, 0.0, 1.0, // Green
-									"green", vertices.length
-								]);
-						}
-					}
-				}
-	
-				sorted_vertices = vertices.sort((a, b) => {
-					return a[7].localeCompare(b[7]);
-				});
-	
-				for (let count = 0; count < vertices.length; count += 4) {
-					vertice_indices.push(
-						count + 0, 
-						count + 1, 
-						count + 2, 
-	
-						count + 0, 
-						count + 1, 
-						count + 3, 
-	
-						count + 0, 
-						count + 2, 
-						count + 1, 
-	
-						count + 0, 
-						count + 2, 
-						count + 3, 
-	
-						count + 0, 
-						count + 3, 
-						count + 1, 
-	
-						count + 0, 
-						count + 3, 
-						count + 2, 
-					);
-				}
-			}
-		}
-	}
-	
-	vertices1d = [].concat(...vertices).filter(e =>
-		e !== 'red' &&
-		e !== 'orange' &&
-		e !== 'white' &&
-		e !== 'yellow' &&
-		e !== 'blue' &&
-		e !== 'green'
-	);
-}
-
-init = () => {
-	init_vertices();
-	
-	canvas = document.getElementById('game-surface');
+set_up_canvas_dimension = () => {
 	canvas.width = CANVAS_WIDTH;
 	canvas.height = CANVAS_HEIGHT;
+}
+
+setup_webgl_canvas = () => {
+	canvas = document.getElementById('game-surface');
+
+	set_up_canvas_dimension();
 
 	gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 	
@@ -237,7 +134,138 @@ init = () => {
 		console.error('ERROR validating program!', gl.getProgramInfoLog(program));
 		return;
 	}
+}
 
+init_vertices = () => {
+	RUBIK_SIZE_X = +document.querySelector("#size-x").value;
+	RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
+	RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
+	RUBIK_LENGTH = +document.querySelector("#length").value;
+
+	CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z) / (RUBIK_LENGTH * 1) };
+	RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
+	END_X   = (RUBIK_SIZE_X - 1) / 2;
+	START_X = -END_X;
+	END_Y   = (RUBIK_SIZE_Y - 1) / 2;
+	START_Y = -END_Y;
+	END_Z   = (RUBIK_SIZE_Z - 1) / 2;
+	START_Z = -END_Z;
+
+	vertices = [];
+	vertice_indices = [];
+	sorted_vertices = [];
+
+	for (let i = START_X; i <= END_X; i += 1) {
+		for (let j = START_Y; j <= END_Y; j += 1) {
+			for (let k = START_Z; k <= END_Z; k += 1) {
+	
+				for (let i2 = -1; i2 < 2; i2 += 2) {
+					for (let j2 = -1; j2 < 2; j2 += 2) {
+						for (let k2 = -1; k2 < 2; k2 += 2) {
+	
+							if (i2 == -1)
+								vertices.push([
+									i + RUBIK_HALF_LENGTH * i2,
+									j + RUBIK_HALF_LENGTH * j2,
+									k + RUBIK_HALF_LENGTH * k2,
+									...ORANGE, 1.0, // Orange
+									"orange", vertices.length
+								]);
+							
+							if (i2 == 1)
+								vertices.push([
+									i + RUBIK_HALF_LENGTH * i2,
+									j + RUBIK_HALF_LENGTH * j2,
+									k + RUBIK_HALF_LENGTH * k2,
+									...RED, 1.0, // Red
+									"red", vertices.length
+								]);
+							
+							if (j2 == -1)
+								vertices.push([
+									i + RUBIK_HALF_LENGTH * i2,
+									j + RUBIK_HALF_LENGTH * j2,
+									k + RUBIK_HALF_LENGTH * k2,
+									...YELLOW, 1.0, // Yellow
+									"yellow", vertices.length
+								]);
+							
+							if (j2 == 1)
+								vertices.push([
+									i + RUBIK_HALF_LENGTH * i2,
+									j + RUBIK_HALF_LENGTH * j2,
+									k + RUBIK_HALF_LENGTH * k2,
+									...WHITE, 1.0, // White
+									"white", vertices.length
+								]);
+							
+							if (k2 == -1)
+								vertices.push([
+									i + RUBIK_HALF_LENGTH * i2,
+									j + RUBIK_HALF_LENGTH * j2,
+									k + RUBIK_HALF_LENGTH * k2,
+									...BLUE, 1.0, // Blue
+									"blue", vertices.length
+								]);
+							
+							if (k2 == 1)
+								vertices.push([
+									i + RUBIK_HALF_LENGTH * i2,
+									j + RUBIK_HALF_LENGTH * j2,
+									k + RUBIK_HALF_LENGTH * k2,
+									...GREEN, 1.0, // Green
+									"green", vertices.length
+								]);
+						}
+					}
+				}
+	
+				sorted_vertices = vertices.sort((a, b) => {
+					return a[7].localeCompare(b[7]);
+				});
+	
+				for (let count = 0; count < vertices.length; count += 4) {
+					vertice_indices.push(
+						count + 0, 
+						count + 1, 
+						count + 2, 
+	
+						count + 0, 
+						count + 1, 
+						count + 3, 
+	
+						count + 0, 
+						count + 2, 
+						count + 1, 
+	
+						count + 0, 
+						count + 2, 
+						count + 3, 
+	
+						count + 0, 
+						count + 3, 
+						count + 1, 
+	
+						count + 0, 
+						count + 3, 
+						count + 2, 
+					);
+				}
+			}
+		}
+	}
+	
+	vertices1d = [].concat(...vertices).filter(e =>
+		e !== 'red' &&
+		e !== 'orange' &&
+		e !== 'white' &&
+		e !== 'yellow' &&
+		e !== 'blue' &&
+		e !== 'green'
+	);
+}
+
+add_buffer_data = () => {
 	vertex_buffer_object = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1d), gl.STATIC_DRAW);
@@ -270,11 +298,25 @@ init = () => {
 	gl.enableVertexAttribArray(color_attribute_locationn);
 
 	// Tell OpenGL state machine which program should be active.
-	gl.useProgram(program);
+	gl.useProgram(program);	
+};
 
+get_matrix_in_shader = () => {
 	mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
 	mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
 	mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
+}
+
+set_up_support_matrix = () => {
+	x_rotation_matrix = new Float32Array(16);
+	y_rotation_matrix = new Float32Array(16);
+	z_rotation_matrix = new Float32Array(16);
+	identity_matrix = new Float32Array(16);
+
+	mat4.identity(x_rotation_matrix);
+	mat4.identity(y_rotation_matrix);
+	mat4.identity(z_rotation_matrix);
+	mat4.identity(identity_matrix);
 
 	world_matrix = new Float32Array(16);
 	view_matrix = new Float32Array(16);
@@ -287,38 +329,31 @@ init = () => {
 		CAMERA_POSITION.z
 	], [0, 0, 0], [0, 1, 0]);
 	mat4.perspective(projection_matrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
+}
 
+add_support_matrix_to_shader = () => {
 	gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 	gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
 	gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
+}
 
-	x_rotation_matrix = new Float32Array(16);
-	y_rotation_matrix = new Float32Array(16);
-	z_rotation_matrix = new Float32Array(16);
+draw = () => {
+	gl.clearColor(gray, gray, gray, 1.0);
+	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+	gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
 
-	//
-	// Main render loop
-	//
-	identity_matrix = new Float32Array(16);
-
-    mat4.identity(identity_matrix);
-
-	mat4.rotate(x_rotation_matrix, identity_matrix, Math.PI / -5, [1, 0, 0]);
-	mat4.rotate(y_rotation_matrix, identity_matrix, Math.PI / 4, [0, 1, 0]);
-	// mat4.rotate(z_rotation_matrix, identity_matrix, Math.PI / 2, [0, 0, 1]);
-	mat4.mul(world_matrix, x_rotation_matrix, y_rotation_matrix, z_rotation_matrix);
+orbit_around_rubik = () => {
+	angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+	
+	mat4.rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
+	mat4.rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
+	mat4.mul(world_matrix, y_rotation_matrix, x_rotation_matrix);
 	
 	gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
+}
 
-	gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-};
-
-function loop() {
-	if (!is_running)
-		return;
-
-	// FPS Counter
-	
+count_fps = () => {
 	timeMeasurements.push(performance.now());
 
 	const msPassed = timeMeasurements[timeMeasurements.length - 1] - timeMeasurements[0];
@@ -329,32 +364,35 @@ function loop() {
 	}
   
 	SHOW_FPS_ELEMENT.innerText = fps;
+}
 
-	// Rotating
+function loop() {
+	if (!is_running)
+		return;
 
-	angle = performance.now() / 1000 / 6 * 2 * Math.PI;
-	
-	mat4.rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
-	mat4.rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
-	mat4.mul(world_matrix, y_rotation_matrix, x_rotation_matrix);
-	
-	gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
-
-	canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
-
-	gl.clearColor(gray, gray, gray, 1.0);
-	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-	gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+	count_fps();
+	orbit_around_rubik();
+	set_up_canvas_dimension();
+	draw();
 
 	requestAnimationFrame(loop);
 };
 
-function start() {
+start = () => {
 	is_running = true;
 	loop();
 }
 
-function stop() {
+stop = () => {
 	is_running = false;
 }
+
+document.querySelector("#create").addEventListener("click", e => {
+	setup_webgl_canvas();
+	init_vertices();
+	add_buffer_data();
+	get_matrix_in_shader();
+	set_up_support_matrix();
+	add_support_matrix_to_shader();
+	draw();
+});

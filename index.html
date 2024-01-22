@@ -67,7 +67,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.5.1/gl-matrix.js" integrity="sha512-P8YGJLVaQHqdx4xWLS4/zl2OzsgoauOtdhlek30IGEmeye3XxXs7ghRcHSeFn+89NRAT7q/ooHY3pO/BfmBCuQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script id="vs" type="x-shader/x-vertex">
-        precision mediump float;
+        precision lowp float;
         
         attribute vec3 vertPosition;
         attribute vec4 vertColor;
@@ -85,7 +85,7 @@
     </script>
 
     <script id="fs" type="x-shader/x-fragment">
-        precision mediump float;
+        precision lowp float;
         
         varying vec4 fragColor;
 
@@ -96,7 +96,7 @@
 
     <script src="script.js" defer></script>
 </head>
-<body onload="init()">
+<body>
 
     <canvas id="game-surface">
         Your browser does not support HTML5
@@ -104,20 +104,24 @@
 
     <div id="controller">
         <div class="input-block">
-                <p>FPS: <span id="fps"></span></p>
-            </div>
+            <p>FPS: <span id="fps"></span></p>
+        </div>
         <div id="rubik-controller">
             <div class="input-block">
                 <label for="size-x">Rubik Size X:</label>
-                <input id="size-x" min="0" max="10" value="2" size="2">
+                <input id="size-x" type="number" min="1" max="10" value="2" size="4" step="1">
             </div>
             <div class="input-block">
                 <label for="size-y">Rubik Size Y:</label>
-                <input id="size-y" min="0" max="10" value="2" size="2">
+                <input id="size-y" type="number" min="1" max="10" value="2" size="4" step="1">
             </div>
             <div class="input-block">
                 <label for="size-z">Rubik Size Z:</label>
-                <input id="size-z" min="0" max="10" value="2" size="2">
+                <input id="size-z" type="number" min="1" max="10" value="2" size="4" step="1">
+            </div>
+            <div class="input-block">
+                <label for="length">Rubik Length:</label>
+                <input id="length" type="number" min="1" max="10" value="0.75" size="4" step="0.1">
             </div>
             <div class="input-block">
                 <input id="create" type="button" value="Create rubik's cube">
@@ -132,12 +136,12 @@
             </div>
         </div>
         <div id="movement-controller">
-            <button id="">U</button>
-            <button id="">D</button>
-            <button id="">F</button>
-            <button id="">B</button>
-            <button id="">R</button>
-            <button id="">L</button>
+            <button id="rotate-U">U</button>
+            <button id="rotate-D">D</button>
+            <button id="rotate-F">F</button>
+            <button id="rotate-B">B</button>
+            <button id="rotate-R">R</button>
+            <button id="rotate-L">L</button>
         </div>
     </div>
 </body>
