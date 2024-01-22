@@ -92,6 +92,7 @@ setup_webgl_canvas = () => {
         return;
 	}
 
+	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clearColor(gray, gray, gray, 1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.enable(gl.DEPTH_TEST);
@@ -144,7 +145,7 @@ init_vertices = () => {
 	RUBIK_LENGTH = +document.querySelector("#length").value;
 	STICKER_GAP  = +document.querySelector("#sticker-gap").value;
 
-	CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z) / (RUBIK_LENGTH * 1) };
+	CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z + STICKER_GAP * 3) / (RUBIK_LENGTH * 1) };
 	RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
 	END_X   = (RUBIK_SIZE_X - 1) / 2;
 	START_X = -END_X;
@@ -409,4 +410,8 @@ document.querySelector("#create").addEventListener("click", () => {
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
 	console.log(vertices1d);
+});
+
+document.addEventListener("resize", () => {
+	setup_webgl_canvas();
 });
