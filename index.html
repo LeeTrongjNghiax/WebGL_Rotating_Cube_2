@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WebGL Rotating Cube 2</title>
+
+    <style>
+        * {
+            font-size: 20px;
+            color: #eeeeee;
+            font-family: monospace;
+        }
+        body {
+            margin: 0;
+            height: 100vh;
+            box-sizing: border-box;
+            background: #000000;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            width:  75%;
+            height: 90%;
+        }
+        #controller {
+            padding: 0.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        #rubik-controller, #orbit-controller {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        #movement-controller {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        input {
+            padding: 0.25rem;
+            background-color: #121212;
+        }
+        .input-block {
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        button {
+            background: #121212;
+        }
+
+        @media (orientation: portrait) {
+            body {
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.5.1/gl-matrix.js" integrity="sha512-P8YGJLVaQHqdx4xWLS4/zl2OzsgoauOtdhlek30IGEmeye3XxXs7ghRcHSeFn+89NRAT7q/ooHY3pO/BfmBCuQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script id="vs" type="x-shader/x-vertex">
+        precision mediump float;
+        
+        attribute vec3 vertPosition;
+        attribute vec4 vertColor;
+
+        varying vec4 fragColor;
+
+        uniform mat4 mWorld;
+        uniform mat4 mView;
+        uniform mat4 mProj;
+        
+        void main() {
+            fragColor = vertColor;
+            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);
+        }
+    </script>
+
+    <script id="fs" type="x-shader/x-fragment">
+        precision mediump float;
+        
+        varying vec4 fragColor;
+
+        void main() {
+            gl_FragColor = fragColor;
+        }
+    </script>
+
+    <script src="script.js" defer></script>
+</head>
+<body onload="init()">
+
+    <canvas id="game-surface">
+        Your browser does not support HTML5
+    </canvas>
+
+    <div id="controller">
+        <div class="input-block">
+                <p>FPS: <span id="fps"></span></p>
+            </div>
+        <div id="rubik-controller">
+            <div class="input-block">
+                <label for="size-x">Rubik Size X:</label>
+                <input id="size-x" min="0" max="10" value="2" size="2">
+            </div>
+            <div class="input-block">
+                <label for="size-y">Rubik Size Y:</label>
+                <input id="size-y" min="0" max="10" value="2" size="2">
+            </div>
+            <div class="input-block">
+                <label for="size-z">Rubik Size Z:</label>
+                <input id="size-z" min="0" max="10" value="2" size="2">
+            </div>
+            <div class="input-block">
+                <input id="create" type="button" value="Create rubik's cube">
+            </div>
+        </div>
+        <div id="orbit-controller">
+            <div class="input-block">
+                <input id="start" type="button" value="Start rotating" onclick="start()">
+            </div>
+            <div class="input-block">
+                <input id="stop" type="button" value="Stop rotating" onclick="stop()">
+            </div>
+        </div>
+        <div id="movement-controller">
+            <button id="">U</button>
+            <button id="">D</button>
+            <button id="">F</button>
+            <button id="">B</button>
+            <button id="">R</button>
+            <button id="">L</button>
+        </div>
+    </div>
+</body>
+</html>
