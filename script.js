@@ -145,6 +145,7 @@ init_vertices = () => {
 	RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
 	RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
 	RUBIK_LENGTH = +document.querySelector("#length").value;
+	STICKER_GAP  = +document.querySelector("#sticker-gap").value;
 
 	CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z) / (RUBIK_LENGTH * 1) };
 	RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
@@ -162,63 +163,61 @@ init_vertices = () => {
 	for (i = START_X; i <= END_X; i += 1) {
 		for (j = START_Y; j <= END_Y; j += 1) {
 			for (k = START_Z; k <= END_Z; k += 1) {
-
-				console.log( "i: " + i );
 	
 				for (i2 = -1; i2 < 2; i2 += 2) {
 					for (j2 = -1; j2 < 2; j2 += 2) {
 						for (k2 = -1; k2 < 2; k2 += 2) {
 	
-							if (i2 == -1)
+							if (i2 == -1 && i == START_X)
 								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
+									i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
 									j + RUBIK_HALF_LENGTH * j2,
 									k + RUBIK_HALF_LENGTH * k2,
 									...ORANGE, 1.0, // Orange
 									"orange", vertices.length
 								]);
 							
-							if (i2 == 1)
+							if (i2 == 1 && i == END_X)
 								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
+									i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
 									j + RUBIK_HALF_LENGTH * j2,
 									k + RUBIK_HALF_LENGTH * k2,
 									...RED, 1.0, // Red
 									"red", vertices.length
 								]);
 							
-							if (j2 == -1)
+							if (j2 == -1 && j == START_Y)
 								vertices.push([
 									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
+									j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
 									k + RUBIK_HALF_LENGTH * k2,
 									...YELLOW, 1.0, // Yellow
 									"yellow", vertices.length
 								]);
 							
-							if (j2 == 1)
+							if (j2 == 1 && j == END_Y)
 								vertices.push([
 									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
+									j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
 									k + RUBIK_HALF_LENGTH * k2,
 									...WHITE, 1.0, // White
 									"white", vertices.length
 								]);
 							
-							if (k2 == -1)
+							if (k2 == -1 && k == START_Z)
 								vertices.push([
 									i + RUBIK_HALF_LENGTH * i2,
 									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
+									k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
 									...BLUE, 1.0, // Blue
 									"blue", vertices.length
 								]);
 							
-							if (k2 == 1)
+							if (k2 == 1 && k == END_Z)
 								vertices.push([
 									i + RUBIK_HALF_LENGTH * i2,
 									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
+									k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
 									...GREEN, 1.0, // Green
 									"green", vertices.length
 								]);
