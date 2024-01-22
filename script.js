@@ -1,9 +1,6 @@
 const VERTEX_SHADER_TEXT = document.querySelector("#vs").innerHTML;
 const FRAGMENT_SHADER_TEXT = document.querySelector("#fs").innerHTML;
 
-const CANVAS_WIDTH = innerWidth * 3 / 4;
-const CANVAS_HEIGHT = innerHeight * 3 / 4;
-
 const gray = 18 / 255;
 const WHITE  = [1.0, 1.0, 1.0];
 const YELLOW = [1.0, 1.0, 0.0];
@@ -79,8 +76,8 @@ let START_Z;
 let i, j, k, i2, j2, k2, count;
 
 set_up_canvas_dimension = () => {
-	canvas.width = CANVAS_WIDTH;
-	canvas.height = CANVAS_HEIGHT;
+	canvas.width = innerWidth * 9 / 10;
+	canvas.height = innerHeight * 9 / 10;
 }
 
 setup_webgl_canvas = () => {
@@ -157,6 +154,7 @@ init_vertices = () => {
 	START_Z = -END_Z;
 
 	vertices = [];
+	vertices1d = [];
 	vertice_indices = [];
 	sorted_vertices = [];
 
@@ -392,7 +390,14 @@ stop = () => {
 	is_running = false;
 }
 
-document.querySelector("#create").addEventListener("click", e => {
+document.querySelector("#show-control").addEventListener("click", () => {
+	if (document.querySelector("#controller").style.left == "0px")
+		document.querySelector("#controller").style.left = "-100%";
+	else
+		document.querySelector("#controller").style.left = "0px";
+});
+
+document.querySelector("#create").addEventListener("click", () => {
 	setup_webgl_canvas();
 	init_vertices();
 	add_buffer_data();
@@ -400,4 +405,8 @@ document.querySelector("#create").addEventListener("click", e => {
 	set_up_support_matrix();
 	add_support_matrix_to_shader();
 	draw();
+});
+
+document.querySelector("#rotate-U").addEventListener("click", () => {
+	console.log(vertices1d);
 });
