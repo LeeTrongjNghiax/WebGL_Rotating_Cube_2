@@ -317,22 +317,22 @@ set_up_support_matrix = () => {
 	z_rotation_matrix = new Float32Array(16);
 	identity_matrix = new Float32Array(16);
 
-	mat4.identity(x_rotation_matrix);
-	mat4.identity(y_rotation_matrix);
-	mat4.identity(z_rotation_matrix);
-	mat4.identity(identity_matrix);
+	identity(x_rotation_matrix);
+	identity(y_rotation_matrix);
+	identity(z_rotation_matrix);
+	identity(identity_matrix);
 
 	world_matrix = new Float32Array(16);
 	view_matrix = new Float32Array(16);
 	projection_matrix = new Float32Array(16);
 
-	mat4.identity(world_matrix);
-	mat4.lookAt(view_matrix, [
+	identity(world_matrix);
+	lookAt(view_matrix, [
 		CAMERA_POSITION.x,
 		CAMERA_POSITION.y,
 		CAMERA_POSITION.z
 	], [0, 0, 0], [0, 1, 0]);
-	mat4.perspective(projection_matrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
+	perspective(projection_matrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
 }
 
 add_support_matrix_to_shader = () => {
@@ -350,9 +350,9 @@ draw = () => {
 orbit_around_rubik = () => {
 	angle = performance.now() / 1000 / 6 * 2 * Math.PI;
 	
-	mat4.rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
-	mat4.rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
-	mat4.mul(world_matrix, y_rotation_matrix, x_rotation_matrix);
+	rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
+	rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
+	multiply(world_matrix, y_rotation_matrix, x_rotation_matrix);
 	
 	gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
@@ -409,7 +409,7 @@ document.querySelector("#create").addEventListener("click", () => {
 });
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
-	console.log(vertices1d);
+	console.log(vertices);
 });
 
 document.addEventListener("resize", () => {
