@@ -72,7 +72,11 @@ let START_X ;
 let END_Y   ;
 let START_Y ;
 let END_Z   ;
-let START_Z ;
+let START_Z;
+
+// index
+
+let i, j, k, i2, j2, k2, count;
 
 set_up_canvas_dimension = () => {
 	canvas.width = CANVAS_WIDTH;
@@ -155,13 +159,15 @@ init_vertices = () => {
 	vertice_indices = [];
 	sorted_vertices = [];
 
-	for (let i = START_X; i <= END_X; i += 1) {
-		for (let j = START_Y; j <= END_Y; j += 1) {
-			for (let k = START_Z; k <= END_Z; k += 1) {
+	for (i = START_X; i <= END_X; i += 1) {
+		for (j = START_Y; j <= END_Y; j += 1) {
+			for (k = START_Z; k <= END_Z; k += 1) {
+
+				console.log( "i: " + i );
 	
-				for (let i2 = -1; i2 < 2; i2 += 2) {
-					for (let j2 = -1; j2 < 2; j2 += 2) {
-						for (let k2 = -1; k2 < 2; k2 += 2) {
+				for (i2 = -1; i2 < 2; i2 += 2) {
+					for (j2 = -1; j2 < 2; j2 += 2) {
+						for (k2 = -1; k2 < 2; k2 += 2) {
 	
 							if (i2 == -1)
 								vertices.push([
@@ -224,7 +230,7 @@ init_vertices = () => {
 					return a[7].localeCompare(b[7]);
 				});
 	
-				for (let count = 0; count < vertices.length; count += 4) {
+				for (count = 0; count < vertices.length; count += 4) {
 					vertice_indices.push(
 						count + 0, 
 						count + 1, 
@@ -366,7 +372,7 @@ count_fps = () => {
 	SHOW_FPS_ELEMENT.innerText = fps;
 }
 
-function loop() {
+loop = () => {
 	if (!is_running)
 		return;
 
