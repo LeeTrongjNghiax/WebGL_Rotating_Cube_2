@@ -2,8 +2,8 @@
 // Shader
 //
 
-const VERTEX_SHADER_TEXT = document.querySelector("#vs").innerHTML;
-const FRAGMENT_SHADER_TEXT = document.querySelector("#fs").innerHTML;
+let vertex_shader_text;
+let fragment_shader_text;
 
 let vertex_shader;
 let fragment_shader;
@@ -26,21 +26,30 @@ let left_color  = [1.0, 0.5, 0.0];
 // Input
 //
 
-let canvas = document.querySelector('#game-surface');
+let canvas;
+
+let rubik_size_x;
+let rubik_size_y;
+let rubik_size_z;
+let rubik_length;
+let sticker_gap;
 
 let rotate_angle_x;
 let rotate_angle_y;
 let rotate_angle_z;
 
+let fovy;
+let aspect_ratio;
+let near;
+let far;
+
 let draw_mode;
 let draw_mode_value;
 
-let RUBIK_SIZE_X;
-let RUBIK_SIZE_Y;
-let RUBIK_SIZE_Z;
-let RUBIK_LENGTH;
-let CAMERA_POSITION;
-let RUBIK_HALF_LENGTH;
+let camera_position;
+let camera_look_at;
+
+let rubik_half_length;
 let END_X;
 let START_X;
 let END_Y;
@@ -58,7 +67,7 @@ let i, j, k, i2, j2, k2, count;
 // count_fps variable
 //
 
-const SHOW_FPS_ELEMENT = document.querySelector("#fps");
+let show_fps_element;
 const DECIMAL_PLACES = 2;
 const UPDATE_EACH_SECOND = 1;
 
@@ -87,9 +96,9 @@ let gl;
 
 let program;
 
-let cubie_objects = [];
-let vertices = [];
-let vertice_indices = [];
+let cubie_objects;
+let vertices;
+let vertice_indices;
 let sorted_vertices;
 
 let vertex_buffer_object;
@@ -115,25 +124,38 @@ let y_rotation_matrix;
 let z_rotation_matrix;
 let identity_matrix;
 
-// Perspective matrix data
-
-let fovy;
-let aspect_ratio;
-let near;
-let far;
-
 get_input_data = () => {
+    vertex_shader_text = document.querySelector("#vs").innerHTML;
+    fragment_shader_text = document.querySelector("#fs").innerHTML;
+    show_fps_element = document.querySelector("#fps")
+    
     canvas = document.querySelector('#game-surface');
 
-    RUBIK_SIZE_X = +document.querySelector("#size-x").value || 2;
-    RUBIK_SIZE_Y = +document.querySelector("#size-y").value || 2;
-    RUBIK_SIZE_Z = +document.querySelector("#size-z").value || 2;
-    RUBIK_LENGTH = +document.querySelector("#length").value || 1;
-    STICKER_GAP = +document.querySelector("#sticker-gap").value || 0;
+    rubik_size_x = +document.querySelector("#size-x").value || 2;
+    rubik_size_y = +document.querySelector("#size-y").value || 2;
+    rubik_size_z = +document.querySelector("#size-z").value || 2;
+    rubik_length = +document.querySelector("#length").value || 1;
+    sticker_gap = +document.querySelector("#sticker-gap").value || 0;
 
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
     rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
+
+    camera_position = {
+        x: +document.querySelector("#camera-x").value,
+        y: +document.querySelector("#camera-y").value,
+        z: +document.querySelector("#camera-z").value,
+    };
+
+    camera_look_at = {
+        x: +document.querySelector("#look-at-x").value,
+        y: +document.querySelector("#look-at-y").value,
+        z: +document.querySelector("#look-at-z").value,
+    }
+
+    fovy = +document.querySelector("#fovy").value || toRadian(45);
+    near = +document.querySelector("#near").value || 0.1;
+    far = +document.querySelector("#far").value || 100;
 
     up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
     down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
@@ -141,10 +163,6 @@ get_input_data = () => {
     back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
     right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
-    
-    fovy = +document.querySelector("#fovy").value || toRadian(45);
-    near = +document.querySelector("#near").value || 0.1;
-    far = +document.querySelector("#far").value || 100;
 }
 
 set_up_canvas_dimension = () => {
@@ -185,8 +203,8 @@ setup_webgl_canvas = () => {
     vertex_shader = gl.createShader(gl.VERTEX_SHADER);
     fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
 
-    gl.shaderSource(vertex_shader, VERTEX_SHADER_TEXT);
-    gl.shaderSource(fragment_shader, FRAGMENT_SHADER_TEXT);
+    gl.shaderSource(vertex_shader, vertex_shader_text);
+    gl.shaderSource(fragment_shader, fragment_shader_text);
 
     gl.compileShader(vertex_shader);
     if (!gl.getShaderParameter(vertex_shader, gl.COMPILE_STATUS)) {
@@ -218,13 +236,12 @@ setup_webgl_canvas = () => {
 }
 
 init_vertices = () => {
-    CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z + STICKER_GAP * 3) / (RUBIK_LENGTH * 1) };
-    RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
-    END_X = (RUBIK_SIZE_X - 1) / 2;
+    rubik_half_length = rubik_length / 2
+    END_X = (rubik_size_x - 1) / 2;
     START_X = -END_X;
-    END_Y = (RUBIK_SIZE_Y - 1) / 2;
+    END_Y = (rubik_size_y - 1) / 2;
     START_Y = -END_Y;
-    END_Z = (RUBIK_SIZE_Z - 1) / 2;
+    END_Z = (rubik_size_z - 1) / 2;
     START_Z = -END_Z;
 
     cubie_objects = [];
@@ -244,9 +261,9 @@ init_vertices = () => {
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
-                                            i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
-                                            j + RUBIK_HALF_LENGTH * j2,
-                                            k + RUBIK_HALF_LENGTH * k2,
+                                            i + rubik_half_length * i2 - sticker_gap,
+                                            j + rubik_half_length * j2,
+                                            k + rubik_half_length * k2,
                                         ),
                                         new Color(
                                             left_color[0],
@@ -262,9 +279,9 @@ init_vertices = () => {
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
-                                            i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
-                                            j + RUBIK_HALF_LENGTH * j2,
-                                            k + RUBIK_HALF_LENGTH * k2,
+                                            i + rubik_half_length * i2 + sticker_gap,
+                                            j + rubik_half_length * j2,
+                                            k + rubik_half_length * k2,
                                         ),
                                         new Color(
                                             right_color[0],
@@ -280,9 +297,9 @@ init_vertices = () => {
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
-                                            i + RUBIK_HALF_LENGTH * i2,
-                                            j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
-                                            k + RUBIK_HALF_LENGTH * k2,
+                                            i + rubik_half_length * i2,
+                                            j + rubik_half_length * j2 - sticker_gap,
+                                            k + rubik_half_length * k2,
                                         ),
                                         new Color(
                                             down_color[0],
@@ -298,9 +315,9 @@ init_vertices = () => {
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
-                                            i + RUBIK_HALF_LENGTH * i2,
-                                            j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
-                                            k + RUBIK_HALF_LENGTH * k2,
+                                            i + rubik_half_length * i2,
+                                            j + rubik_half_length * j2 + sticker_gap,
+                                            k + rubik_half_length * k2,
                                         ),
                                         new Color(
                                             up_color[0],
@@ -316,9 +333,9 @@ init_vertices = () => {
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
-                                            i + RUBIK_HALF_LENGTH * i2,
-                                            j + RUBIK_HALF_LENGTH * j2,
-                                            k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
+                                            i + rubik_half_length * i2,
+                                            j + rubik_half_length * j2,
+                                            k + rubik_half_length * k2 - sticker_gap,
                                         ),
                                         new Color(
                                             back_color[0],
@@ -334,9 +351,9 @@ init_vertices = () => {
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
-                                            i + RUBIK_HALF_LENGTH * i2,
-                                            j + RUBIK_HALF_LENGTH * j2,
-                                            k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
+                                            i + rubik_half_length * i2,
+                                            j + rubik_half_length * j2,
+                                            k + rubik_half_length * k2 + sticker_gap,
                                         ),
                                         new Color(
                                             front_color[0],
@@ -448,10 +465,14 @@ set_up_support_matrix = () => {
 
     identity(world_matrix);
     lookAt(view_matrix, [
-        CAMERA_POSITION.x,
-        CAMERA_POSITION.y,
-        CAMERA_POSITION.z
-    ], [0, 0, 0], [0, 1, 0]);
+        camera_position.x,
+        camera_position.y,
+        camera_position.z, 
+    ], [
+        camera_look_at.x, 
+        camera_look_at.y, 
+        camera_look_at.z, 
+    ], [0, 1, 0]);
     perspective(
         projection_matrix,
         toRadian(fovy),
@@ -527,7 +548,7 @@ count_fps = () => {
         timeMeasurements = [];
     }
 
-    SHOW_FPS_ELEMENT.innerText = fps;
+    show_fps_element.innerText = fps;
 }
 
 loop = () => {
