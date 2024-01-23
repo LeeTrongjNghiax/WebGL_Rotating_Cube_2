@@ -87,6 +87,32 @@
 
 
         <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Orbit</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <label for="rotate-angle-x">Rotate angle X:</label>
+                    <input id="rotate-angle-x" type="number" min="-10" max="10" value="1" size="2" step="0.1">
+                </div>
+                <div class="input-block">
+                    <label for="rotate-angle-y">Rotate angle Y:</label>
+                    <input id="rotate-angle-y" type="number" min="-10" max="10" value="1" size="2" step="0.1">
+                </div>
+                <div class="input-block">
+                    <label for="rotate-angle-z">Rotate angle Z:</label>
+                    <input id="rotate-angle-z" type="number" min="-10" max="10" value="1" size="2" step="0.1">
+                </div>
+                <div class="input-block">
+                    <button id="start" onclick="start()">Start rotating</button>
+                </div>
+                <div class="input-block">
+                    <button id="stop" onclick="stop()">Stop rotating</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dropdown">
             <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Draw mode</p>
 
             <div class="dropdown-content">
@@ -133,20 +159,6 @@
                 <div class="input-block">
                     <label for="left-color">Left color:</label>
                     <input id="left-color" type="color" value="#FFA700">
-                </div>    
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Orbit</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <input id="start" type="button" value="Start rotating" onclick="start()">
-                </div>
-                <div class="input-block">
-                    <input id="stop" type="button" value="Stop rotating" onclick="stop()">
                 </div>
             </div>
         </div>

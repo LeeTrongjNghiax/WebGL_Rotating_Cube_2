@@ -11,6 +11,10 @@ let back_color  = [0.0, 0.0, 1.0];
 let right_color = [1.0, 0.0, 0.0];
 let left_color  = [1.0, 0.5, 0.0];
 
+let rotate_angle_x;
+let rotate_angle_y;
+let rotate_angle_z;
+
 let canvas;
 let gl;
 
@@ -43,7 +47,13 @@ let y_rotation_matrix;
 let z_rotation_matrix;
 let identity_matrix;
 
-let angle = 0;
+let draw_mode;
+let draw_mode_value;
+
+let angle_constant;
+let angle_x = 0;
+let angle_y = 0;
+let angle_z = 0;
 
 let is_running = false;
 
@@ -92,6 +102,10 @@ get_input_data = () => {
     back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value);
     right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value);
     left_color  = hex_to_normalize_rgb(document.querySelector("#left-color").value);
+
+    rotate_angle_x = +document.querySelector("#rotate-angle-x").value
+    rotate_angle_y = +document.querySelector("#rotate-angle-y").value
+    rotate_angle_z = +document.querySelector("#rotate-angle-z").value
 }
 
 set_up_canvas_dimension = () => {
@@ -404,10 +418,10 @@ draw_triangle_fan = () => {
 }
 
 draw = () => {
-    let select = document.getElementById("draw-mode");
-    let text = select.options[select.selectedIndex].value;
+    draw_mode = document.getElementById("draw-mode");
+    draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
 
-    switch (text) {
+    switch (draw_mode_value) {
         case "points":
             draw_points();
             break;
@@ -433,11 +447,16 @@ draw = () => {
 }
 
 orbit_around_rubik = () => {
-    angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+    angle_constant = performance.now() / 1000 / 6;
 
-    rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
-    rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
-    multiply(world_matrix, y_rotation_matrix, x_rotation_matrix);
+    angle_x = angle_constant * rotate_angle_x % (2 * Math.PI);
+    angle_y = angle_constant * rotate_angle_y % (2 * Math.PI);
+    angle_z = angle_constant * rotate_angle_z % (2 * Math.PI);
+
+    rotate(x_rotation_matrix, identity_matrix, angle_x, [1, 0, 0]);
+    rotate(y_rotation_matrix, identity_matrix, angle_y, [0, 1, 0]);
+    rotate(z_rotation_matrix, identity_matrix, angle_z, [0, 0, 1]);
+    multiply(world_matrix, z_rotation_matrix, y_rotation_matrix, x_rotation_matrix);
 
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
