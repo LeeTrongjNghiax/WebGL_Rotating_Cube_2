@@ -1,13 +1,15 @@
 const VERTEX_SHADER_TEXT = document.querySelector("#vs").innerHTML;
 const FRAGMENT_SHADER_TEXT = document.querySelector("#fs").innerHTML;
 
-const gray = 200 / 255;
-const WHITE = [1.0, 1.0, 1.0];
-const YELLOW = [1.0, 1.0, 0.0];
-const GREEN = [0.0, 1.0, 0.0];
-const BLUE = [0.0, 0.0, 1.0];
-const RED = [1.0, 0.0, 0.0];
-const ORANGE = [1.0, 0.5, 0.0];
+const LIGHT_COLOR = 255 / 255;
+const DARK_COLOR = 0 / 255;
+
+let up_color    = [1.0, 1.0, 1.0];
+let down_color  = [1.0, 1.0, 0.0];
+let front_color = [0.0, 1.0, 0.0];
+let back_color  = [0.0, 0.0, 1.0];
+let right_color = [1.0, 0.0, 0.0];
+let left_color  = [1.0, 0.5, 0.0];
 
 let canvas;
 let gl;
@@ -75,14 +77,36 @@ let START_Z;
 
 let i, j, k, i2, j2, k2, count;
 
+get_input_data = () => {
+    canvas = document.querySelector('#game-surface');
+
+    RUBIK_SIZE_X = +document.querySelector("#size-x").value;
+    RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
+    RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
+    RUBIK_LENGTH = +document.querySelector("#length").value;
+    STICKER_GAP = +document.querySelector("#sticker-gap").value;
+
+    up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value);
+    down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value);
+    front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value);
+    back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value);
+    right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value);
+    left_color  = hex_to_normalize_rgb(document.querySelector("#left-color").value);
+}
+
 set_up_canvas_dimension = () => {
     canvas.width = innerWidth * 9 / 10;
     canvas.height = innerHeight * 9 / 10;
 }
 
-setup_webgl_canvas = () => {
-    canvas = document.getElementById('game-surface');
+clear_canvas = () => {
+    if (document.body.classList.contains("light-mode"))
+        gl.clearColor(LIGHT_COLOR, LIGHT_COLOR, LIGHT_COLOR, 1.0);
+    else
+        gl.clearColor(DARK_COLOR, DARK_COLOR, DARK_COLOR, 1.0);
+}
 
+setup_webgl_canvas = () => {
     set_up_canvas_dimension();
 
     gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -93,7 +117,9 @@ setup_webgl_canvas = () => {
     }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(gray, gray, gray, 1.0);
+
+    clear_canvas();
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -139,12 +165,6 @@ setup_webgl_canvas = () => {
 }
 
 init_vertices = () => {
-    RUBIK_SIZE_X = +document.querySelector("#size-x").value;
-    RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
-    RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
-    RUBIK_LENGTH = +document.querySelector("#length").value;
-    STICKER_GAP = +document.querySelector("#sticker-gap").value;
-
     CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z + STICKER_GAP * 3) / (RUBIK_LENGTH * 1) };
     RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
     END_X = (RUBIK_SIZE_X - 1) / 2;
@@ -172,7 +192,7 @@ init_vertices = () => {
                                     i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
                                     j + RUBIK_HALF_LENGTH * j2,
                                     k + RUBIK_HALF_LENGTH * k2,
-                                    ...ORANGE, 1.0, // Orange
+                                    ...left_color, 1.0, // Orange
                                     "orange", vertices.length
                                 ]);
 
@@ -181,7 +201,7 @@ init_vertices = () => {
                                     i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
                                     j + RUBIK_HALF_LENGTH * j2,
                                     k + RUBIK_HALF_LENGTH * k2,
-                                    ...RED, 1.0, // Red
+                                    ...right_color, 1.0, // Red
                                     "red", vertices.length
                                 ]);
 
@@ -190,7 +210,7 @@ init_vertices = () => {
                                     i + RUBIK_HALF_LENGTH * i2,
                                     j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
                                     k + RUBIK_HALF_LENGTH * k2,
-                                    ...YELLOW, 1.0, // Yellow
+                                    ...down_color, 1.0, // Yellow
                                     "yellow", vertices.length
                                 ]);
 
@@ -199,7 +219,7 @@ init_vertices = () => {
                                     i + RUBIK_HALF_LENGTH * i2,
                                     j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
                                     k + RUBIK_HALF_LENGTH * k2,
-                                    ...WHITE, 1.0, // White
+                                    ...up_color, 1.0, // White
                                     "white", vertices.length
                                 ]);
 
@@ -208,7 +228,7 @@ init_vertices = () => {
                                     i + RUBIK_HALF_LENGTH * i2,
                                     j + RUBIK_HALF_LENGTH * j2,
                                     k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
-                                    ...BLUE, 1.0, // Blue
+                                    ...back_color, 1.0, // Blue
                                     "blue", vertices.length
                                 ]);
 
@@ -217,7 +237,7 @@ init_vertices = () => {
                                     i + RUBIK_HALF_LENGTH * i2,
                                     j + RUBIK_HALF_LENGTH * j2,
                                     k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
-                                    ...GREEN, 1.0, // Green
+                                    ...front_color, 1.0, // Green
                                     "green", vertices.length
                                 ]);
                         }
@@ -342,42 +362,43 @@ add_support_matrix_to_shader = () => {
 }
 
 draw_points = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas();
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.POINTS, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
 draw_lines = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas();
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.LINES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
 draw_line_loop = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas();
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.LINE_LOOP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
 draw_line_strip = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas();
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.LINE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
 draw_triangles = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas()
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
 draw_triangle_strip = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas();
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
+
 draw_triangle_fan = () => {
-    gl.clearColor(gray, gray, gray, 1.0);
+    clear_canvas();
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLE_FAN, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
@@ -455,27 +476,11 @@ stop = () => {
     is_running = false;
 }
 
-document.querySelector("#show-control").addEventListener("click", () => {
-    if (document.querySelector("#controller").style.left == "0px")
-        document.querySelector("#controller").style.left = "-100%";
+show_drop_down = e => {
+    e.nextElementSibling.classList.toggle("show");
+
+    if ( e.nextElementSibling.classList.contains("show") )
+        e.childNodes[0].innerHTML = "△"
     else
-        document.querySelector("#controller").style.left = "0px";
-});
-
-document.querySelector("#create").addEventListener("click", () => {
-    setup_webgl_canvas();
-    init_vertices();
-    add_buffer_data();
-    get_matrix_in_shader();
-    set_up_support_matrix();
-    add_support_matrix_to_shader();
-    draw();
-});
-
-document.querySelector("#rotate-U").addEventListener("click", () => {
-    console.log(vertices);
-});
-
-document.addEventListener("resize", () => {
-    setup_webgl_canvas();
-});
+        e.childNodes[0].innerHTML = "▽"
+}

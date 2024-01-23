@@ -12,82 +12,161 @@
     <script src="function.js"></script>
 
     <script id="vs" type="x-shader/x-vertex">
-        precision lowp float; attribute vec3 vertPosition; attribute vec4 vertColor; varying vec4 fragColor; uniform mat4 mWorld; uniform mat4 mView; uniform mat4 mProj; void main() { fragColor = vertColor; gl_Position = mProj * mView * mWorld * vec4(vertPosition,
-        1.0); }
+        precision lowp float; 
+        attribute vec3 vertPosition; attribute vec4 vertColor; 
+        
+        varying vec4 fragColor; 
+        
+        uniform mat4 mWorld; 
+        uniform mat4 mView; 
+        uniform mat4 mProj; 
+        
+        void main() { 
+            fragColor = vertColor; 
+            gl_Position = mProj * mView * mWorld * vec4(vertPosition,
+        1.0); 
+        }
     </script>
 
     <script id="fs" type="x-shader/x-fragment">
-        precision lowp float; varying vec4 fragColor; void main() { gl_FragColor = fragColor; }
+        precision lowp float; 
+        
+        varying vec4 fragColor; 
+        
+        void main() { 
+            gl_FragColor = fragColor; 
+        }
     </script>
 
     <script src="script.js" defer></script>
+    <script src="add_event_listener.js" defer></script>
 </head>
 
 <body>
 
-    <button id="show-control">Show control</button>
+    <div class="button-block">
+        <button id="change-theme">Change theme</button>
+        <button id="show-control">Show control</button>
+        <button id="create">Create rubik's cube</button>
+    </div>
 
     <canvas id="game-surface">
         Your browser does not support HTML5
     </canvas>
 
     <div id="controller">
-        <div class="input-block">
-            <p>FPS: <span id="fps"></span></p>
-        </div>
-        <div id="rubik-controller">
-            <div class="input-block">
-                <label for="size-x">Rubik Size X:</label>
-                <input id="size-x" type="number" min="1" max="100" value="2" size="4" step="1">
-            </div>
-            <div class="input-block">
-                <label for="size-y">Rubik Size Y:</label>
-                <input id="size-y" type="number" min="1" max="100" value="2" size="4" step="1">
-            </div>
-            <div class="input-block">
-                <label for="size-z">Rubik Size Z:</label>
-                <input id="size-z" type="number" min="1" max="100" value="2" size="4" step="1">
-            </div>
-            <div class="input-block">
-                <label for="length">Rubik Length:</label>
-                <input id="length" type="number" min="0" max="10" value="0.75" size="4" step="0.1">
-            </div>
-            <div class="input-block">
-                <label for="sticker-gap">Sticker gap:</label>
-                <input id="sticker-gap" type="number" min="-10" max="10" value="0" size="4" step="0.1">
-            </div>
-            <div class="input-block">
-                <label for="draw-mode">Draw mode:</label>
-                <select name="draw-mode" id="draw-mode">
-                    <option value="points">Points</option>
-                    <option value="lines">Lines</option>
-                    <option value="line_loop">Line Loop</option>
-                    <option value="line_strip">Line Strip</option>
-                    <option value="triangles">Triangles</option>
-                    <option value="triangle_strip">Triangle Strip</option>
-                    <option value="triangle_fan">Triangle Fan</option>
-                </select>
-            </div>
-            <div class="input-block">
-                <input id="create" type="button" value="Create rubik's cube">
+        <p>FPS: <span id="fps"></span></p>
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <label for="size-x">Rubik Size X:</label>
+                    <input id="size-x" type="number" min="1" max="100" value="2" size="4" step="1">
+                </div>
+                <div class="input-block">
+                    <label for="size-y">Rubik Size Y:</label>
+                    <input id="size-y" type="number" min="1" max="100" value="2" size="4" step="1">
+                </div>
+                <div class="input-block">
+                    <label for="size-z">Rubik Size Z:</label>
+                    <input id="size-z" type="number" min="1" max="100" value="2" size="4" step="1">
+                </div>
+                <div class="input-block">
+                    <label for="length">Rubik Length:</label>
+                    <input id="length" type="number" min="0" max="10" value="0.75" size="4" step="0.1">
+                </div>
+                <div class="input-block">
+                    <label for="sticker-gap">Sticker gap:</label>
+                    <input id="sticker-gap" type="number" min="-10" max="10" value="0" size="4" step="0.1">
+                </div>
             </div>
         </div>
-        <div id="orbit-controller">
-            <div class="input-block">
-                <input id="start" type="button" value="Start rotating" onclick="start()">
-            </div>
-            <div class="input-block">
-                <input id="stop" type="button" value="Stop rotating" onclick="stop()">
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Draw mode</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <label for="draw-mode">Draw mode:</label>
+                    <select name="draw-mode" id="draw-mode">
+                        <option value="points">Points</option>
+                        <option value="lines">Lines</option>
+                        <option value="line_loop">Line Loop</option>
+                        <option value="line_strip">Line Strip</option>
+                        <option selected value="triangles">Triangles</option>
+                        <option value="triangle_strip">Triangle Strip</option>
+                        <option value="triangle_fan">Triangle Fan</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div id="movement-controller">
-            <button id="rotate-U">U</button>
-            <button id="rotate-D">D</button>
-            <button id="rotate-F">F</button>
-            <button id="rotate-B">B</button>
-            <button id="rotate-R">R</button>
-            <button id="rotate-L">L</button>
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Color</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <label for="top-color">Top color:</label>
+                    <input id="top-color" type="color" value="#FFFFFF">
+                </div>
+                <div class="input-block">
+                    <label for="bottom-color">Bottom color:</label>
+                    <input id="bottom-color" type="color" value="#FFFF00">
+                </div>
+                <div class="input-block">
+                    <label for="front-color">Front color:</label>
+                    <input id="front-color" type="color" value="#00FF00">
+                </div>
+                <div class="input-block">
+                    <label for="back-color">Back color:</label>
+                    <input id="back-color" type="color" value="#0000FF">
+                </div>
+                <div class="input-block">
+                    <label for="right-color">Right color:</label>
+                    <input id="right-color" type="color" value="#FF0000">
+                </div>
+                <div class="input-block">
+                    <label for="left-color">Left color:</label>
+                    <input id="left-color" type="color" value="#FFA700">
+                </div>    
+            </div>
         </div>
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Orbit</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <input id="start" type="button" value="Start rotating" onclick="start()">
+                </div>
+                <div class="input-block">
+                    <input id="stop" type="button" value="Stop rotating" onclick="stop()">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Movement</p>
+
+            <div class="dropdown-content">
+                <div id="movement-controller">
+                    <button id="rotate-U">U</button>
+                    <button id="rotate-D">D</button>
+                    <button id="rotate-F">F</button>
+                    <button id="rotate-B">B</button>
+                    <button id="rotate-R">R</button>
+                    <button id="rotate-L">L</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 </body>
 

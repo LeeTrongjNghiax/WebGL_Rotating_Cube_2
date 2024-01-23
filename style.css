@@ -1,13 +1,36 @@
+:root {
+    --light-color: #eeeeee;
+    --dark-color: #121212;
+}
+
+.light-mode, 
+.light-mode button, 
+.light-mode #controller, 
+.light-mode input, 
+.light-mode select, 
+.light-mode option {
+    background: var(--light-color);
+    color: var(--dark-color);
+}
+
+.dark-mode, 
+.dark-mode button, 
+.dark-mode #controller, 
+.dark-mode input, 
+.dark-mode select, 
+.dark-mode option {
+    background: var(--dark-color);
+    color: var(--light-color);
+}
+
 *,
 button {
     font-size: 18px;
-    color: #eeeeee;
     font-family: monospace;
 }
 
 body {
     box-sizing: border-box;
-    background: #eeeeee;
     display: flex;
     gap: 1rem;
     flex-direction: column;
@@ -15,8 +38,14 @@ body {
     justify-content: space-around;
 }
 
-#show-control {
-    width: 90%;
+.button-block {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+}
+
+.button-block > button {
+    width: 100%;
     padding: 0.5rem;
 }
 
@@ -28,26 +57,15 @@ canvas {
 
 #controller {
     position: absolute;
+    height: 100vh;
+    overflow: scroll;
     top: 10px;
     left: -100%;
-    padding: 0.25rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    /* justify-content: space-around; */
     transition: left 0.5s;
-    background: #000000aa;
-}
-
-select,
-option {
-    background: #121212;
-}
-
-#rubik-controller,
-#orbit-controller {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
 #movement-controller {
@@ -59,7 +77,6 @@ option {
 
 input {
     padding: 0.25rem;
-    background-color: #121212;
 }
 
 .input-block {
@@ -69,6 +86,41 @@ input {
     justify-content: space-between;
 }
 
-button {
-    background: #121212;
+
+/* Dropdown */
+
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    flex-direction: column;
+}
+
+.dropdown-trigger {
+    font-weight: bolder;
+    font-size: 1.5rem;
+}
+
+.dropdown-trigger:hover {
+    color: green;
+}
+
+.input-container {
+    width: 90%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+.show {
+    display: flex;
+}
+
+@media (orientation: portrait) {
+    .button-block {
+        flex-direction: column;
+    }
 }
