@@ -9,13 +9,11 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <script src="class.js"></script>
-
-    <script src="function.js"></script>
-
     <script id="vs" type="x-shader/x-vertex">
         precision lowp float; 
-        attribute vec3 vertPosition; attribute vec4 vertColor; 
+
+        attribute vec3 vertPosition; 
+        attribute vec4 vertColor; 
         
         varying vec4 fragColor; 
         
@@ -25,8 +23,7 @@
         
         void main() { 
             fragColor = vertColor; 
-            gl_Position = mProj * mView * mWorld * vec4(vertPosition,
-        1.0); 
+            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
         }
     </script>
 
@@ -40,6 +37,8 @@
         }
     </script>
 
+    <script src="class.js"></script>
+    <script src="function.js"></script>
     <script src="script.js" defer></script>
     <script src="add_event_listener.js" defer></script>
 </head>
@@ -48,10 +47,11 @@
 
     <div class="button-block">
         <button id="change-theme">Change theme</button>
-        <button id="show-control">Show control</button>
         <button id="create">Create rubik's cube</button>
+        <button id="create-random">Create random rubik's cube</button>
         <button id="start" onclick="start()">Start rotating</button>
         <button id="stop" onclick="stop()">Stop rotating</button>
+        <button id="show-control">Show control</button>
     </div>
 
     <canvas id="game-surface">

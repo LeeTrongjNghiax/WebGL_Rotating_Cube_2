@@ -1,3 +1,7 @@
+document.addEventListener("resize", () => {
+    setup_webgl_canvas();
+});
+
 document.body.classList.add("dark-mode");
 
 document.getElementById("change-theme").addEventListener('click', e => {
@@ -5,10 +9,6 @@ document.getElementById("change-theme").addEventListener('click', e => {
         document.body.classList.replace("light-mode", "dark-mode");
     else
         document.body.classList.replace("dark-mode", "light-mode");
-});
-
-document.addEventListener("resize", () => {
-    setup_webgl_canvas();
 });
 
 document.querySelector("#show-control").addEventListener("click", () => {
@@ -20,6 +20,17 @@ document.querySelector("#show-control").addEventListener("click", () => {
 
 document.querySelector("#create").addEventListener("click", () => {
     get_input_data();
+    setup_webgl_canvas();
+    init_vertices();
+    add_buffer_data();
+    get_matrix_in_shader();
+    set_up_support_matrix();
+    add_support_matrix_to_shader();
+    draw();
+});
+
+document.querySelector("#create-random").addEventListener("click", () => {
+    get_random_input_data();
     setup_webgl_canvas();
     init_vertices();
     add_buffer_data();

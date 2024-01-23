@@ -51,12 +51,12 @@ let camera_look_at;
 let up_axis;
 
 let rubik_half_length;
-let END_X;
-let START_X;
-let END_Y;
-let START_Y;
-let END_Z;
-let START_Z;
+let end_x;
+let start_x;
+let end_y;
+let start_y;
+let end_z;
+let start_z;
 
 //
 // Index
@@ -68,11 +68,10 @@ let i, j, k, i2, j2, k2, count;
 // count_fps variable
 //
 
-let show_fps_element;
 const DECIMAL_PLACES = 2;
 const UPDATE_EACH_SECOND = 1;
-
 const DECIMAL_PLACES_RATIO = Math.pow(10, DECIMAL_PLACES);
+let show_fps_element;
 let timeMeasurements = [];
 
 let fps = 0;
@@ -172,33 +171,81 @@ get_input_data = () => {
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
 }
 
+get_random_input_data = () => {
+    vertex_shader_text = document.querySelector("#vs").innerHTML;
+    fragment_shader_text = document.querySelector("#fs").innerHTML;
+    show_fps_element = document.querySelector("#fps")
+    
+    canvas = document.querySelector('#game-surface');
+
+    rubik_size_x = +document.querySelector("#size-x").value || 2;
+    rubik_size_y = +document.querySelector("#size-y").value || 2;
+    rubik_size_z = +document.querySelector("#size-z").value || 2;
+    rubik_length = +document.querySelector("#length").value || 1;
+    sticker_gap = +document.querySelector("#sticker-gap").value || 0;
+
+    rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
+    rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
+    rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
+
+    camera_position = {
+        x: +document.querySelector("#camera-x").value || 0, 
+        y: +document.querySelector("#camera-y").value || 0, 
+        z: +document.querySelector("#camera-z").value || -5, 
+    };
+
+    camera_look_at = {
+        x: +document.querySelector("#look-at-x").value || 0, 
+        y: +document.querySelector("#look-at-y").value || 0, 
+        z: +document.querySelector("#look-at-z").value || 0, 
+    }
+
+    up_axis = {
+        x: +document.querySelector("#up-axis-x").value || 0, 
+        y: +document.querySelector("#up-axis-y").value || 1, 
+        z: +document.querySelector("#up-axis-z").value || 0, 
+    }
+
+    fovy = +document.querySelector("#fovy").value || toRadian(45);
+    near = +document.querySelector("#near").value || 0.1;
+    far = +document.querySelector("#far").value || 100;
+
+    up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
+    down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
+    front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
+    back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
+    right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
+    left_color  = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
+}
+
 set_up_canvas_dimension = () => {
     canvas.width = innerWidth * 9 / 10;
     canvas.height = innerHeight * 9 / 10;
 }
 
-clear_canvas = () => {
+reset_canvas = () => {
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    
     if (document.body.classList.contains("light-mode"))
         gl.clearColor(LIGHT_COLOR, LIGHT_COLOR, LIGHT_COLOR, 1.0);
     else
         gl.clearColor(DARK_COLOR, DARK_COLOR, DARK_COLOR, 1.0);
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
 setup_webgl_canvas = () => {
     set_up_canvas_dimension();
 
-    gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
     if (!gl) {
         alert('Your browser does not support WebGL');
         return;
     }
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
-
-    clear_canvas();
-
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    reset_canvas();
+    
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.frontFace(gl.CCW);
@@ -244,27 +291,27 @@ setup_webgl_canvas = () => {
 
 init_vertices = () => {
     rubik_half_length = rubik_length / 2
-    END_X = (rubik_size_x - 1) / 2;
-    START_X = -END_X;
-    END_Y = (rubik_size_y - 1) / 2;
-    START_Y = -END_Y;
-    END_Z = (rubik_size_z - 1) / 2;
-    START_Z = -END_Z;
+    end_x = (rubik_size_x - 1) / 2;
+    start_x = -end_x;
+    end_y = (rubik_size_y - 1) / 2;
+    start_y = -end_y;
+    end_z = (rubik_size_z - 1) / 2;
+    start_z = -end_z;
 
     cubie_objects = [];
     vertices = [];
     vertice_indices = [];
     sorted_vertices = [];
 
-    for (i = START_X; i <= END_X; i += 1) {
-        for (j = START_Y; j <= END_Y; j += 1) {
-            for (k = START_Z; k <= END_Z; k += 1) {
+    for (i = start_x; i <= end_x; i += 1) {
+        for (j = start_y; j <= end_y; j += 1) {
+            for (k = start_z; k <= end_z; k += 1) {
 
                 for (i2 = -1; i2 < 2; i2 += 2) {
                     for (j2 = -1; j2 < 2; j2 += 2) {
                         for (k2 = -1; k2 < 2; k2 += 2) {
 
-                            if (i2 == -1 && i == START_X)
+                            if (i2 == -1 && i == start_x)
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
@@ -282,7 +329,7 @@ init_vertices = () => {
                                     )
                                 );
 
-                            if (i2 == 1 && i == END_X)
+                            if (i2 == 1 && i == end_x)
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
@@ -300,7 +347,7 @@ init_vertices = () => {
                                     )
                                 );
 
-                            if (j2 == -1 && j == START_Y)
+                            if (j2 == -1 && j == start_y)
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
@@ -318,7 +365,7 @@ init_vertices = () => {
                                     )
                                 );
 
-                            if (j2 == 1 && j == END_Y)
+                            if (j2 == 1 && j == end_y)
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
@@ -336,7 +383,7 @@ init_vertices = () => {
                                     )
                                 );
 
-                            if (k2 == -1 && k == START_Z)
+                            if (k2 == -1 && k == start_z)
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
@@ -354,7 +401,7 @@ init_vertices = () => {
                                     )
                                 );
 
-                            if (k2 == 1 && k == END_Z)
+                            if (k2 == 1 && k == end_z)
                                 cubie_objects.push(
                                     new Vertex(
                                         new Position(
@@ -500,9 +547,7 @@ add_support_matrix_to_shader = () => {
 }
 
 draw = () => {
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    reset_canvas();
 
     draw_mode = document.getElementById("draw-mode");
     draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
