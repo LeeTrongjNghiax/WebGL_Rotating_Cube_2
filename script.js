@@ -1,5 +1,16 @@
+//
+// Shader
+//
+
 const VERTEX_SHADER_TEXT = document.querySelector("#vs").innerHTML;
 const FRAGMENT_SHADER_TEXT = document.querySelector("#fs").innerHTML;
+
+let vertex_shader;
+let fragment_shader;
+
+//
+// Color
+//
 
 const LIGHT_COLOR = 255 / 255;
 const DARK_COLOR = 0 / 255;
@@ -11,64 +22,18 @@ let back_color  = [0.0, 0.0, 1.0];
 let right_color = [1.0, 0.0, 0.0];
 let left_color  = [1.0, 0.5, 0.0];
 
+//
+// Input
+//
+
+let canvas = document.querySelector('#game-surface');
+
 let rotate_angle_x;
 let rotate_angle_y;
 let rotate_angle_z;
 
-let canvas = document.querySelector('#game-surface');
-let gl;
-
-let vertex_shader;
-let fragment_shader;
-
-let program;
-
-let vertices = [];
-let vertice_indices = [];
-let vertices1d;
-let sorted_vertices;
-
-let vertex_buffer_object;
-let vertex_index_buffer_object;
-
-let position_attribute_location;
-let color_attribute_locationn;
-
-let mat_world_uniform_location;
-let mat_view_uniform_location;
-let mat_projection_uniform_location;
-
-let world_matrix;
-let view_matrix;
-let projection_matrix;
-
-let x_rotation_matrix;
-let y_rotation_matrix;
-let z_rotation_matrix;
-let identity_matrix;
-
 let draw_mode;
 let draw_mode_value;
-
-let angle_constant;
-let angle_x = 0;
-let angle_y = 0;
-let angle_z = 0;
-
-let is_running = false;
-
-// FPS
-
-const SHOW_FPS_ELEMENT = document.querySelector("#fps");
-const DECIMAL_PLACES = 2;
-const UPDATE_EACH_SECOND = 1;
-
-const DECIMAL_PLACES_RATIO = Math.pow(10, DECIMAL_PLACES);
-let timeMeasurements = [];
-
-let fps = 0;
-
-// Cube
 
 let RUBIK_SIZE_X;
 let RUBIK_SIZE_Y;
@@ -83,29 +48,103 @@ let START_Y;
 let END_Z;
 let START_Z;
 
-// index
+//
+// Index
+//
 
 let i, j, k, i2, j2, k2, count;
+
+//
+// count_fps variable
+//
+
+const SHOW_FPS_ELEMENT = document.querySelector("#fps");
+const DECIMAL_PLACES = 2;
+const UPDATE_EACH_SECOND = 1;
+
+const DECIMAL_PLACES_RATIO = Math.pow(10, DECIMAL_PLACES);
+let timeMeasurements = [];
+
+let fps = 0;
+
+//
+// loop variable
+//
+
+let angle_x = 0;
+let angle_y = 0;
+let angle_z = 0;
+
+let angle_constant;
+
+let is_running = false;
+
+//
+//
+//
+
+let gl;
+
+let program;
+
+let cubie_objects = [];
+let vertices = [];
+let vertice_indices = [];
+let sorted_vertices;
+
+let vertex_buffer_object;
+let vertex_index_buffer_object;
+
+let position_attribute_location;
+let color_attribute_locationn;
+
+let mat_world_uniform_location;
+let mat_view_uniform_location;
+let mat_projection_uniform_location;
+
+//
+// Matrix
+//
+
+let world_matrix;
+let view_matrix;
+let projection_matrix;
+
+let x_rotation_matrix;
+let y_rotation_matrix;
+let z_rotation_matrix;
+let identity_matrix;
+
+// Perspective matrix data
+
+let fovy;
+let aspect_ratio;
+let near;
+let far;
 
 get_input_data = () => {
     canvas = document.querySelector('#game-surface');
 
-    RUBIK_SIZE_X = +document.querySelector("#size-x").value;
-    RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
-    RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
-    RUBIK_LENGTH = +document.querySelector("#length").value;
-    STICKER_GAP = +document.querySelector("#sticker-gap").value;
+    RUBIK_SIZE_X = +document.querySelector("#size-x").value || 2;
+    RUBIK_SIZE_Y = +document.querySelector("#size-y").value || 2;
+    RUBIK_SIZE_Z = +document.querySelector("#size-z").value || 2;
+    RUBIK_LENGTH = +document.querySelector("#length").value || 1;
+    STICKER_GAP = +document.querySelector("#sticker-gap").value || 0;
 
-    up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value);
-    down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value);
-    front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value);
-    back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value);
-    right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value);
-    left_color  = hex_to_normalize_rgb(document.querySelector("#left-color").value);
+    rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
+    rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
+    rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
 
-    rotate_angle_x = +document.querySelector("#rotate-angle-x").value
-    rotate_angle_y = +document.querySelector("#rotate-angle-y").value
-    rotate_angle_z = +document.querySelector("#rotate-angle-z").value
+    up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
+    down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
+    front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
+    back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
+    right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
+    left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
+    
+    fovy = +document.querySelector("#fovy").value || toRadian(45);
+    near = +document.querySelector("#near").value || 0.1;
+    far = +document.querySelector("#far").value || 100;
 }
 
 set_up_canvas_dimension = () => {
@@ -188,8 +227,8 @@ init_vertices = () => {
     END_Z = (RUBIK_SIZE_Z - 1) / 2;
     START_Z = -END_Z;
 
+    cubie_objects = [];
     vertices = [];
-    vertices1d = [];
     vertice_indices = [];
     sorted_vertices = [];
 
@@ -202,67 +241,121 @@ init_vertices = () => {
                         for (k2 = -1; k2 < 2; k2 += 2) {
 
                             if (i2 == -1 && i == START_X)
-                                vertices.push([
-                                    i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
-                                    j + RUBIK_HALF_LENGTH * j2,
-                                    k + RUBIK_HALF_LENGTH * k2,
-                                    ...left_color, 1.0, // Orange
-                                    "orange", vertices.length
-                                ]);
+                                cubie_objects.push(
+                                    new Vertex(
+                                        new Position(
+                                            i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
+                                            j + RUBIK_HALF_LENGTH * j2,
+                                            k + RUBIK_HALF_LENGTH * k2,
+                                        ),
+                                        new Color(
+                                            left_color[0],
+                                            left_color[1], 
+                                            left_color[2], 
+                                            255
+                                        ), 
+                                        "orange", cubie_objects.length
+                                    )
+                                );
 
                             if (i2 == 1 && i == END_X)
-                                vertices.push([
-                                    i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
-                                    j + RUBIK_HALF_LENGTH * j2,
-                                    k + RUBIK_HALF_LENGTH * k2,
-                                    ...right_color, 1.0, // Red
-                                    "red", vertices.length
-                                ]);
+                                cubie_objects.push(
+                                    new Vertex(
+                                        new Position(
+                                            i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
+                                            j + RUBIK_HALF_LENGTH * j2,
+                                            k + RUBIK_HALF_LENGTH * k2,
+                                        ),
+                                        new Color(
+                                            right_color[0],
+                                            right_color[1], 
+                                            right_color[2], 
+                                            255
+                                        ), 
+                                        "red", cubie_objects.length
+                                    )
+                                );
 
                             if (j2 == -1 && j == START_Y)
-                                vertices.push([
-                                    i + RUBIK_HALF_LENGTH * i2,
-                                    j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
-                                    k + RUBIK_HALF_LENGTH * k2,
-                                    ...down_color, 1.0, // Yellow
-                                    "yellow", vertices.length
-                                ]);
+                                cubie_objects.push(
+                                    new Vertex(
+                                        new Position(
+                                            i + RUBIK_HALF_LENGTH * i2,
+                                            j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
+                                            k + RUBIK_HALF_LENGTH * k2,
+                                        ),
+                                        new Color(
+                                            down_color[0],
+                                            down_color[1], 
+                                            down_color[2], 
+                                            255
+                                        ), 
+                                        "yellow", cubie_objects.length
+                                    )
+                                );
 
                             if (j2 == 1 && j == END_Y)
-                                vertices.push([
-                                    i + RUBIK_HALF_LENGTH * i2,
-                                    j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
-                                    k + RUBIK_HALF_LENGTH * k2,
-                                    ...up_color, 1.0, // White
-                                    "white", vertices.length
-                                ]);
+                                cubie_objects.push(
+                                    new Vertex(
+                                        new Position(
+                                            i + RUBIK_HALF_LENGTH * i2,
+                                            j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
+                                            k + RUBIK_HALF_LENGTH * k2,
+                                        ),
+                                        new Color(
+                                            up_color[0],
+                                            up_color[1], 
+                                            up_color[2], 
+                                            255
+                                        ), 
+                                        "white", cubie_objects.length
+                                    )
+                                );
 
                             if (k2 == -1 && k == START_Z)
-                                vertices.push([
-                                    i + RUBIK_HALF_LENGTH * i2,
-                                    j + RUBIK_HALF_LENGTH * j2,
-                                    k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
-                                    ...back_color, 1.0, // Blue
-                                    "blue", vertices.length
-                                ]);
+                                cubie_objects.push(
+                                    new Vertex(
+                                        new Position(
+                                            i + RUBIK_HALF_LENGTH * i2,
+                                            j + RUBIK_HALF_LENGTH * j2,
+                                            k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
+                                        ),
+                                        new Color(
+                                            back_color[0],
+                                            back_color[1], 
+                                            back_color[2], 
+                                            255
+                                        ), 
+                                        "blue", cubie_objects.length
+                                    )
+                                );
 
                             if (k2 == 1 && k == END_Z)
-                                vertices.push([
-                                    i + RUBIK_HALF_LENGTH * i2,
-                                    j + RUBIK_HALF_LENGTH * j2,
-                                    k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
-                                    ...front_color, 1.0, // Green
-                                    "green", vertices.length
-                                ]);
+                                cubie_objects.push(
+                                    new Vertex(
+                                        new Position(
+                                            i + RUBIK_HALF_LENGTH * i2,
+                                            j + RUBIK_HALF_LENGTH * j2,
+                                            k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
+                                        ),
+                                        new Color(
+                                            front_color[0],
+                                            front_color[1], 
+                                            front_color[2], 
+                                            255
+                                        ), 
+                                        "blue", cubie_objects.length
+                                    )
+                                );
                         }
                     }
                 }
 
-                sorted_vertices = vertices.sort((a, b) => {
-                    return a[7].localeCompare(b[7]);
+                sorted_vertices = cubie_objects.sort((a, b) => {
+                    return a.color_name.localeCompare(b.color_name);
                 });
 
-                for (count = 0; count < vertices.length; count += 4) {
+                for (count = 0; count < cubie_objects.length; count += 4) {
                     vertice_indices.push(
                         count + 0,
                         count + 1,
@@ -293,20 +386,13 @@ init_vertices = () => {
         }
     }
 
-    vertices1d = [].concat(...vertices).filter(e =>
-        e !== 'red' &&
-        e !== 'orange' &&
-        e !== 'white' &&
-        e !== 'yellow' &&
-        e !== 'blue' &&
-        e !== 'green'
-    );
+    vertices = [].concat(...cubie_objects.map(cubie => cubie.to_string()));
 }
 
 add_buffer_data = () => {
     vertex_buffer_object = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1d), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
     vertex_index_buffer_object = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
@@ -366,7 +452,13 @@ set_up_support_matrix = () => {
         CAMERA_POSITION.y,
         CAMERA_POSITION.z
     ], [0, 0, 0], [0, 1, 0]);
-    perspective(projection_matrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 1.0, 100.0);
+    perspective(
+        projection_matrix,
+        toRadian(fovy),
+        canvas.clientWidth / canvas.clientHeight,
+        near,
+        far
+    );
 }
 
 add_support_matrix_to_shader = () => {
@@ -420,7 +512,7 @@ orbit_around_rubik = () => {
     rotate(z_rotation_matrix, identity_matrix, angle_z, [0, 0, 1]);
 
     multiply(world_matrix, x_rotation_matrix, y_rotation_matrix);
-    multiply(world_matrix, y_rotation_matrix, z_rotation_matrix);
+    multiply(world_matrix, world_matrix, z_rotation_matrix);
 
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
