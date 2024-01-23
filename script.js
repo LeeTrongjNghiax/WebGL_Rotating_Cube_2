@@ -48,6 +48,7 @@ let draw_mode_value;
 
 let camera_position;
 let camera_look_at;
+let up_axis;
 
 let rubik_half_length;
 let END_X;
@@ -142,15 +143,21 @@ get_input_data = () => {
     rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
 
     camera_position = {
-        x: +document.querySelector("#camera-x").value,
-        y: +document.querySelector("#camera-y").value,
-        z: +document.querySelector("#camera-z").value,
+        x: +document.querySelector("#camera-x").value || 0, 
+        y: +document.querySelector("#camera-y").value || 0, 
+        z: +document.querySelector("#camera-z").value || -5, 
     };
 
     camera_look_at = {
-        x: +document.querySelector("#look-at-x").value,
-        y: +document.querySelector("#look-at-y").value,
-        z: +document.querySelector("#look-at-z").value,
+        x: +document.querySelector("#look-at-x").value || 0, 
+        y: +document.querySelector("#look-at-y").value || 0, 
+        z: +document.querySelector("#look-at-z").value || 0, 
+    }
+
+    up_axis = {
+        x: +document.querySelector("#up-axis-x").value || 0, 
+        y: +document.querySelector("#up-axis-y").value || 1, 
+        z: +document.querySelector("#up-axis-z").value || 0, 
     }
 
     fovy = +document.querySelector("#fovy").value || toRadian(45);
@@ -466,13 +473,17 @@ set_up_support_matrix = () => {
     identity(world_matrix);
     lookAt(view_matrix, [
         camera_position.x,
-        camera_position.y,
+        camera_position.y, 
         camera_position.z, 
     ], [
         camera_look_at.x, 
         camera_look_at.y, 
         camera_look_at.z, 
-    ], [0, 1, 0]);
+    ], [
+        up_axis.x, 
+        up_axis.y, 
+        up_axis.z, 
+    ]);
     perspective(
         projection_matrix,
         toRadian(fovy),
