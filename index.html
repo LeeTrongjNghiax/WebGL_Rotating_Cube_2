@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,35 +12,17 @@
     <script src="function.js"></script>
 
     <script id="vs" type="x-shader/x-vertex">
-        precision lowp float;
-        
-        attribute vec3 vertPosition;
-        attribute vec4 vertColor;
-
-        varying vec4 fragColor;
-
-        uniform mat4 mWorld;
-        uniform mat4 mView;
-        uniform mat4 mProj;
-        
-        void main() {
-            fragColor = vertColor;
-            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);
-        }
+        precision lowp float; attribute vec3 vertPosition; attribute vec4 vertColor; varying vec4 fragColor; uniform mat4 mWorld; uniform mat4 mView; uniform mat4 mProj; void main() { fragColor = vertColor; gl_Position = mProj * mView * mWorld * vec4(vertPosition,
+        1.0); }
     </script>
 
     <script id="fs" type="x-shader/x-fragment">
-        precision lowp float;
-        
-        varying vec4 fragColor;
-
-        void main() {
-            gl_FragColor = fragColor;
-        }
+        precision lowp float; varying vec4 fragColor; void main() { gl_FragColor = fragColor; }
     </script>
 
     <script src="script.js" defer></script>
 </head>
+
 <body>
 
     <button id="show-control">Show control</button>
@@ -74,6 +57,18 @@
                 <input id="sticker-gap" type="number" min="-10" max="10" value="0" size="4" step="0.1">
             </div>
             <div class="input-block">
+                <label for="draw-mode">Draw mode:</label>
+                <select name="draw-mode" id="draw-mode">
+                    <option value="points">Points</option>
+                    <option value="lines">Lines</option>
+                    <option value="line_loop">Line Loop</option>
+                    <option value="line_strip">Line Strip</option>
+                    <option value="triangles">Triangles</option>
+                    <option value="triangle_strip">Triangle Strip</option>
+                    <option value="triangle_fan">Triangle Fan</option>
+                </select>
+            </div>
+            <div class="input-block">
                 <input id="create" type="button" value="Create rubik's cube">
             </div>
         </div>
@@ -95,4 +90,5 @@
         </div>
     </div>
 </body>
+
 </html>

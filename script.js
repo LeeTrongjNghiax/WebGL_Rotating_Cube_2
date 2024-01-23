@@ -1,12 +1,12 @@
 const VERTEX_SHADER_TEXT = document.querySelector("#vs").innerHTML;
 const FRAGMENT_SHADER_TEXT = document.querySelector("#fs").innerHTML;
 
-const gray = 18 / 255;
-const WHITE  = [1.0, 1.0, 1.0];
+const gray = 200 / 255;
+const WHITE = [1.0, 1.0, 1.0];
 const YELLOW = [1.0, 1.0, 0.0];
-const GREEN  = [0.0, 1.0, 0.0];
-const BLUE   = [0.0, 0.0, 1.0];
-const RED    = [1.0, 0.0, 0.0];
+const GREEN = [0.0, 1.0, 0.0];
+const BLUE = [0.0, 0.0, 1.0];
+const RED = [1.0, 0.0, 0.0];
 const ORANGE = [1.0, 0.5, 0.0];
 
 let canvas;
@@ -46,7 +46,7 @@ let angle = 0;
 let is_running = false;
 
 // FPS
-    
+
 const SHOW_FPS_ELEMENT = document.querySelector("#fps");
 const DECIMAL_PLACES = 2;
 const UPDATE_EACH_SECOND = 1;
@@ -64,11 +64,11 @@ let RUBIK_SIZE_Z;
 let RUBIK_LENGTH;
 let CAMERA_POSITION;
 let RUBIK_HALF_LENGTH;
-let END_X   ;
-let START_X ;
-let END_Y   ;
-let START_Y ;
-let END_Z   ;
+let END_X;
+let START_X;
+let END_Y;
+let START_Y;
+let END_Z;
 let START_Z;
 
 // index
@@ -76,342 +76,406 @@ let START_Z;
 let i, j, k, i2, j2, k2, count;
 
 set_up_canvas_dimension = () => {
-	canvas.width = innerWidth * 9 / 10;
-	canvas.height = innerHeight * 9 / 10;
+    canvas.width = innerWidth * 9 / 10;
+    canvas.height = innerHeight * 9 / 10;
 }
 
 setup_webgl_canvas = () => {
-	canvas = document.getElementById('game-surface');
+    canvas = document.getElementById('game-surface');
 
-	set_up_canvas_dimension();
+    set_up_canvas_dimension();
 
-	gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-	
-	if (!gl) {
+    gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+    if (!gl) {
         alert('Your browser does not support WebGL');
         return;
-	}
-
-	gl.viewport(0, 0, canvas.width, canvas.height);
-	gl.clearColor(gray, gray, gray, 1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.enable(gl.DEPTH_TEST);
-	gl.enable(gl.CULL_FACE);
-	gl.frontFace(gl.CCW);
-	gl.cullFace(gl.BACK);
-
-	//
-	// Create shaders
-	// 
-	vertex_shader = gl.createShader(gl.VERTEX_SHADER);
-	fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
-
-	gl.shaderSource(vertex_shader, VERTEX_SHADER_TEXT);
-	gl.shaderSource(fragment_shader, FRAGMENT_SHADER_TEXT);
-
-	gl.compileShader(vertex_shader);
-	if (!gl.getShaderParameter(vertex_shader, gl.COMPILE_STATUS)) {
-		console.error('ERROR compiling vertex shader!', gl.getShaderInfoLog(vertex_shader));
-		return;
-	}
-
-	gl.compileShader(fragment_shader);
-	if (!gl.getShaderParameter(fragment_shader, gl.COMPILE_STATUS)) {
-		console.error('ERROR compiling fragment shader!', gl.getShaderInfoLog(fragment_shader));
-		return;
-	}
-
-	program = gl.createProgram();
-	gl.attachShader(program, vertex_shader);
-    gl.attachShader(program, fragment_shader);
-    
-	gl.linkProgram(program);
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		console.error('ERROR linking program!', gl.getProgramInfoLog(program));
-		return;
     }
-    
-	gl.validateProgram(program);
-	if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-		console.error('ERROR validating program!', gl.getProgramInfoLog(program));
-		return;
-	}
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.frontFace(gl.CCW);
+    gl.cullFace(gl.BACK);
+
+    //
+    // Create shaders
+    // 
+    vertex_shader = gl.createShader(gl.VERTEX_SHADER);
+    fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    gl.shaderSource(vertex_shader, VERTEX_SHADER_TEXT);
+    gl.shaderSource(fragment_shader, FRAGMENT_SHADER_TEXT);
+
+    gl.compileShader(vertex_shader);
+    if (!gl.getShaderParameter(vertex_shader, gl.COMPILE_STATUS)) {
+        console.error('ERROR compiling vertex shader!', gl.getShaderInfoLog(vertex_shader));
+        return;
+    }
+
+    gl.compileShader(fragment_shader);
+    if (!gl.getShaderParameter(fragment_shader, gl.COMPILE_STATUS)) {
+        console.error('ERROR compiling fragment shader!', gl.getShaderInfoLog(fragment_shader));
+        return;
+    }
+
+    program = gl.createProgram();
+    gl.attachShader(program, vertex_shader);
+    gl.attachShader(program, fragment_shader);
+
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error('ERROR linking program!', gl.getProgramInfoLog(program));
+        return;
+    }
+
+    gl.validateProgram(program);
+    if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
+        console.error('ERROR validating program!', gl.getProgramInfoLog(program));
+        return;
+    }
 }
 
 init_vertices = () => {
-	RUBIK_SIZE_X = +document.querySelector("#size-x").value;
-	RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
-	RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
-	RUBIK_LENGTH = +document.querySelector("#length").value;
-	STICKER_GAP  = +document.querySelector("#sticker-gap").value;
+    RUBIK_SIZE_X = +document.querySelector("#size-x").value;
+    RUBIK_SIZE_Y = +document.querySelector("#size-y").value;
+    RUBIK_SIZE_Z = +document.querySelector("#size-z").value;
+    RUBIK_LENGTH = +document.querySelector("#length").value;
+    STICKER_GAP = +document.querySelector("#sticker-gap").value;
 
-	CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z + STICKER_GAP * 3) / (RUBIK_LENGTH * 1) };
-	RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
-	END_X   = (RUBIK_SIZE_X - 1) / 2;
-	START_X = -END_X;
-	END_Y   = (RUBIK_SIZE_Y - 1) / 2;
-	START_Y = -END_Y;
-	END_Z   = (RUBIK_SIZE_Z - 1) / 2;
-	START_Z = -END_Z;
+    CAMERA_POSITION = { x: 0, y: 0, z: (RUBIK_SIZE_X + RUBIK_SIZE_Y + RUBIK_SIZE_Z + STICKER_GAP * 3) / (RUBIK_LENGTH * 1) };
+    RUBIK_HALF_LENGTH = RUBIK_LENGTH / 2
+    END_X = (RUBIK_SIZE_X - 1) / 2;
+    START_X = -END_X;
+    END_Y = (RUBIK_SIZE_Y - 1) / 2;
+    START_Y = -END_Y;
+    END_Z = (RUBIK_SIZE_Z - 1) / 2;
+    START_Z = -END_Z;
 
-	vertices = [];
-	vertices1d = [];
-	vertice_indices = [];
-	sorted_vertices = [];
+    vertices = [];
+    vertices1d = [];
+    vertice_indices = [];
+    sorted_vertices = [];
 
-	for (i = START_X; i <= END_X; i += 1) {
-		for (j = START_Y; j <= END_Y; j += 1) {
-			for (k = START_Z; k <= END_Z; k += 1) {
-	
-				for (i2 = -1; i2 < 2; i2 += 2) {
-					for (j2 = -1; j2 < 2; j2 += 2) {
-						for (k2 = -1; k2 < 2; k2 += 2) {
-	
-							if (i2 == -1 && i == START_X)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									...ORANGE, 1.0, // Orange
-									"orange", vertices.length
-								]);
-							
-							if (i2 == 1 && i == END_X)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2,
-									...RED, 1.0, // Red
-									"red", vertices.length
-								]);
-							
-							if (j2 == -1 && j == START_Y)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
-									k + RUBIK_HALF_LENGTH * k2,
-									...YELLOW, 1.0, // Yellow
-									"yellow", vertices.length
-								]);
-							
-							if (j2 == 1 && j == END_Y)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
-									k + RUBIK_HALF_LENGTH * k2,
-									...WHITE, 1.0, // White
-									"white", vertices.length
-								]);
-							
-							if (k2 == -1 && k == START_Z)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
-									...BLUE, 1.0, // Blue
-									"blue", vertices.length
-								]);
-							
-							if (k2 == 1 && k == END_Z)
-								vertices.push([
-									i + RUBIK_HALF_LENGTH * i2,
-									j + RUBIK_HALF_LENGTH * j2,
-									k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
-									...GREEN, 1.0, // Green
-									"green", vertices.length
-								]);
-						}
-					}
-				}
-	
-				sorted_vertices = vertices.sort((a, b) => {
-					return a[7].localeCompare(b[7]);
-				});
-	
-				for (count = 0; count < vertices.length; count += 4) {
-					vertice_indices.push(
-						count + 0, 
-						count + 1, 
-						count + 2, 
-	
-						count + 0, 
-						count + 1, 
-						count + 3, 
-	
-						count + 0, 
-						count + 2, 
-						count + 1, 
-	
-						count + 0, 
-						count + 2, 
-						count + 3, 
-	
-						count + 0, 
-						count + 3, 
-						count + 1, 
-	
-						count + 0, 
-						count + 3, 
-						count + 2, 
-					);
-				}
-			}
-		}
-	}
-	
-	vertices1d = [].concat(...vertices).filter(e =>
-		e !== 'red' &&
-		e !== 'orange' &&
-		e !== 'white' &&
-		e !== 'yellow' &&
-		e !== 'blue' &&
-		e !== 'green'
-	);
+    for (i = START_X; i <= END_X; i += 1) {
+        for (j = START_Y; j <= END_Y; j += 1) {
+            for (k = START_Z; k <= END_Z; k += 1) {
+
+                for (i2 = -1; i2 < 2; i2 += 2) {
+                    for (j2 = -1; j2 < 2; j2 += 2) {
+                        for (k2 = -1; k2 < 2; k2 += 2) {
+
+                            if (i2 == -1 && i == START_X)
+                                vertices.push([
+                                    i + RUBIK_HALF_LENGTH * i2 - STICKER_GAP,
+                                    j + RUBIK_HALF_LENGTH * j2,
+                                    k + RUBIK_HALF_LENGTH * k2,
+                                    ...ORANGE, 1.0, // Orange
+                                    "orange", vertices.length
+                                ]);
+
+                            if (i2 == 1 && i == END_X)
+                                vertices.push([
+                                    i + RUBIK_HALF_LENGTH * i2 + STICKER_GAP,
+                                    j + RUBIK_HALF_LENGTH * j2,
+                                    k + RUBIK_HALF_LENGTH * k2,
+                                    ...RED, 1.0, // Red
+                                    "red", vertices.length
+                                ]);
+
+                            if (j2 == -1 && j == START_Y)
+                                vertices.push([
+                                    i + RUBIK_HALF_LENGTH * i2,
+                                    j + RUBIK_HALF_LENGTH * j2 - STICKER_GAP,
+                                    k + RUBIK_HALF_LENGTH * k2,
+                                    ...YELLOW, 1.0, // Yellow
+                                    "yellow", vertices.length
+                                ]);
+
+                            if (j2 == 1 && j == END_Y)
+                                vertices.push([
+                                    i + RUBIK_HALF_LENGTH * i2,
+                                    j + RUBIK_HALF_LENGTH * j2 + STICKER_GAP,
+                                    k + RUBIK_HALF_LENGTH * k2,
+                                    ...WHITE, 1.0, // White
+                                    "white", vertices.length
+                                ]);
+
+                            if (k2 == -1 && k == START_Z)
+                                vertices.push([
+                                    i + RUBIK_HALF_LENGTH * i2,
+                                    j + RUBIK_HALF_LENGTH * j2,
+                                    k + RUBIK_HALF_LENGTH * k2 - STICKER_GAP,
+                                    ...BLUE, 1.0, // Blue
+                                    "blue", vertices.length
+                                ]);
+
+                            if (k2 == 1 && k == END_Z)
+                                vertices.push([
+                                    i + RUBIK_HALF_LENGTH * i2,
+                                    j + RUBIK_HALF_LENGTH * j2,
+                                    k + RUBIK_HALF_LENGTH * k2 + STICKER_GAP,
+                                    ...GREEN, 1.0, // Green
+                                    "green", vertices.length
+                                ]);
+                        }
+                    }
+                }
+
+                sorted_vertices = vertices.sort((a, b) => {
+                    return a[7].localeCompare(b[7]);
+                });
+
+                for (count = 0; count < vertices.length; count += 4) {
+                    vertice_indices.push(
+                        count + 0,
+                        count + 1,
+                        count + 2,
+
+                        count + 0,
+                        count + 1,
+                        count + 3,
+
+                        count + 0,
+                        count + 2,
+                        count + 1,
+
+                        count + 0,
+                        count + 2,
+                        count + 3,
+
+                        count + 0,
+                        count + 3,
+                        count + 1,
+
+                        count + 0,
+                        count + 3,
+                        count + 2,
+                    );
+                }
+            }
+        }
+    }
+
+    vertices1d = [].concat(...vertices).filter(e =>
+        e !== 'red' &&
+        e !== 'orange' &&
+        e !== 'white' &&
+        e !== 'yellow' &&
+        e !== 'blue' &&
+        e !== 'green'
+    );
 }
 
 add_buffer_data = () => {
-	vertex_buffer_object = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1d), gl.STATIC_DRAW);
+    vertex_buffer_object = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1d), gl.STATIC_DRAW);
 
-	vertex_index_buffer_object = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
+    vertex_index_buffer_object = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
 
-	position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
-	color_attribute_locationn = gl.getAttribLocation(program, 'vertColor');
+    position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
+    color_attribute_locationn = gl.getAttribLocation(program, 'vertColor');
 
-	gl.vertexAttribPointer(
-		position_attribute_location, // Attribute location
-		3, // Number of elements per attribute
-		gl.FLOAT, // Type of elements
-		gl.FALSE,
-		8 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
-		0 // Offset from the beginning of a single vertex to this attribute
-	);
-	gl.vertexAttribPointer(
-		color_attribute_locationn, // Attribute location
-		4, // Number of elements per attribute
-		gl.FLOAT, // Type of elements
-		gl.FALSE,
-		8 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
-		3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
-	);
+    gl.vertexAttribPointer(
+        position_attribute_location, // Attribute location
+        3, // Number of elements per attribute
+        gl.FLOAT, // Type of elements
+        gl.FALSE,
+        8 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+        0 // Offset from the beginning of a single vertex to this attribute
+    );
+    gl.vertexAttribPointer(
+        color_attribute_locationn, // Attribute location
+        4, // Number of elements per attribute
+        gl.FLOAT, // Type of elements
+        gl.FALSE,
+        8 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+        3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
+    );
 
-	gl.enableVertexAttribArray(position_attribute_location);
-	gl.enableVertexAttribArray(color_attribute_locationn);
+    gl.enableVertexAttribArray(position_attribute_location);
+    gl.enableVertexAttribArray(color_attribute_locationn);
 
-	// Tell OpenGL state machine which program should be active.
-	gl.useProgram(program);	
+    // Tell OpenGL state machine which program should be active.
+    gl.useProgram(program);
 };
 
 get_matrix_in_shader = () => {
-	mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
-	mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
-	mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
+    mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
+    mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
+    mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
 }
 
 set_up_support_matrix = () => {
-	x_rotation_matrix = new Float32Array(16);
-	y_rotation_matrix = new Float32Array(16);
-	z_rotation_matrix = new Float32Array(16);
-	identity_matrix = new Float32Array(16);
+    x_rotation_matrix = new Float32Array(16);
+    y_rotation_matrix = new Float32Array(16);
+    z_rotation_matrix = new Float32Array(16);
+    identity_matrix = new Float32Array(16);
 
-	identity(x_rotation_matrix);
-	identity(y_rotation_matrix);
-	identity(z_rotation_matrix);
-	identity(identity_matrix);
+    identity(x_rotation_matrix);
+    identity(y_rotation_matrix);
+    identity(z_rotation_matrix);
+    identity(identity_matrix);
 
-	world_matrix = new Float32Array(16);
-	view_matrix = new Float32Array(16);
-	projection_matrix = new Float32Array(16);
+    world_matrix = new Float32Array(16);
+    view_matrix = new Float32Array(16);
+    projection_matrix = new Float32Array(16);
 
-	identity(world_matrix);
-	lookAt(view_matrix, [
-		CAMERA_POSITION.x,
-		CAMERA_POSITION.y,
-		CAMERA_POSITION.z
-	], [0, 0, 0], [0, 1, 0]);
-	perspective(projection_matrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
+    identity(world_matrix);
+    lookAt(view_matrix, [
+        CAMERA_POSITION.x,
+        CAMERA_POSITION.y,
+        CAMERA_POSITION.z
+    ], [0, 0, 0], [0, 1, 0]);
+    perspective(projection_matrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
 }
 
 add_support_matrix_to_shader = () => {
-	gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
-	gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
-	gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
+    gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
+    gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
+    gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
+}
+
+draw_points = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.POINTS, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
+
+draw_lines = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.LINES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
+
+draw_line_loop = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.LINE_LOOP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
+
+draw_line_strip = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.LINE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
+
+draw_triangles = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
+
+draw_triangle_strip = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.TRIANGLE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+}
+draw_triangle_fan = () => {
+    gl.clearColor(gray, gray, gray, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.drawElements(gl.TRIANGLE_FAN, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
 draw = () => {
-	gl.clearColor(gray, gray, gray, 1.0);
-	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-	gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+    let select = document.getElementById("draw-mode");
+    let text = select.options[select.selectedIndex].value;
+
+    switch (text) {
+        case "points":
+            draw_points();
+            break;
+        case "lines":
+            draw_lines();
+            break;
+        case "line_loop":
+            draw_line_loop();
+            break;
+        case "line_strip":
+            draw_line_strip();
+            break;
+        case "triangles":
+            draw_triangles();
+            break;
+        case "triangle_strip":
+            draw_triangle_strip();
+            break;
+        case "triangle_fan":
+            draw_triangle_fan();
+            break;
+    }
 }
 
 orbit_around_rubik = () => {
-	angle = performance.now() / 1000 / 6 * 2 * Math.PI;
-	
-	rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
-	rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
-	multiply(world_matrix, y_rotation_matrix, x_rotation_matrix);
-	
-	gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
+    angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+
+    rotate(y_rotation_matrix, identity_matrix, angle, [0, 1, 0]);
+    rotate(x_rotation_matrix, identity_matrix, angle / 4, [1, 0, 0]);
+    multiply(world_matrix, y_rotation_matrix, x_rotation_matrix);
+
+    gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
 count_fps = () => {
-	timeMeasurements.push(performance.now());
+    timeMeasurements.push(performance.now());
 
-	const msPassed = timeMeasurements[timeMeasurements.length - 1] - timeMeasurements[0];
-	
-	if (msPassed >= UPDATE_EACH_SECOND * 1000) {
-		fps = Math.round(timeMeasurements.length / msPassed * 1000 * DECIMAL_PLACES_RATIO) / DECIMAL_PLACES_RATIO;
-		timeMeasurements = [];
-	}
-  
-	SHOW_FPS_ELEMENT.innerText = fps;
+    const msPassed = timeMeasurements[timeMeasurements.length - 1] - timeMeasurements[0];
+
+    if (msPassed >= UPDATE_EACH_SECOND * 1000) {
+        fps = Math.round(timeMeasurements.length / msPassed * 1000 * DECIMAL_PLACES_RATIO) / DECIMAL_PLACES_RATIO;
+        timeMeasurements = [];
+    }
+
+    SHOW_FPS_ELEMENT.innerText = fps;
 }
 
 loop = () => {
-	if (!is_running)
-		return;
+    if (!is_running)
+        return;
 
-	count_fps();
-	orbit_around_rubik();
-	set_up_canvas_dimension();
-	draw();
+    count_fps();
+    orbit_around_rubik();
+    set_up_canvas_dimension();
+    draw();
 
-	requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
 };
 
 start = () => {
-	is_running = true;
-	loop();
+    is_running = true;
+    loop();
 }
 
 stop = () => {
-	is_running = false;
+    is_running = false;
 }
 
 document.querySelector("#show-control").addEventListener("click", () => {
-	if (document.querySelector("#controller").style.left == "0px")
-		document.querySelector("#controller").style.left = "-100%";
-	else
-		document.querySelector("#controller").style.left = "0px";
+    if (document.querySelector("#controller").style.left == "0px")
+        document.querySelector("#controller").style.left = "-100%";
+    else
+        document.querySelector("#controller").style.left = "0px";
 });
 
 document.querySelector("#create").addEventListener("click", () => {
-	setup_webgl_canvas();
-	init_vertices();
-	add_buffer_data();
-	get_matrix_in_shader();
-	set_up_support_matrix();
-	add_support_matrix_to_shader();
-	draw();
+    setup_webgl_canvas();
+    init_vertices();
+    add_buffer_data();
+    get_matrix_in_shader();
+    set_up_support_matrix();
+    add_support_matrix_to_shader();
+    draw();
 });
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
-	console.log(vertices);
+    console.log(vertices);
 });
 
 document.addEventListener("resize", () => {
-	setup_webgl_canvas();
+    setup_webgl_canvas();
 });
