@@ -7,6 +7,14 @@ function hex_to_normalize_rgb(hex) {
     ] : null;
 }
 
+function radToDeg(r) {
+    return r * 180 / Math.PI;
+}
+    
+function degToRad(d) {
+    return d * Math.PI / 180;
+}
+
 function toRadian(a) {
     return a * Math.PI / 180;
 }
@@ -259,5 +267,62 @@ function perspective(out, fovy, aspect, near, far) {
     out[13] = 0;
     out[14] = 2 * far * near * nf;
     out[15] = 0;
+    return out;
+}
+
+function fromRotation(out, rad, axis) {
+    let x = axis[0],
+      y = axis[1],
+      z = axis[2];
+    let len = Math.hypot(x, y, z);
+    let s, c, t;
+    if (len < 0.000001) {
+      return null;
+    }
+    len = 1 / len;
+    x *= len;
+    y *= len;
+    z *= len;
+    s = Math.sin(rad);
+    c = Math.cos(rad);
+    t = 1 - c;
+    // Perform rotation-specific matrix multiplication
+    out[0] = x * x * t + c;
+    out[1] = y * x * t + z * s;
+    out[2] = z * x * t - y * s;
+    out[3] = 0;
+    out[4] = x * y * t - z * s;
+    out[5] = y * y * t + c;
+    out[6] = z * y * t + x * s;
+    out[7] = 0;
+    out[8] = x * z * t + y * s;
+    out[9] = y * z * t - x * s;
+    out[10] = z * z * t + c;
+    out[11] = 0;
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = 0;
+    out[15] = 1;
+    return out;
+}
+  
+function create_identity_4_matrix() {
+    let out = new Float32Array(16);
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[11] = 0;
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = 0;
+    out[0] = 1;
+    out[5] = 1;
+    out[10] = 1;
+    out[15] = 1;
     return out;
 }

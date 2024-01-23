@@ -15,7 +15,7 @@ let rotate_angle_x;
 let rotate_angle_y;
 let rotate_angle_z;
 
-let canvas;
+let canvas = document.querySelector('#game-surface');
 let gl;
 
 let vertex_shader;
@@ -366,7 +366,7 @@ set_up_support_matrix = () => {
         CAMERA_POSITION.y,
         CAMERA_POSITION.z
     ], [0, 0, 0], [0, 1, 0]);
-    perspective(projection_matrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
+    perspective(projection_matrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 1.0, 100.0);
 }
 
 add_support_matrix_to_shader = () => {
@@ -375,73 +375,35 @@ add_support_matrix_to_shader = () => {
     gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
 }
 
-draw_points = () => {
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.POINTS, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
-draw_lines = () => {
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.LINES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
-draw_line_loop = () => {
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.LINE_LOOP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
-draw_line_strip = () => {
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.LINE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
-draw_triangles = () => {
-    clear_canvas()
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
-draw_triangle_strip = () => {
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
-draw_triangle_fan = () => {
-    clear_canvas();
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLE_FAN, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-}
-
 draw = () => {
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    clear_canvas();
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
     draw_mode = document.getElementById("draw-mode");
     draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
 
     switch (draw_mode_value) {
         case "points":
-            draw_points();
+            gl.drawElements(gl.POINTS, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
         case "lines":
-            draw_lines();
+            gl.drawElements(gl.LINES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
         case "line_loop":
-            draw_line_loop();
+            gl.drawElements(gl.LINE_LOOP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
         case "line_strip":
-            draw_line_strip();
+            gl.drawElements(gl.LINE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
         case "triangles":
-            draw_triangles();
+            gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
         case "triangle_strip":
-            draw_triangle_strip();
+            gl.drawElements(gl.TRIANGLE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
         case "triangle_fan":
-            draw_triangle_fan();
+            gl.drawElements(gl.TRIANGLE_FAN, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
             break;
     }
 }
@@ -456,7 +418,9 @@ orbit_around_rubik = () => {
     rotate(x_rotation_matrix, identity_matrix, angle_x, [1, 0, 0]);
     rotate(y_rotation_matrix, identity_matrix, angle_y, [0, 1, 0]);
     rotate(z_rotation_matrix, identity_matrix, angle_z, [0, 0, 1]);
-    multiply(world_matrix, z_rotation_matrix, y_rotation_matrix, x_rotation_matrix);
+
+    multiply(world_matrix, x_rotation_matrix, y_rotation_matrix);
+    multiply(world_matrix, y_rotation_matrix, z_rotation_matrix);
 
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
