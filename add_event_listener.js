@@ -43,6 +43,10 @@ document.querySelector("#show-control").addEventListener("click", () => {
         document.querySelector("#controller").style.left = "0px";
 });
 
+document.querySelector("#hide-control").addEventListener("click", () => {
+    document.querySelector("#controller").style.left = "-100%";
+});
+
 document.querySelector("#rotate-U").addEventListener("click", () => {
     console.log(vertices);
 });
