@@ -35,6 +35,8 @@ let rubik_size_y;
 let rubik_size_z;
 let rubik_length;
 let sticker_gap;
+let is_render_inner_cube;
+let is_render_outer_cube;
 
 let rotate_angle_x;
 let rotate_angle_y;
@@ -146,6 +148,11 @@ get_input_data = () => {
     rubik_size_z = +document.querySelector("#size-z").value || 2;
     rubik_length = +document.querySelector("#length").value || 1;
     sticker_gap = +document.querySelector("#sticker-gap").value || 0;
+    is_render_inner_cube = document.querySelector("#render-inner-cube").checked || true;
+    is_render_outer_cube = document.querySelector("#render-outer-cube").checked || true;
+
+    console.log(is_render_inner_cube);
+    console.log(is_render_outer_cube);
 
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
@@ -595,8 +602,14 @@ init_vertices = () => {
     for (i = start_x; i <= end_x; i += 1) {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
-                add_sticker_vertex(i, j, k)
+
+                // if (is_render_outer_cube)
+                add_sticker_vertex(i, j, k);
+
+                // if (is_render_inner_cube)
                 add_inner_vertex(i, j, k);
+
+
             }
         }
     }
