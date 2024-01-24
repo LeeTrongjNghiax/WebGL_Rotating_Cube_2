@@ -1,14 +1,14 @@
 :root {
-    --light-color: #eeeeee;
+    --light-color: #eeeeeeaa;
     --light-color-semi-tran: #eeeeeeaa;
     --dark-color: #121212;
     --dark-color-semi-tran: #121212aa;
 }
 
-.light-mode, 
-.light-mode button, 
-.light-mode input, 
-.light-mode select, 
+.light-mode,
+.light-mode button,
+.light-mode input,
+.light-mode select,
 .light-mode option {
     background: var(--light-color);
     color: var(--dark-color);
@@ -19,10 +19,10 @@
     color: var(--dark-color);
 }
 
-.dark-mode, 
-.dark-mode button, 
-.dark-mode input, 
-.dark-mode select, 
+.dark-mode,
+.dark-mode button,
+.dark-mode input,
+.dark-mode select,
 .dark-mode option {
     background: var(--dark-color);
     color: var(--light-color);
@@ -54,7 +54,7 @@ body {
     gap: 1rem;
 }
 
-.button-block > button {
+.button-block>button {
     width: 100%;
     padding: 0.5rem;
 }
@@ -98,7 +98,6 @@ input {
 
 
 /* Dropdown */
-
 
 .dropdown {
     position: relative;
