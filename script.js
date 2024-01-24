@@ -50,6 +50,7 @@ let far;
 
 let draw_mode;
 let draw_mode_value;
+let draw_mode_constant;
 let point_size;
 
 let camera_position;
@@ -110,14 +111,24 @@ let cubie;
 let cubie_objects;
 let vertices;
 let vertice_indices;
+let vertice_indices_length;
 
 let point_size_buffer_object;
 let vertex_buffer_object;
 let vertex_index_buffer_object;
 
+//
+// Attribute location
+//
+
+
 let point_size_attribute_location;
 let position_attribute_location;
 let color_attribute_location;
+
+//
+// Uniform location
+//
 
 let point_size_uniform_location;
 let mat_world_uniform_location;
@@ -182,6 +193,7 @@ get_input_data = () => {
     far = +document.querySelector("#far").value || 100;
 
     draw_mode = document.getElementById("draw-mode");
+    draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
     point_size = +document.querySelector("#point-size").value || 1;
 
     up_color = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
@@ -610,9 +622,6 @@ init_vertices = () => {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
 
-                // console.log(is_render_outer_cube);
-                // console.log(is_render_inner_cube);
-
                 if (is_render_outer_cube)
                     add_sticker_vertex(i, j, k);
 
@@ -625,6 +634,9 @@ init_vertices = () => {
     }
 
     vertices = [].concat(...cubie_objects.map(cubie => cubie.to_string()));
+    cubie_objects = [];
+
+    vertice_indices_length = vertice_indices.length;
 }
 
 add_buffer_data = () => {
@@ -635,6 +647,9 @@ add_buffer_data = () => {
     vertex_index_buffer_object = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
+
+    vertices = [];
+    vertice_indices = [];
 
     position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
     color_attribute_location = gl.getAttribLocation(program, 'vertColor');
@@ -718,31 +733,30 @@ add_support_matrix_to_shader = () => {
 draw = () => {
     reset_canvas();
 
-    draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
-
     switch (draw_mode_value) {
         case "points":
-            gl.drawElements(gl.POINTS, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+            draw_mode_constant = gl.POINTS;
             break;
         case "lines":
-            gl.drawElements(gl.LINES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+            draw_mode_constant = gl.LINES;
             break;
         case "line_loop":
-            gl.drawElements(gl.LINE_LOOP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+            draw_mode_constant = gl.LINE_LOOP;
             break;
         case "line_strip":
-            gl.drawElements(gl.LINE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
-            break;
-        case "triangles":
-            gl.drawElements(gl.TRIANGLES, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+            draw_mode_constant = gl.LINE_STRIP;
             break;
         case "triangle_strip":
-            gl.drawElements(gl.TRIANGLE_STRIP, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+            draw_mode_constant = gl.TRIANGLE_STRIP;
             break;
         case "triangle_fan":
-            gl.drawElements(gl.TRIANGLE_FAN, vertice_indices.length, gl.UNSIGNED_SHORT, 0);
+            draw_mode_constant = gl.TRIANGLE_FAN;
             break;
+        case "triangles": default:
+            draw_mode_constant = gl.TRIANGLES;
     }
+
+    gl.drawElements(draw_mode_constant, vertice_indices_length, gl.UNSIGNED_SHORT, 0);
 }
 
 orbit_around_rubik = () => {
