@@ -151,9 +151,6 @@ get_input_data = () => {
     is_render_inner_cube = document.querySelector("#render-inner-cube").checked || true;
     is_render_outer_cube = document.querySelector("#render-outer-cube").checked || true;
 
-    console.log(is_render_inner_cube);
-    console.log(is_render_outer_cube);
-
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
     rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
@@ -177,6 +174,8 @@ get_input_data = () => {
     }
 
     fovy = +document.querySelector("#fovy").value || toRadian(45);
+    set_up_canvas_dimension();
+    aspect_ratio = canvas.width / canvas.height;
     near = +document.querySelector("#near").value || 0.1;
     far = +document.querySelector("#far").value || 100;
 
@@ -189,6 +188,8 @@ get_input_data = () => {
     back_color = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
     right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
+    inner_color = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
+    transparent = +document.querySelector("#transparent").value / 255 || 1.0;
 }
 
 set_up_canvas_dimension = () => {
@@ -223,6 +224,7 @@ setup_webgl_canvas = () => {
     gl.enable(gl.CULL_FACE);
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
+    // gl.blendFunc(gl.ONE_MINUS_SRC_COLOR, gl.SRC_COLOR);
 
     //
     // Create shaders
@@ -270,6 +272,7 @@ add_sticker_vertex = (i, j, k) => {
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
             for (k2 = -1; k2 < 2; k2 += 2) {
+
                 if (i2 == -1 && i == start_x)
                     sub_vertices.push(
                         new Vertex(
@@ -692,7 +695,7 @@ set_up_support_matrix = () => {
     perspective(
         projection_matrix,
         toRadian(fovy),
-        canvas.clientWidth / canvas.clientHeight,
+        aspect_ratio,
         near,
         far
     );

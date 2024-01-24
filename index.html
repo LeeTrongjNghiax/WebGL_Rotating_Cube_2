@@ -10,12 +10,34 @@
     <link rel="stylesheet" href="style.css">
 
     <script id="vs" type="x-shader/x-vertex">
-        precision lowp float; attribute vec3 vertPosition; attribute vec4 vertColor; varying vec4 fragColor; uniform float pointSize; uniform mat4 mWorld; uniform mat4 mView; uniform mat4 mProj; void main() { fragColor = vertColor; gl_PointSize = pointSize; gl_Position
-        = mProj * mView * mWorld * vec4(vertPosition, 1.0); }
+        precision lowp float; 
+
+        attribute vec3 vertPosition; 
+        attribute vec4 vertColor; 
+        
+        varying vec4 fragColor; 
+        
+        uniform float pointSize; 
+        uniform mat4 mWorld; 
+        uniform mat4 mView; 
+        uniform mat4 mProj; 
+        
+        void main() { 
+            fragColor = vertColor; 
+            gl_PointSize = pointSize; 
+            gl_Position
+        = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
+        }
     </script>
 
     <script id="fs" type="x-shader/x-fragment">
-        precision lowp float; varying vec4 fragColor; void main() { gl_FragColor = fragColor; }
+        precision lowp float; 
+        
+        varying vec4 fragColor; 
+        
+        void main() { 
+            gl_FragColor = fragColor; 
+        }
     </script>
 
     <script src="class.js"></script>
@@ -214,6 +236,14 @@
                 <div class="input-block">
                     <label for="left-color">Left color:</label>
                     <input id="left-color" type="color" value="#FFA700">
+                </div>
+                <div class="input-block">
+                    <label for="inner-color">Inner color:</label>
+                    <input id="inner-color" type="color" value="#121212">
+                </div>
+                <div class="input-block">
+                    <label for="transparent">Transparent:</label>
+                    <input id="transparent" type="number" min="0" max="255" value="255" size="2" step="1">
                 </div>
             </div>
         </div>
