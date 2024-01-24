@@ -1,11 +1,12 @@
 :root {
     --light-color: #eeeeee;
+    --light-color-semi-tran: #eeeeeeaa;
     --dark-color: #121212;
+    --dark-color-semi-tran: #121212aa;
 }
 
 .light-mode, 
 .light-mode button, 
-.light-mode #controller, 
 .light-mode input, 
 .light-mode select, 
 .light-mode option {
@@ -13,13 +14,22 @@
     color: var(--dark-color);
 }
 
+.light-mode #controller {
+    background: var(--light-color-semi-tran);
+    color: var(--dark-color);
+}
+
 .dark-mode, 
 .dark-mode button, 
-.dark-mode #controller, 
 .dark-mode input, 
 .dark-mode select, 
 .dark-mode option {
     background: var(--dark-color);
+    color: var(--light-color);
+}
+
+.dark-mode #controller {
+    background: var(--dark-color-semi-tran);
     color: var(--light-color);
 }
 
@@ -56,7 +66,7 @@ canvas {
 }
 
 #controller {
-    position: absolute;
+    position: fixed;
     height: 100vh;
     overflow: scroll;
     top: 10px;
@@ -64,7 +74,6 @@ canvas {
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    /* justify-content: space-around; */
     transition: left 0.5s;
 }
 

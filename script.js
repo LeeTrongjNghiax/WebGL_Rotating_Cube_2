@@ -45,6 +45,7 @@ let far;
 
 let draw_mode;
 let draw_mode_value;
+let point_size;
 
 let camera_position;
 let camera_look_at;
@@ -100,12 +101,15 @@ let cubie_objects;
 let vertices;
 let vertice_indices;
 
+let point_size_buffer_object;
 let vertex_buffer_object;
 let vertex_index_buffer_object;
 
+let point_size_attribute_location;
 let position_attribute_location;
 let color_attribute_locationn;
 
+let point_size_uniform_location;
 let mat_world_uniform_location;
 let mat_view_uniform_location;
 let mat_projection_uniform_location;
@@ -161,6 +165,9 @@ get_input_data = () => {
     fovy = +document.querySelector("#fovy").value || toRadian(45);
     near = +document.querySelector("#near").value || 0.1;
     far = +document.querySelector("#far").value || 100;
+
+    draw_mode = document.getElementById("draw-mode");
+    point_size = +document.querySelector("#point-size").value || 1;
 
     up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
     down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
@@ -714,6 +721,7 @@ add_buffer_data = () => {
 };
 
 get_matrix_in_shader = () => {
+    point_size_uniform_location = gl.getUniformLocation(program, 'pointSize');
     mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
     mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
     mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
@@ -761,12 +769,12 @@ add_support_matrix_to_shader = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
     gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
     gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
+    gl.uniform1f(point_size_uniform_location, point_size);
 }
 
 draw = () => {
     reset_canvas();
 
-    draw_mode = document.getElementById("draw-mode");
     draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
 
     switch (draw_mode_value) {
