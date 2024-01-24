@@ -10,33 +10,12 @@
     <link rel="stylesheet" href="style.css">
 
     <script id="vs" type="x-shader/x-vertex">
-        precision lowp float; 
-
-        attribute vec3 vertPosition; 
-        attribute vec4 vertColor; 
-        
-        varying vec4 fragColor; 
-
-        uniform float pointSize;
-        uniform mat4 mWorld; 
-        uniform mat4 mView; 
-        uniform mat4 mProj; 
-        
-        void main() { 
-            fragColor = vertColor; 
-            gl_PointSize = pointSize;
-            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
-        }
+        precision lowp float; attribute vec3 vertPosition; attribute vec4 vertColor; varying vec4 fragColor; uniform float pointSize; uniform mat4 mWorld; uniform mat4 mView; uniform mat4 mProj; void main() { fragColor = vertColor; gl_PointSize = pointSize; gl_Position
+        = mProj * mView * mWorld * vec4(vertPosition, 1.0); }
     </script>
 
     <script id="fs" type="x-shader/x-fragment">
-        precision lowp float; 
-        
-        varying vec4 fragColor; 
-        
-        void main() { 
-            gl_FragColor = fragColor; 
-        }
+        precision lowp float; varying vec4 fragColor; void main() { gl_FragColor = fragColor; }
     </script>
 
     <script src="class.js"></script>
@@ -51,7 +30,7 @@
         <button id="change-theme">Change theme</button>
         <button id="create">Create rubik's cube</button>
         <!-- <button id="create-random">Create random rubik's cube</button> -->
-        <button id="toggle-rotate" class ="is_stop_rotating">Start rotating</button>
+        <button id="toggle-rotate" class="is_stop_rotating">Start rotating</button>
         <button id="show-control">Show control</button>
     </div>
 
@@ -69,15 +48,15 @@
             <div class="dropdown-content">
                 <div class="input-block">
                     <label for="size-x">Rubik Size X:</label>
-                    <input id="size-x" type="number" min="1" max="100" value="3" size="4" step="1">
+                    <input id="size-x" type="number" min="1" max="100" value="2" size="4" step="1">
                 </div>
                 <div class="input-block">
                     <label for="size-y">Rubik Size Y:</label>
-                    <input id="size-y" type="number" min="1" max="100" value="3" size="4" step="1">
+                    <input id="size-y" type="number" min="1" max="100" value="2" size="4" step="1">
                 </div>
                 <div class="input-block">
                     <label for="size-z">Rubik Size Z:</label>
-                    <input id="size-z" type="number" min="1" max="100" value="3" size="4" step="1">
+                    <input id="size-z" type="number" min="1" max="100" value="2" size="4" step="1">
                 </div>
                 <div class="input-block">
                     <label for="length">Rubik Length:</label>
@@ -248,10 +227,6 @@
         </div>
 
     </div>
-
-    <script>
-
-    </script>
 </body>
 
 </html>

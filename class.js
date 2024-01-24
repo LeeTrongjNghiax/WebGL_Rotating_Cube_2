@@ -38,7 +38,8 @@ class Vertex {
     to_string() {
         return [
             ...this.relative_position.get_position(),
-            ...this.color.get_color(), 
+            ...this.color.get_color(),
+            // this.color_name
         ];
     }
 }
