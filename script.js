@@ -15,6 +15,7 @@ let fragment_shader;
 const LIGHT_COLOR = 255 / 255;
 const DARK_COLOR = 0 / 255;
 
+let transparent = 1.0;
 let up_color    = [1.0, 1.0, 1.0];
 let down_color  = [1.0, 1.0, 0.0];
 let front_color = [0.0, 1.0, 0.0];
@@ -63,7 +64,7 @@ let start_z;
 // Index
 //
 
-let i, j, k, i2, j2, k2, count;
+let i, j, k, i2, j2, k2, count, i3;
 
 //
 // count_fps variable
@@ -97,6 +98,11 @@ let gl;
 
 let program;
 
+let sub_vertices;
+let faces;
+let number_of_face;
+let number_of_vertex_per_face = 4;
+let cubie;
 let cubie_objects;
 let vertices;
 let vertice_indices;
@@ -107,7 +113,7 @@ let vertex_index_buffer_object;
 
 let point_size_attribute_location;
 let position_attribute_location;
-let color_attribute_locationn;
+let color_attribute_location;
 
 let point_size_uniform_location;
 let mat_world_uniform_location;
@@ -175,53 +181,6 @@ get_input_data = () => {
     back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
     right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
-}
-
-get_random_input_data = () => {
-    vertex_shader_text = document.querySelector("#vs").innerHTML;
-    fragment_shader_text = document.querySelector("#fs").innerHTML;
-    show_fps_element = document.querySelector("#fps")
-    
-    canvas = document.querySelector('#game-surface');
-
-    rubik_size_x = +document.querySelector("#size-x").value || 2;
-    rubik_size_y = +document.querySelector("#size-y").value || 2;
-    rubik_size_z = +document.querySelector("#size-z").value || 2;
-    rubik_length = +document.querySelector("#length").value || 1;
-    sticker_gap = +document.querySelector("#sticker-gap").value || 0;
-
-    rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
-    rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
-    rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
-
-    camera_position = {
-        x: +document.querySelector("#camera-x").value || 0, 
-        y: +document.querySelector("#camera-y").value || 0, 
-        z: +document.querySelector("#camera-z").value || -5, 
-    };
-
-    camera_look_at = {
-        x: +document.querySelector("#look-at-x").value || 0, 
-        y: +document.querySelector("#look-at-y").value || 0, 
-        z: +document.querySelector("#look-at-z").value || 0, 
-    }
-
-    up_axis = {
-        x: +document.querySelector("#up-axis-x").value || 0, 
-        y: +document.querySelector("#up-axis-y").value || 1, 
-        z: +document.querySelector("#up-axis-z").value || 0, 
-    }
-
-    fovy = +document.querySelector("#fovy").value || toRadian(45);
-    near = +document.querySelector("#near").value || 0.1;
-    far = +document.querySelector("#far").value || 100;
-
-    up_color    = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
-    down_color  = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
-    front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
-    back_color  = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
-    right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
-    left_color  = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
 }
 
 set_up_canvas_dimension = () => {
@@ -295,114 +254,180 @@ setup_webgl_canvas = () => {
     }
 }
 
-add_outer_vertex = (i, i2, j, j2, k, k2) => {
-    if (i2 == -1 && i == start_x)
-        cubie_objects.push(
-            new Vertex(
-                new Position(
-                    i + rubik_half_length * i2 - sticker_gap,
-                    j + rubik_half_length * j2,
-                    k + rubik_half_length * k2,
-                ),
-                new Color(
-                    left_color[0],
-                    left_color[1], 
-                    left_color[2], 
-                    255
-                ), 
-                "orange", cubie_objects.length
-            )
+add_outer_vertex = (i, j, k) => {
+    flag = false;
+    sub_vertices = [];
+    cubie = new Cubie();
+    faces = [];
+
+    for (i2 = -1; i2 < 2; i2 += 2) {
+        for (j2 = -1; j2 < 2; j2 += 2) {
+            for (k2 = -1; k2 < 2; k2 += 2) {
+                if (i2 == -1 && i == start_x) {
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(i, j, k,),
+                            new Position(
+                                i + rubik_half_length * i2 - sticker_gap,
+                                j + rubik_half_length * j2,
+                                k + rubik_half_length * k2,
+                            ),
+                            new Color(
+                                left_color[0],
+                                left_color[1], 
+                                left_color[2], 
+                                transparent
+                            ), 
+                            "orange", cubie_objects.length
+                        )
+                    );
+                    flag = true;
+                }
+                    
+
+                if (i2 == 1 && i == end_x) {
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(i, j, k,),
+                            new Position(
+                                i + rubik_half_length * i2 + sticker_gap,
+                                j + rubik_half_length * j2,
+                                k + rubik_half_length * k2,
+                            ),
+                            new Color(
+                                right_color[0],
+                                right_color[1], 
+                                right_color[2], 
+                                transparent
+                            ), 
+                            "red", cubie_objects.length
+                        )
+                    );
+                    flag = true;
+                }
+
+                if (j2 == -1 && j == start_y) {
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(i, j, k,),
+                            new Position(
+                                i + rubik_half_length * i2,
+                                j + rubik_half_length * j2 - sticker_gap,
+                                k + rubik_half_length * k2,
+                            ),
+                            new Color(
+                                down_color[0],
+                                down_color[1],
+                                down_color[2],
+                                transparent
+                            ),
+                            "yellow", cubie_objects.length
+                        )
+                    );
+                    flag = true;
+                }
+
+                if (j2 == 1 && j == end_y) {
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(i, j, k,),
+                            new Position(
+                                i + rubik_half_length * i2,
+                                j + rubik_half_length * j2 + sticker_gap,
+                                k + rubik_half_length * k2,
+                            ),
+                            new Color(
+                                up_color[0],
+                                up_color[1],
+                                up_color[2],
+                                transparent
+                            ),
+                            "white", cubie_objects.length
+                        )
+                    );
+                    flag = true;
+                }
+
+                if (k2 == -1 && k == start_z) {
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(i, j, k,),
+                            new Position(
+                                i + rubik_half_length * i2,
+                                j + rubik_half_length * j2,
+                                k + rubik_half_length * k2 - sticker_gap,
+                            ),
+                            new Color(
+                                back_color[0],
+                                back_color[1],
+                                back_color[2],
+                                transparent
+                            ),
+                            "blue", cubie_objects.length
+                        )
+                    );
+                    flag = true;
+                }
+
+                if (k2 == 1 && k == end_z) {
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(i, j, k,),
+                            new Position(
+                                i + rubik_half_length * i2,
+                                j + rubik_half_length * j2,
+                                k + rubik_half_length * k2 + sticker_gap,
+                            ),
+                            new Color(
+                                front_color[0],
+                                front_color[1],
+                                front_color[2],
+                                transparent
+                            ),
+                            "green", cubie_objects.length
+                        )
+                    );
+                    flag = true;
+                }
+            }
+        }
+    }
+
+    sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
+
+    number_of_face = sub_vertices.length / number_of_vertex_per_face;
+    for (i3 = 0; i3 < number_of_face; i3++)
+        faces[i3] = new Face();
+
+    for (i3 = 0; i3 < number_of_face; i3 += 1) {
+        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 0]);
+        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 1]);
+        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 2]);
+        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 3]);
+
+        vertice_indices.push(
+            count + 0,
+            count + 1,
+            count + 2,
+
+            count + 0,
+            count + 2,
+            count + 1,
+            
+            count + 3,
+            count + 1,
+            count + 2,
+
+            count + 3,
+            count + 2,
+            count + 1,
         );
 
-    if (i2 == 1 && i == end_x)
-        cubie_objects.push(
-            new Vertex(
-                new Position(
-                    i + rubik_half_length * i2 + sticker_gap,
-                    j + rubik_half_length * j2,
-                    k + rubik_half_length * k2,
-                ),
-                new Color(
-                    right_color[0],
-                    right_color[1], 
-                    right_color[2], 
-                    255
-                ), 
-                "red", cubie_objects.length
-            )
-        );
+        count += number_of_vertex_per_face;
+        cubie.add_face(faces[i3]);
+    }
 
-    if (j2 == -1 && j == start_y)
-        cubie_objects.push(
-            new Vertex(
-                new Position(
-                    i + rubik_half_length * i2,
-                    j + rubik_half_length * j2 - sticker_gap,
-                    k + rubik_half_length * k2,
-                ),
-                new Color(
-                    down_color[0],
-                    down_color[1], 
-                    down_color[2], 
-                    255
-                ), 
-                "yellow", cubie_objects.length
-            )
-        );
-
-    if (j2 == 1 && j == end_y)
-        cubie_objects.push(
-            new Vertex(
-                new Position(
-                    i + rubik_half_length * i2,
-                    j + rubik_half_length * j2 + sticker_gap,
-                    k + rubik_half_length * k2,
-                ),
-                new Color(
-                    up_color[0],
-                    up_color[1], 
-                    up_color[2], 
-                    255
-                ), 
-                "white", cubie_objects.length
-            )
-        );
-
-    if (k2 == -1 && k == start_z)
-        cubie_objects.push(
-            new Vertex(
-                new Position(
-                    i + rubik_half_length * i2,
-                    j + rubik_half_length * j2,
-                    k + rubik_half_length * k2 - sticker_gap,
-                ),
-                new Color(
-                    back_color[0],
-                    back_color[1], 
-                    back_color[2], 
-                    255
-                ), 
-                "blue", cubie_objects.length
-            )
-        );
-
-    if (k2 == 1 && k == end_z)
-        cubie_objects.push(
-            new Vertex(
-                new Position(
-                    i + rubik_half_length * i2,
-                    j + rubik_half_length * j2,
-                    k + rubik_half_length * k2 + sticker_gap,
-                ),
-                new Color(
-                    front_color[0],
-                    front_color[1], 
-                    front_color[2], 
-                    255
-                ), 
-                "blue", cubie_objects.length
-            )
-        );
+    cubie_objects.push(cubie)
 }
 
 add_inner_vertex = (i, i2, j, j2, k, k2) => {
@@ -637,49 +662,15 @@ init_vertices = () => {
     cubie_objects = [];
     vertices = [];
     vertice_indices = [];
+    count = 0;
 
     for (i = start_x; i <= end_x; i += 1) {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
-
-                for (i2 = -1; i2 < 2; i2 += 2) {
-                    for (j2 = -1; j2 < 2; j2 += 2) {
-                        for (k2 = -1; k2 < 2; k2 += 2) {
-                            // add_all_vertex(i, i2, j, j2, k, k2);
-                            add_outer_vertex(i, i2, j, j2, k, k2);
-                            // add_inner_vertex(i, i2, j, j2, k, k2);
-                        }
-                    }
-                }
-
-                cubie_objects.sort((a, b) => {
-                    return a.color_name.localeCompare(b.color_name);
-                });
-
-                for (count = 0; count < cubie_objects.length; count += 4) {
-                    vertice_indices.push(
-                        count + 0,
-                        count + 1,
-                        count + 2,
-
-                        count + 0,
-                        count + 2,
-                        count + 1,
-
-                        count + 3,
-                        count + 1,
-                        count + 2,
-
-                        count + 3,
-                        count + 2,
-                        count + 1,
-                    );
-                }
+                add_outer_vertex(i, j, k);
             }
         }
     }
-
-    // console.log(sorted_vertices);
 
     vertices = [].concat(...cubie_objects.map(cubie => cubie.to_string()));
 }
@@ -694,27 +685,27 @@ add_buffer_data = () => {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
 
     position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
-    color_attribute_locationn = gl.getAttribLocation(program, 'vertColor');
+    color_attribute_location = gl.getAttribLocation(program, 'vertColor');
 
     gl.vertexAttribPointer(
         position_attribute_location, // Attribute location
         3, // Number of elements per attribute
         gl.FLOAT, // Type of elements
         gl.FALSE,
-        8 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+        7 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
         0 // Offset from the beginning of a single vertex to this attribute
     );
     gl.vertexAttribPointer(
-        color_attribute_locationn, // Attribute location
+        color_attribute_location, // Attribute location
         4, // Number of elements per attribute
         gl.FLOAT, // Type of elements
         gl.FALSE,
-        8 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+        7 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
         3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
     );
 
     gl.enableVertexAttribArray(position_attribute_location);
-    gl.enableVertexAttribArray(color_attribute_locationn);
+    gl.enableVertexAttribArray(color_attribute_location);
 
     // Tell OpenGL state machine which program should be active.
     gl.useProgram(program);

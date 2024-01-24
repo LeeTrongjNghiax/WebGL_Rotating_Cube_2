@@ -18,22 +18,18 @@ class Position {
         this.z = z;
     }
 
-    get_vector_length() {
-        return Math.sqrt(
-            Math.pow(this.x, 2) +
-            Math.pow(this.y, 2) +
-            Math.pow(this.z, 2)
-        );
-    }
-
     get_position() {
         return [this.x, this.y, this.z];
     }
 }
 
 class Vertex {
-    constructor(position, color, color_name, index) {
-        this.position = position;
+    constructor(
+        absolute_position,
+        relative_position, color, color_name, index
+    ) {
+        this.absolute_position = absolute_position;
+        this.relative_position = relative_position;
         this.color = color;
         this.color_name = color_name;
         this.index = index;
@@ -41,9 +37,40 @@ class Vertex {
 
     to_string() {
         return [
-            ...this.position.get_position(),
+            ...this.relative_position.get_position(),
             ...this.color.get_color(), 
-            this.index
         ];
+    }
+}
+
+class Face {
+    constructor(vertices = []) {
+        this.vertices = vertices;
+    }
+
+    add_vertex(vertex) {
+        this.vertices.push(vertex);
+    }
+
+    to_string() {
+        return [].concat(
+            ...[].concat(
+                ...this.vertices.map(e => e.to_string())
+            )
+        );
+    }
+}
+
+class Cubie {
+    constructor(faces = []) {
+        this.faces = faces;
+    }
+
+    add_face(face) {
+        this.faces.push(face);
+    }
+
+    to_string() {
+        return [].concat(...this.faces.map(e => e.to_string()));
     }
 }
