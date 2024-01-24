@@ -35,6 +35,7 @@ let rubik_size_y;
 let rubik_size_z;
 let rubik_length;
 let sticker_gap;
+let sticker_size;
 let is_render_inner_cube;
 let is_render_outer_cube;
 
@@ -148,8 +149,9 @@ get_input_data = () => {
     rubik_size_z = +document.querySelector("#size-z").value || 2;
     rubik_length = +document.querySelector("#length").value || 1;
     sticker_gap = +document.querySelector("#sticker-gap").value || 0;
-    is_render_inner_cube = document.querySelector("#render-inner-cube").checked || true;
-    is_render_outer_cube = document.querySelector("#render-outer-cube").checked || true;
+    sticker_size = +document.querySelector("#sticker-size").value || 1;
+    is_render_inner_cube = document.querySelector("#render-inner-cube").checked;
+    is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
 
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
@@ -211,7 +213,7 @@ reset_canvas = () => {
 setup_webgl_canvas = () => {
     set_up_canvas_dimension();
 
-    gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    gl = canvas.getContext('webgl2', { premultipliedAlpha: true }) || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
     if (!gl) {
         alert('Your browser does not support WebGL');
@@ -220,11 +222,13 @@ setup_webgl_canvas = () => {
 
     reset_canvas();
 
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
-    // gl.blendFunc(gl.ONE_MINUS_SRC_COLOR, gl.SRC_COLOR);
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     //
     // Create shaders
@@ -276,11 +280,11 @@ add_sticker_vertex = (i, j, k) => {
                 if (i2 == -1 && i == start_x)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2 - sticker_gap,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
+                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
                             ),
                             new Color(
                                 left_color[0],
@@ -296,11 +300,11 @@ add_sticker_vertex = (i, j, k) => {
                 if (i2 == 1 && i == end_x)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2 + sticker_gap,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
+                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
                             ),
                             new Color(
                                 right_color[0],
@@ -315,11 +319,11 @@ add_sticker_vertex = (i, j, k) => {
                 if (j2 == -1 && j == start_y)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
-                                i + rubik_half_length * i2,
+                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
                                 j + rubik_half_length * j2 - sticker_gap,
-                                k + rubik_half_length * k2,
+                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
                             ),
                             new Color(
                                 down_color[0],
@@ -334,11 +338,11 @@ add_sticker_vertex = (i, j, k) => {
                 if (j2 == 1 && j == end_y)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
-                                i + rubik_half_length * i2,
+                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
                                 j + rubik_half_length * j2 + sticker_gap,
-                                k + rubik_half_length * k2,
+                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
                             ),
                             new Color(
                                 up_color[0],
@@ -353,10 +357,10 @@ add_sticker_vertex = (i, j, k) => {
                 if (k2 == -1 && k == start_z)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
+                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
                                 k + rubik_half_length * k2 - sticker_gap,
                             ),
                             new Color(
@@ -372,10 +376,10 @@ add_sticker_vertex = (i, j, k) => {
                 if (k2 == 1 && k == end_z)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
+                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
                                 k + rubik_half_length * k2 + sticker_gap,
                             ),
                             new Color(
@@ -440,7 +444,7 @@ add_inner_vertex = (i, j, k) => {
                 if (i2 == -1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -458,7 +462,7 @@ add_inner_vertex = (i, j, k) => {
                 else
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -477,7 +481,7 @@ add_inner_vertex = (i, j, k) => {
                 if (j2 == -1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -495,7 +499,7 @@ add_inner_vertex = (i, j, k) => {
                 else
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -514,7 +518,7 @@ add_inner_vertex = (i, j, k) => {
                 if (k2 == -1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -532,7 +536,7 @@ add_inner_vertex = (i, j, k) => {
                 else
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k, ),
+                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -606,11 +610,14 @@ init_vertices = () => {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
 
-                // if (is_render_outer_cube)
-                add_sticker_vertex(i, j, k);
+                // console.log(is_render_outer_cube);
+                // console.log(is_render_inner_cube);
 
-                // if (is_render_inner_cube)
-                add_inner_vertex(i, j, k);
+                if (is_render_outer_cube)
+                    add_sticker_vertex(i, j, k);
+
+                if (is_render_inner_cube)
+                    add_inner_vertex(i, j, k);
 
 
             }

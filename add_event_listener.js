@@ -27,12 +27,12 @@ document.querySelector("#toggle-rotate").addEventListener("click", e => {
         stop();
         e.target.classList.toggle("is_rotating");
         e.target.classList.toggle("is_stop_rotating");
-        e.target.innerHTML = "Start rotating";
+        e.target.innerHTML = "Start orbiting";
     } else {
         start();
         e.target.classList.toggle("is_stop_rotating");
         e.target.classList.toggle("is_rotating");
-        e.target.innerHTML = "Stop rotating";
+        e.target.innerHTML = "Stop orbiting";
     }
 })
 

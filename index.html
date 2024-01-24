@@ -52,7 +52,7 @@
         <button id="change-theme">Change theme</button>
         <button id="create">Create rubik's cube</button>
         <!-- <button id="create-random">Create random rubik's cube</button> -->
-        <button id="toggle-rotate" class="is_stop_rotating">Start rotating</button>
+        <button id="toggle-rotate" class="is_stop_rotating">Start orbiting</button>
         <button id="show-control">Show control</button>
     </div>
 
@@ -82,19 +82,23 @@
                 </div>
                 <div class="input-block">
                     <label for="length">Rubik Length:</label>
-                    <input id="length" type="number" min="0" max="10" value="0.75" size="4" step="0.1">
+                    <input id="length" type="number" min="0" max="10" value="1" size="4" step="0.1">
                 </div>
                 <div class="input-block">
                     <label for="sticker-gap">Sticker gap:</label>
-                    <input id="sticker-gap" type="number" min="-10" max="10" value="0" size="4" step="0.1">
+                    <input id="sticker-gap" type="number" min="-10" max="10" value="0.01" size="4" step="0.01">
+                </div>
+                <div class="input-block">
+                    <label for="sticker-size">Sticker size:</label>
+                    <input id="sticker-size" type="number" min="0" max="1" value="0.9" size="4" step="0.9">
                 </div>
                 <div class="input-block">
                     <label for="render-inner-cube">Render Inner cube:</label>
-                    <input id="render-inner-cube" type="checkbox" size="4" step="0.1">
+                    <input id="render-inner-cube" type="checkbox" checked>
                 </div>
                 <div class="input-block">
                     <label for="render-outer-cube">Render Outer cube:</label>
-                    <input id="render-outer-cube" type="checkbox" size="4" step="0.1">
+                    <input id="render-outer-cube" type="checkbox" checked>
                 </div>
             </div>
         </div>
@@ -239,7 +243,7 @@
                 </div>
                 <div class="input-block">
                     <label for="inner-color">Inner color:</label>
-                    <input id="inner-color" type="color" value="#121212">
+                    <input id="inner-color" type="color" value="#191919">
                 </div>
                 <div class="input-block">
                     <label for="transparent">Transparent:</label>
