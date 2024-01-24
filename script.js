@@ -164,9 +164,9 @@ get_input_data = () => {
     is_render_inner_cube = document.querySelector("#render-inner-cube").checked;
     is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
 
-    rotate_angle_x = +document.querySelector("#rotate-angle-x").value || 1;
-    rotate_angle_y = +document.querySelector("#rotate-angle-y").value || 1;
-    rotate_angle_z = +document.querySelector("#rotate-angle-z").value || 1;
+    rotate_angle_x = +document.querySelector("#rotate-angle-x").value;
+    rotate_angle_y = +document.querySelector("#rotate-angle-y").value;
+    rotate_angle_z = +document.querySelector("#rotate-angle-z").value;
 
     camera_position = {
         x: +document.querySelector("#camera-x").value || 0,
