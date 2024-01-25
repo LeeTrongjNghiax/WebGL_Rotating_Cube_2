@@ -25,8 +25,7 @@
         void main() { 
             fragColor = vertColor; 
             gl_PointSize = pointSize; 
-            gl_Position
-        = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
+            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
         }
     </script>
 
@@ -143,15 +142,15 @@
                     <input id="camera-z" type="number" min="-100" max="100" value="-5" size="2" step="1">
                 </div>
                 <div class="input-block">
-                    <label for="look-at-x">Camera loot at X:</label>
+                    <label for="look-at-x">Camera look at X:</label>
                     <input id="look-at-x" type="number" min="-100" max="100" value="0" size="2" step="1">
                 </div>
                 <div class="input-block">
-                    <label for="look-at-y">Camera loot at Y:</label>
+                    <label for="look-at-y">Camera look at Y:</label>
                     <input id="look-at-y" type="number" min="-100" max="100" value="0" size="2" step="1">
                 </div>
                 <div class="input-block">
-                    <label for="look-at-z">Camera loot at Z:</label>
+                    <label for="look-at-z">Camera look at Z:</label>
                     <input id="look-at-z" type="number" min="-100" max="100" value="0" size="2" step="1">
                 </div>
                 <div class="input-block">
