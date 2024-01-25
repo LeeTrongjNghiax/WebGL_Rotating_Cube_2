@@ -71,6 +71,8 @@ let start_y;
 let end_z;
 let start_z;
 
+let shader_program_version;
+
 //
 // Index
 //
@@ -159,9 +161,7 @@ let z_rotation_matrix;
 let identity_matrix;
 
 get_input_data = () => {
-    vertex_shader_text = document.querySelector("#vs").innerHTML;
-    fragment_shader_text = document.querySelector("#fs").innerHTML;
-    show_fps_element = document.querySelector("#fps")
+    show_fps_element = document.querySelector("#fps");
 
     canvas = document.querySelector('#game-surface');
 
@@ -217,6 +217,16 @@ get_input_data = () => {
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
     inner_color = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
     transparent = +document.querySelector("#transparent").value / 255 || 1.0;
+
+    shader_program_version = document.querySelector("#shader-program-version").checked;
+
+    if (shader_program_version) {
+        vertex_shader_text = document.querySelector("#vs300").innerHTML;
+        fragment_shader_text = document.querySelector("#fs300").innerHTML;
+    } else {
+        vertex_shader_text = document.querySelector("#vs").innerHTML;
+        fragment_shader_text = document.querySelector("#fs").innerHTML;
+    }
 }
 
 set_up_canvas_dimension = () => {

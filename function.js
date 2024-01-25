@@ -326,3 +326,18 @@ function create_identity_4_matrix() {
     out[15] = 1;
     return out;
 }
+
+function readTextFile(file) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function () {
+      if(rawFile.readyState === 4)  {
+        if(rawFile.status === 200 || rawFile.status == 0) {
+            var allText = rawFile.responseText;
+            console.log(allText);
+          return allText;
+         }
+      }
+    }
+    rawFile.send(null);
+  }

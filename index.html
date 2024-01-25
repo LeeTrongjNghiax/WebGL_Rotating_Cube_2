@@ -10,14 +10,12 @@
     <link rel="stylesheet" href="style.css">
 
     <script id="vs" type="x-shader/x-vertex">
-        precision lowp float; 
-
-        attribute vec3 vertPosition; 
-        attribute vec4 vertColor; 
+        attribute highp vec3 vertPosition; 
+        attribute lowp vec4 vertColor; 
         
-        varying vec4 fragColor; 
+        varying lowp vec4 fragColor; 
         
-        uniform float pointSize; 
+        uniform lowp float pointSize; 
         uniform mat4 mWorld; 
         uniform mat4 mView; 
         uniform mat4 mProj; 
@@ -30,14 +28,46 @@
     </script>
 
     <script id="fs" type="x-shader/x-fragment">
-        precision lowp float; 
-        
-        varying vec4 fragColor; 
+        varying lowp vec4 fragColor; 
         
         void main() { 
             gl_FragColor = fragColor; 
         }
     </script>
+
+    <script id="vs300" type="x-shader/x-vertex">#version 300 es
+        precision highp float;
+        
+        in vec3 vertPosition; 
+        in vec4 vertColor; 
+        
+        out vec4 fragColor; 
+        
+        uniform lowp float pointSize; 
+        uniform mat4 mWorld; 
+        uniform mat4 mView; 
+        uniform mat4 mProj; 
+        
+        void main() { 
+            fragColor = vertColor; 
+            gl_PointSize = pointSize; 
+            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
+        }
+    </script>
+
+    <script id="fs300" type="x-shader/x-fragment">#version 300 es
+        precision highp float;
+
+        in vec4 fragColor;
+        out vec4 outFragColor;
+
+        void main() {
+            outFragColor = fragColor; 
+        }
+    </script>
+
+    <script id="vs2" src="vertex_shader.vertex" type="x-shader/x-vertex" ></script>
+    <script id="fs2" src="fragment_shader.fragment" type="x-shader/x-fragment" ></script>
 
     <script src="class.js"></script>
     <script src="function.js"></script>
@@ -266,6 +296,17 @@
                 <div class="input-block">
                     <label for="transparent">Transparent:</label>
                     <input id="transparent" type="number" min="0" max="255" value="255" size="2" step="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Shader Program</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <label for="shader-program-version">Use higher precision shader program version:</label>
+                    <input id="shader-program-version" type="checkbox" checked size="2">
                 </div>
             </div>
         </div>
