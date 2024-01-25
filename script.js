@@ -12,6 +12,9 @@ let fragment_shader;
 // Color
 //
 
+const DEGREE_OF_CIRCLE = 360;
+const MILLISECOND_PER_SECOND = 1000;
+
 const LIGHT_COLOR = 255 / 255;
 const DARK_COLOR = 0 / 255;
 
@@ -43,6 +46,8 @@ let is_render_inner_plane;
 let rotate_angle_x;
 let rotate_angle_y;
 let rotate_angle_z;
+let angle_per_second;
+let update_angle_method;
 
 let fovy;
 let aspect_ratio;
@@ -88,13 +93,17 @@ let fps = 0;
 // loop variable
 //
 
+let request_animation_frame;
 let angle_x = 0;
 let angle_y = 0;
 let angle_z = 0;
 
-let angle_constant;
+let angle = 0;
 
 let is_running = false;
+let last_tick;
+let current_tick;
+let time;
 
 //
 //
@@ -169,6 +178,8 @@ get_input_data = () => {
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value;
     rotate_angle_z = +document.querySelector("#rotate-angle-z").value;
+    angle_per_second = +document.querySelector("#angle-per-second").value || 90;
+    update_angle_method = document.querySelector('input[name="update-angle-method"]:checked').value;
 
     camera_position = {
         x: +document.querySelector("#camera-x").value || 0,
@@ -922,12 +933,23 @@ draw = () => {
     gl.drawElements(draw_mode_constant, vertice_indices_length, gl.UNSIGNED_SHORT, 0);
 }
 
-orbit_around_rubik = () => {
-    angle_constant = performance.now() / 1000 / 6;
+update_angle = (angle) => {
+    current_tick = performance.now();
+    time = (current_tick - last_tick) / MILLISECOND_PER_SECOND;
+    last_tick = current_tick;
+    return (angle + angle_per_second * time) % DEGREE_OF_CIRCLE;
+}
 
-    angle_x = angle_constant * rotate_angle_x % (2 * Math.PI);
-    angle_y = angle_constant * rotate_angle_y % (2 * Math.PI);
-    angle_z = angle_constant * rotate_angle_z % (2 * Math.PI);
+orbit_around_rubik = () => {
+
+    if (update_angle_method == "method1")
+        angle = performance.now() / MILLISECOND_PER_SECOND / 6;
+    else if (update_angle_method == "method2")
+        angle = update_angle(angle);
+
+    angle_x = angle * rotate_angle_x % (2 * Math.PI);
+    angle_y = angle * rotate_angle_y % (2 * Math.PI);
+    angle_z = angle * rotate_angle_z % (2 * Math.PI);
 
     rotate(x_rotation_matrix, identity_matrix, angle_x, [1, 0, 0]);
     rotate(y_rotation_matrix, identity_matrix, angle_y, [0, 1, 0]);
@@ -953,24 +975,27 @@ count_fps = () => {
 }
 
 loop = () => {
-    if (!is_running)
-        return;
-
+    last_tick = performance.now();
     count_fps();
     orbit_around_rubik();
     set_up_canvas_dimension();
     draw();
 
-    requestAnimationFrame(loop);
+    request_animation_frame = requestAnimationFrame(loop);
 };
 
 start = () => {
-    is_running = true;
-    loop();
+    if (!is_running) {
+        loop();
+        last_tick = performance.now();
+        is_running = true;
+    }
 }
 
 stop = () => {
     is_running = false;
+    cancelAnimationFrame(request_animation_frame);
+    request_animation_frame = undefined;
 }
 
 show_drop_down = e => {
