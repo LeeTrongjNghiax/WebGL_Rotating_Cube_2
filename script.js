@@ -937,7 +937,7 @@ update_angle = (angle) => {
     current_tick = performance.now();
     time = (current_tick - last_tick) / MILLISECOND_PER_SECOND;
     last_tick = current_tick;
-    return (angle + angle_per_second * time) % DEGREE_OF_CIRCLE;
+    return (angle + angle_per_second * time) % (2 * Math.PI);
 }
 
 orbit_around_rubik = () => {
