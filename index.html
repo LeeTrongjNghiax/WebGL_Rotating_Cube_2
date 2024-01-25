@@ -23,6 +23,7 @@
         void main() { 
             fragColor = vertColor; 
             gl_PointSize = pointSize; 
+
             gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
         }
     </script>
@@ -122,7 +123,7 @@
                 </div>
                 <div class="input-block">
                     <label for="render-inner-cube">Render Inner cube:</label>
-                    <input id="render-inner-cube" type="checkbox" checked>
+                    <input id="render-inner-cube" type="checkbox">
                 </div>
                 <div class="input-block">
                     <label for="render-outer-cube">Render Outer cube:</label>

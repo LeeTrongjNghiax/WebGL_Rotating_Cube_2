@@ -120,7 +120,7 @@ let faces;
 let number_of_face;
 let number_of_vertex_per_face = 4;
 let cubie;
-let cubie_objects;
+let rubik;
 let vertices;
 let vertice_indices;
 let vertice_indices_length;
@@ -213,7 +213,7 @@ get_input_data = () => {
     down_color = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
     front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
     back_color = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
-    right_color = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
+    left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.0, 0.0];
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
     inner_color = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
     transparent = +document.querySelector("#transparent").value / 255 || 1.0;
@@ -305,6 +305,7 @@ setup_webgl_canvas = () => {
 add_sticker_vertex = (i, j, k) => {
     sub_vertices = [];
     cubie = new Cubie();
+    cubie.absolute_position = new Position(i, j, k);
     faces = [];
 
     for (i2 = -1; i2 < 2; i2 += 2) {
@@ -314,29 +315,8 @@ add_sticker_vertex = (i, j, k) => {
                 if (i2 == -1 && i == start_x)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2 - sticker_gap,
-                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                left_color[0],
-                                left_color[1],
-                                left_color[2],
-                                transparent
-                            ),
-                            "orange", cubie_objects.length
-                        )
-                    );
-
-
-                if (i2 == 1 && i == end_x)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(i, j, k),
-                            new Position(
-                                i + rubik_half_length * i2 + sticker_gap,
                                 j + rubik_half_length * j2 - (sticker_size % 1) * j2,
                                 k + rubik_half_length * k2 - (sticker_size % 1) * k2,
                             ),
@@ -346,14 +326,32 @@ add_sticker_vertex = (i, j, k) => {
                                 right_color[2],
                                 transparent
                             ),
-                            "red", cubie_objects.length
+                            "left", rubik.cubies.length
+                        )
+                    );
+
+
+                if (i2 == 1 && i == end_x)
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(
+                                i + rubik_half_length * i2 + sticker_gap,
+                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
+                            ),
+                            new Color(
+                                left_color[0],
+                                left_color[1],
+                                left_color[2],
+                                transparent
+                            ),
+                            "right", rubik.cubies.length
                         )
                     );
 
                 if (j2 == -1 && j == start_y)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2 - (sticker_size % 1) * i2,
                                 j + rubik_half_length * j2 - sticker_gap,
@@ -365,14 +363,13 @@ add_sticker_vertex = (i, j, k) => {
                                 down_color[2],
                                 transparent
                             ),
-                            "yellow", cubie_objects.length
+                            "down", rubik.cubies.length
                         )
                     );
 
                 if (j2 == 1 && j == end_y)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2 - (sticker_size % 1) * i2,
                                 j + rubik_half_length * j2 + sticker_gap,
@@ -384,37 +381,17 @@ add_sticker_vertex = (i, j, k) => {
                                 up_color[2],
                                 transparent
                             ),
-                            "white", cubie_objects.length
+                            "up", rubik.cubies.length
                         )
                     );
 
                 if (k2 == -1 && k == start_z)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2 - (sticker_size % 1) * i2,
                                 j + rubik_half_length * j2 - (sticker_size % 1) * j2,
                                 k + rubik_half_length * k2 - sticker_gap,
-                            ),
-                            new Color(
-                                back_color[0],
-                                back_color[1],
-                                back_color[2],
-                                transparent
-                            ),
-                            "blue", cubie_objects.length
-                        )
-                    );
-
-                if (k2 == 1 && k == end_z)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(i, j, k),
-                            new Position(
-                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 + sticker_gap,
                             ),
                             new Color(
                                 front_color[0],
@@ -422,7 +399,25 @@ add_sticker_vertex = (i, j, k) => {
                                 front_color[2],
                                 transparent
                             ),
-                            "green", cubie_objects.length
+                            "front", rubik.cubies.length
+                        )
+                    );
+
+                if (k2 == 1 && k == end_z)
+                    sub_vertices.push(
+                        new Vertex(
+                            new Position(
+                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 + sticker_gap,
+                            ),
+                            new Color(
+                                back_color[0],
+                                back_color[1],
+                                back_color[2],
+                                transparent
+                            ),
+                            "back", rubik.cubies.length
                         )
                     );
             }
@@ -432,14 +427,16 @@ add_sticker_vertex = (i, j, k) => {
     sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
 
     number_of_face = sub_vertices.length / number_of_vertex_per_face;
+
     for (i3 = 0; i3 < number_of_face; i3++)
         faces[i3] = new Face();
 
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 0]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 1]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 2]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 3]);
+        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+
+        for (let j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+        }
 
         vertice_indices.push(
             count + 0,
@@ -463,7 +460,7 @@ add_sticker_vertex = (i, j, k) => {
         cubie.add_face(faces[i3]);
     }
 
-    cubie_objects.push(cubie)
+    rubik.add_cubie(cubie);
 }
 
 add_inner_vertex = (i, j, k) => {
@@ -478,7 +475,6 @@ add_inner_vertex = (i, j, k) => {
                 if (i2 == -1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -490,13 +486,12 @@ add_inner_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "orange", cubie_objects.length
+                            "left", rubik.cubies.length
                         )
                     );
                 else
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -508,14 +503,13 @@ add_inner_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "red", cubie_objects.length
+                            "left", rubik.cubies.length
                         )
                     );
 
                 if (j2 == -1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -527,13 +521,12 @@ add_inner_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "yellow", cubie_objects.length
+                            "down", rubik.cubies.length
                         )
                     );
                 else
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -545,14 +538,13 @@ add_inner_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "white", cubie_objects.length
+                            "up", rubik.cubies.length
                         )
                     );
 
                 if (k2 == -1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -564,13 +556,12 @@ add_inner_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "blue", cubie_objects.length
+                            "front", rubik.cubies.length
                         )
                     );
                 else
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -582,7 +573,7 @@ add_inner_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "green", cubie_objects.length
+                            "back", rubik.cubies.length
                         )
                     );
             }
@@ -596,10 +587,11 @@ add_inner_vertex = (i, j, k) => {
         faces[i3] = new Face();
 
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 0]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 1]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 2]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 3]);
+        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+
+        for (let j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+        }
 
         vertice_indices.push(
             count + 0,
@@ -623,7 +615,7 @@ add_inner_vertex = (i, j, k) => {
         cubie.add_face(faces[i3]);
     }
 
-    cubie_objects.push(cubie)
+    rubik.add_cubie(cubie);
 }
 
 add_inner_plane_vertex = (i, j, k) => {
@@ -638,7 +630,6 @@ add_inner_plane_vertex = (i, j, k) => {
                 if (i2 == -1 && i == start_x + 1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -650,13 +641,12 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "orange", cubie_objects.length
+                            "left", rubik.cubies.length
                         )
                     );
                 else if (i2 == 1 && i == end_x - 1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -668,14 +658,13 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "red", cubie_objects.length
+                            "left", rubik.cubies.length
                         )
                     );
 
                 if (j2 == -1 && j == start_y + 1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -687,13 +676,12 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "yellow", cubie_objects.length
+                            "down", rubik.cubies.length
                         )
                     );
                 else if (j2 == 1 && j == end_y - 1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -705,14 +693,13 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "white", cubie_objects.length
+                            "up", rubik.cubies.length
                         )
                     );
 
                 if (k2 == -1 && k == start_z + 1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -724,13 +711,12 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "blue", cubie_objects.length
+                            "front", rubik.cubies.length
                         )
                     );
                 else if (k2 == 1 && k == end_z - 1)
                     sub_vertices.push(
                         new Vertex(
-                            new Position(i, j, k),
                             new Position(
                                 i + rubik_half_length * i2,
                                 j + rubik_half_length * j2,
@@ -742,7 +728,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[2],
                                 transparent
                             ),
-                            "green", cubie_objects.length
+                            "back", rubik.cubies.length
                         )
                     );
             }
@@ -756,10 +742,11 @@ add_inner_plane_vertex = (i, j, k) => {
         faces[i3] = new Face();
 
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 0]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 1]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 2]);
-        faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + 3]);
+        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+
+        for (let j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+        }
 
         vertice_indices.push(
             count + 0,
@@ -783,10 +770,11 @@ add_inner_plane_vertex = (i, j, k) => {
         cubie.add_face(faces[i3]);
     }
 
-    cubie_objects.push(cubie)
+    rubik.add_cubie(cubie);
 }
 
 init_vertices = () => {
+    rubik = new Rubik();
     rubik_half_length = rubik_length / 2
     end_x = (rubik_size_x - 1) / 2;
     start_x = -end_x;
@@ -795,7 +783,6 @@ init_vertices = () => {
     end_z = (rubik_size_z - 1) / 2;
     start_z = -end_z;
 
-    cubie_objects = [];
     vertices = [];
     vertice_indices = [];
     count = 0;
@@ -817,8 +804,7 @@ init_vertices = () => {
         }
     }
 
-    vertices = [].concat(...cubie_objects.map(cubie => cubie.to_string()));
-    cubie_objects = [];
+    vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
     vertice_indices_length = vertice_indices.length;
 }
