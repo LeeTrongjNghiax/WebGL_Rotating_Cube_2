@@ -36,11 +36,15 @@ document.querySelector("#toggle-rotate").addEventListener("click", e => {
     }
 })
 
-document.querySelector("#show-control").addEventListener("click", () => {
-    if (document.querySelector("#controller").style.left == "0px")
+document.querySelector("#show-control").addEventListener("click", e => {
+    if (document.querySelector("#controller").style.left == "0px") {
         document.querySelector("#controller").style.left = "-100%";
-    else
+        e.target.innerHTML = "Show control";
+    }
+    else {
         document.querySelector("#controller").style.left = "0px";
+        e.target.innerHTML = "Hide control";
+    }
 });
 
 document.querySelector("#hide-control").addEventListener("click", () => {
