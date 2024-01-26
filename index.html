@@ -45,8 +45,8 @@
         }
     </script>
 
-    <script id="vs300" type="x-shader/x-vertex">#version 300 es
-        precision highp float;
+    <script id="vs300" type="x-shader/x-vertex">#version 300 es 
+        precision highp float; 
         
         in vec3 vertPosition; 
         in vec4 vertColor; 
@@ -60,18 +60,18 @@
         
         void main() { 
             fragColor = vertColor; 
-            gl_PointSize = pointSize; 
+            gl_PointSize = pointSize;
             gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
         }
     </script>
 
-    <script id="fs300" type="x-shader/x-fragment">#version 300 es
-        precision highp float;
+    <script id="fs300" type="x-shader/x-fragment">#version 300 es 
+        precision highp float; 
 
-        in vec4 fragColor;
-        out vec4 outFragColor;
-
-        void main() {
+        in vec4 fragColor; 
+        out vec4 outFragColor; 
+        
+        void main() { 
             outFragColor = fragColor; 
         }
     </script>
@@ -164,8 +164,7 @@
                 </div>
                 <div class="input-block">
                     <label for="update-angle-1">Update angle per second method 1:</label>
-                    <input id="update-angle-1" name="update-angle-method" 
-                    value="method1" type="radio" checked>
+                    <input id="update-angle-1" name="update-angle-method" value="method1" type="radio" checked>
                 </div>
                 <div class="input-block">
                     <label for="update-angle-2">Update angle per second method 2:</label>
