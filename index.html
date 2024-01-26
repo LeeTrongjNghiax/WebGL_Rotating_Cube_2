@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="style.css">
 
     <script id="vs" type="x-shader/x-vertex">
-        attribute highp vec3 vertPosition; 
+        #define PI 3.141592653589793
+
+        attribute lowp vec3 vertPosition; 
         attribute lowp vec4 vertColor; 
         
         varying lowp vec4 fragColor; 
@@ -19,21 +21,78 @@
         uniform mat4 mWorld; 
         uniform mat4 mView; 
         uniform mat4 mProj; 
+        uniform int axis; 
+        uniform float min; 
+        uniform float max; 
+        uniform float rad; 
+
+        mat4 create_identity_matrix() {
+            mat4 iden;
+            iden[0] = vec4(1.0,  .0,  .0,  .0);
+            iden[1] = vec4( .0, 1.0,  .0,  .0);
+            iden[2] = vec4( .0,  .0, 1.0,  .0);
+            iden[3] = vec4( .0,  .0,  .0, 1.0);
+            return iden;
+        }
+
+        mat4 create_rotation_x_matrix(float rad) {
+            mat4 rot;
+            rot[0] = vec4(1.0, .0,        .0,        .0);
+            rot[1] = vec4( .0, cos(rad), -sin(rad),  .0);
+            rot[2] = vec4( .0, sin(rad),  cos(rad),  .0);
+            rot[3] = vec4( .0, .0,        .0,       1.0);
+            return rot;
+        } 
+
+        mat4 create_rotation_y_matrix(float rad) {
+            mat4 rot;
+            rot[0] = vec4( cos(rad),  .0, sin(rad),  .0);
+            rot[1] = vec4( .0,       1.0, .0,        .0);
+            rot[2] = vec4(-sin(rad),  .0, cos(rad),  .0);
+            rot[3] = vec4( .0,       0.0, .0,       1.0);
+            return rot;
+        } 
+
+        mat4 create_rotation_z_matrix(float rad) {
+            mat4 rot;
+            rot[0] = vec4(cos(rad), -sin(rad),  .0,  .0);
+            rot[1] = vec4(sin(rad),  cos(rad),  .0,  .0);
+            rot[2] = vec4(.0,        .0,       1.0,  .0);
+            rot[3] = vec4(.0,        .0,        .0, 1.0);
+            return rot;
+        }
+
+        mat4 check_vertex(vec3 vertex, int axis, float min, float max, float rad) {
+            if (axis == 0) 
+                if ((vertex.x >= min) && (vertex.x <= max))
+                    return create_rotation_x_matrix(rad);
+                else
+                    return create_identity_matrix();
+            else if (axis == 1) 
+                if ((vertex.y >= min) && (vertex.y <= max))
+                    return create_rotation_y_matrix(rad);
+                else
+                    return create_identity_matrix();
+            else if (axis == 2) 
+                if ((vertex.z >= min) && (vertex.z <= max))
+                    return create_rotation_z_matrix(rad); 
+                else
+                    return create_identity_matrix();
+        }
         
         void main() { 
-            mat4 rot;
-            rot[0] = vec4(1.0, .0, .0, .0);
-            rot[1] = vec4(.0, cos(3.14 / 4.0), sin(3.14 / 4.0), .0);
-            rot[2] = vec4(.0, -sin(3.14 / 4.0), cos(3.14 / 4.0), .0);
-            rot[3] = vec4(.0, .0, .0, 1.0);
-
             fragColor = vertColor; 
             gl_PointSize = pointSize; 
 
-            if (vertPosition.x == 1.0)
-                gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
-            else
-                gl_Position = mProj * mView * rot * vec4(vertPosition, 1.0); 
+            mat4 rot = check_vertex(
+                vertPosition, axis, 
+                min, max, 
+                rad
+            );
+
+            gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0); 
+
+            /* gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); */
         }
     </script>
 
@@ -312,7 +371,7 @@
             <div class="dropdown-content">
                 <div class="input-block">
                     <label for="shader-program-version">Use higher precision shader program version:</label>
-                    <input id="shader-program-version" type="checkbox" checked size="2">
+                    <input id="shader-program-version" type="checkbox" size="2">
                 </div>
             </div>
         </div>

@@ -134,7 +134,6 @@ let vertex_index_buffer_object;
 //
 
 
-let point_size_attribute_location;
 let position_attribute_location;
 let color_attribute_location;
 
@@ -145,7 +144,10 @@ let color_attribute_location;
 let point_size_uniform_location;
 let mat_world_uniform_location;
 let mat_view_uniform_location;
-let mat_projection_uniform_location;
+let axis_uniform_location;
+let min_plane_uniform_location;
+let max_plane_uniform_location;
+let rad_uniform_location;
 
 //
 // Matrix
@@ -818,7 +820,7 @@ add_buffer_data = () => {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
 
-    vertices = [];
+    // vertices = [];
     vertice_indices = [];
 
     position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
@@ -853,6 +855,11 @@ get_matrix_in_shader = () => {
     mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
     mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
     mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
+
+    axis_uniform_location = gl.getUniformLocation(program, 'axis');
+    min_plane_uniform_location = gl.getUniformLocation(program, 'min');
+    max_plane_uniform_location = gl.getUniformLocation(program, 'max');
+    rad_uniform_location = gl.getUniformLocation(program, 'rad');
 }
 
 set_up_support_matrix = () => {
@@ -898,6 +905,7 @@ add_support_matrix_to_shader = () => {
     gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
     gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
     gl.uniform1f(point_size_uniform_location, point_size);
+    gl.uniform1f(rad_uniform_location, 0.1);
 }
 
 draw = () => {
@@ -955,6 +963,10 @@ orbit_around_rubik = () => {
     multiply(world_matrix, world_matrix, z_rotation_matrix);
 
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
+    gl.uniform1i(axis_uniform_location, 2);
+    gl.uniform1f(min_plane_uniform_location, -1.5);
+    gl.uniform1f(max_plane_uniform_location, -.5);
+    gl.uniform1f(rad_uniform_location, angle * 8);
 }
 
 count_fps = () => {
