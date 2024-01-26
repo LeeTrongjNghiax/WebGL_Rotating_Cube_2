@@ -785,6 +785,11 @@ init_vertices = () => {
     end_z = (rubik_size_z - 1) / 2;
     start_z = -end_z;
 
+    rubik.add_control(new Control("x", start_x, end_x));
+    rubik.add_control(new Control("y", start_y, end_y));
+    rubik.add_control(new Control("z", start_z, end_z));
+    rubik.sticker_gap = sticker_gap;
+
     vertices = [];
     vertice_indices = [];
     count = 0;

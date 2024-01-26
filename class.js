@@ -92,9 +92,23 @@ class Cubie {
     }
 }
 
+class Control {
+    constructor(axis = "x", start = 0, end = 0) {
+        this.axis = axis;
+        this.start = start;
+        this.end = end;
+    }
+}
+
 class Rubik {
-    constructor(cubies = []) {
+    constructor(cubies = [], controls = [], sticker_gap) {
         this.cubies = cubies;
+        this.controls = controls;
+        this.sticker_gap = sticker_gap;
+    }
+
+    add_control(control) {
+        this.controls.push(control);
     }
 
     add_cubie(cubie) {
@@ -110,44 +124,5 @@ class Rubik {
         }
 
         return result;
-    }
-
-    rotate_face(axis = "x", position = 0, angle = 45) {
-        let cubies_to_rotate = this.get_cubies_in_position(axis, position);
-
-        let identity_matrix = new Float32Array(16);
-        identity(identity_matrix);
-
-        let axis_vector;
-        switch(axis) {
-            case "x":
-                axis_vector = [1, 0, 0];
-                break;
-            case "y":
-                axis_vector = [0, 1, 0];
-                break;
-            case "z":
-                axis_vector = [0, 0, 1];
-                break;
-            default:
-                axis_vector = [0, 0, 0];
-        }
-
-        let rotate_matrix = new Float32Array(16);
-        rotate(rotate_matrix, identity_matrix, angle, axis_vector);
-
-        for (let i = 0; i < cubies_to_rotate.length; i++) {
-            let rotated_vector = [];
-            transformMat4(rotated_vector, [
-                cubies_to_rotate[i].absolute_position.x,
-                cubies_to_rotate[i].absolute_position.y,
-                cubies_to_rotate[i].absolute_position.z,
-                1
-            ], rotate_matrix);
-
-            cubies_to_rotate[i].absolute_position.x = rotated_vector[0];
-            cubies_to_rotate[i].absolute_position.y = rotated_vector[1];
-            cubies_to_rotate[i].absolute_position.z = rotated_vector[2];
-        }
     }
 }

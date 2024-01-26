@@ -81,8 +81,8 @@
         }
         
         void main() { 
-            fragColor = vertColor; 
-            gl_PointSize = pointSize; 
+            fragColor = vertColor;
+            gl_PointSize = pointSize;
 
             mat4 rot = check_vertex(
                 vertPosition, axis, 
@@ -90,9 +90,7 @@
                 rad
             );
 
-            gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0); 
-
-            /* gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); */
+            gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
         }
     </script>
 
