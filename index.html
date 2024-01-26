@@ -21,10 +21,19 @@
         uniform mat4 mProj; 
         
         void main() { 
+            mat4 rot;
+            rot[0] = vec4(1.0, .0, .0, .0);
+            rot[1] = vec4(.0, cos(3.14 / 4.0), sin(3.14 / 4.0), .0);
+            rot[2] = vec4(.0, -sin(3.14 / 4.0), cos(3.14 / 4.0), .0);
+            rot[3] = vec4(.0, .0, .0, 1.0);
+
             fragColor = vertColor; 
             gl_PointSize = pointSize; 
 
-            gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
+            if (vertPosition.x == 1.0)
+                gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0); 
+            else
+                gl_Position = mProj * mView * rot * vec4(vertPosition, 1.0); 
         }
     </script>
 
