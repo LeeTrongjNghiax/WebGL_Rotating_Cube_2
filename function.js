@@ -1,3 +1,15 @@
+const EPSILON = 0.000001;
+
+function round_to(num) {
+    if (Math.abs(num - 1) < EPSILON)
+        return 1;
+    
+    if (Math.abs(num - 0) < EPSILON)
+        return 0;
+
+    return num;
+}
+
 function hex_to_normalize_rgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? [
@@ -69,7 +81,7 @@ function rotate(out, a, rad, axis) {
         b21 = void 0,
         b22 = void 0;
 
-    if (Math.abs(len) < 0.000001) {
+    if (Math.abs(len) < EPSILON) {
         return null;
     }
 
@@ -92,25 +104,25 @@ function rotate(out, a, rad, axis) {
     b20 = x * z * t + y * s;b21 = y * z * t - x * s;b22 = z * z * t + c;
 
     // Perform rotation-specific matrix multiplication
-    out[0] = a00 * b00 + a10 * b01 + a20 * b02;
-    out[1] = a01 * b00 + a11 * b01 + a21 * b02;
-    out[2] = a02 * b00 + a12 * b01 + a22 * b02;
-    out[3] = a03 * b00 + a13 * b01 + a23 * b02;
-    out[4] = a00 * b10 + a10 * b11 + a20 * b12;
-    out[5] = a01 * b10 + a11 * b11 + a21 * b12;
-    out[6] = a02 * b10 + a12 * b11 + a22 * b12;
-    out[7] = a03 * b10 + a13 * b11 + a23 * b12;
-    out[8] = a00 * b20 + a10 * b21 + a20 * b22;
-    out[9] = a01 * b20 + a11 * b21 + a21 * b22;
-    out[10] = a02 * b20 + a12 * b21 + a22 * b22;
-    out[11] = a03 * b20 + a13 * b21 + a23 * b22;
+    out[0]  = round_to( a00 * b00 + a10 * b01 + a20 * b02 );
+    out[1]  = round_to( a01 * b00 + a11 * b01 + a21 * b02 );
+    out[2]  = round_to( a02 * b00 + a12 * b01 + a22 * b02 );
+    out[3]  = round_to( a03 * b00 + a13 * b01 + a23 * b02 );
+    out[4]  = round_to( a00 * b10 + a10 * b11 + a20 * b12 );
+    out[5]  = round_to( a01 * b10 + a11 * b11 + a21 * b12 );
+    out[6]  = round_to( a02 * b10 + a12 * b11 + a22 * b12 );
+    out[7]  = round_to( a03 * b10 + a13 * b11 + a23 * b12 );
+    out[8]  = round_to( a00 * b20 + a10 * b21 + a20 * b22 );
+    out[9]  = round_to( a01 * b20 + a11 * b21 + a21 * b22 );
+    out[10] = round_to( a02 * b20 + a12 * b21 + a22 * b22 );
+    out[11] = round_to( a03 * b20 + a13 * b21 + a23 * b22 );
 
     if (a !== out) {
         // If the source and destination differ, copy the unchanged last row
-        out[12] = a[12];
-        out[13] = a[13];
-        out[14] = a[14];
-        out[15] = a[15];
+        out[12] = round_to( a[12] );
+        out[13] = round_to( a[13] );
+        out[14] = round_to( a[14] );
+        out[15] = round_to( a[15] );
     }
     return out;
 }
@@ -184,7 +196,7 @@ function lookAt(out, eye, center, up) {
     var centery = center[1];
     var centerz = center[2];
 
-    if (Math.abs(eyex - centerx) < 0.000001 && Math.abs(eyey - centery) < 0.000001 && Math.abs(eyez - centerz) < 0.000001) {
+    if (Math.abs(eyex - centerx) < EPSILON && Math.abs(eyey - centery) < EPSILON && Math.abs(eyez - centerz) < EPSILON) {
         return identity(out);
     }
 
@@ -276,7 +288,7 @@ function fromRotation(out, rad, axis) {
       z = axis[2];
     let len = Math.hypot(x, y, z);
     let s, c, t;
-    if (len < 0.000001) {
+    if (len < EPSILON) {
       return null;
     }
     len = 1 / len;
