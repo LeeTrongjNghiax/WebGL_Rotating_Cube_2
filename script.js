@@ -981,27 +981,26 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg = (axis, position, finished_rad, id) => {
-    document.querySelector(`#${id}`).disabled = true;
+loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, id, sticker_gap_1 = 0, sticker_gap_2 = 0) => {
+    disable_rotate_function();
 
     rad = 0;
     rad_step = finished_rad / 25;
 
     rotate_interval = setInterval(() => {
         rad += rad_step;
-
-        rotate_face(axis_string_to_number( axis ), position - DELTA, position + DELTA, rad);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
+        
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        rotate_face(axis_string_to_number( axis ), position - DELTA - sticker_gap_1, position + DELTA + sticker_gap_2, rad);
 
         if (Math.abs(rad - finished_rad) < EPSILON) {
             rubik.rotate_face(axis, position, rad);
-
+            
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-
-            document.querySelector(`#${id}`).disabled = false;
-
+            
+            enable_rotate_function();
+            
             clearInterval(rotate_interval);
         }
     }, smooth_transition);
@@ -1058,4 +1057,23 @@ show_drop_down = e => {
         e.childNodes[0].innerHTML = "△"
     else
         e.childNodes[0].innerHTML = "▽"
+}
+
+
+disable_rotate_function = () => {
+    document.querySelector(`#rotate-U`).disabled = true;
+    document.querySelector(`#rotate-D`).disabled = true;
+    document.querySelector(`#rotate-F`).disabled = true;
+    document.querySelector(`#rotate-B`).disabled = true;
+    document.querySelector(`#rotate-R`).disabled = true;
+    document.querySelector(`#rotate-L`).disabled = true;
+}
+
+enable_rotate_function = () => {
+    document.querySelector(`#rotate-U`).disabled = false;
+    document.querySelector(`#rotate-D`).disabled = false;
+    document.querySelector(`#rotate-F`).disabled = false;
+    document.querySelector(`#rotate-B`).disabled = false;
+    document.querySelector(`#rotate-R`).disabled = false;
+    document.querySelector(`#rotate-L`).disabled = false;
 }
