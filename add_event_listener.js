@@ -52,5 +52,20 @@ document.querySelector("#hide-control").addEventListener("click", () => {
 });
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg(0, -1.51, -0.5);
+    loop_rotate_face_till_90_deg("y", 1.0);
+});
+document.querySelector("#rotate-D").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("y", -1.0);
+});
+document.querySelector("#rotate-F").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("z", -1.0);
+});
+document.querySelector("#rotate-B").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("z", 1.0);
+});
+document.querySelector("#rotate-R").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("x", 1.0);
+});
+document.querySelector("#rotate-L").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("x", -1.0);
 });

@@ -1,3 +1,5 @@
+const DELTA = 0.5;
+
 //
 // Shader
 //
@@ -116,7 +118,7 @@ let rotate_interval;
 let rad;
 let rad_step;
 let finished_rad = Math.PI / 2;
-let smooth_transition = 100;
+let smooth_transition = 10;
 
 //
 //
@@ -981,12 +983,12 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg = (axis, min, max) => {
+loop_rotate_face_till_90_deg = (axis, position) => {
     clearInterval(rotate_interval);
 
     times_run = 0;
     rad = 0;
-    rad_step = Math.PI / 50;
+    rad_step = Math.PI / 10;
 
     rotate_interval = setInterval(() => {
         rad += rad_step;
@@ -994,7 +996,7 @@ loop_rotate_face_till_90_deg = (axis, min, max) => {
 
         if (Math.abs(rad - finished_rad) < 0.06) {
             clearInterval(rotate_interval);
-            rubik.rotate_face("x", 0.5);
+            rubik.rotate_face(axis, position);
 
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
             vertice_indices_length = vertice_indices.length;
@@ -1002,12 +1004,11 @@ loop_rotate_face_till_90_deg = (axis, min, max) => {
             gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-            vertex_index_buffer_object = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
         }
 
-        rotate_face(axis, min, max, rad);
+        rotate_face(axis_string_to_number( axis ), position - DELTA, position + DELTA, rad);
     }, smooth_transition);
 }
 

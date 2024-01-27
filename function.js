@@ -1,5 +1,12 @@
 const EPSILON = 0.000001;
 
+function axis_string_to_number(string) {
+    if (string == "x") return 0;
+    if (string == "y") return 1;
+    if (string == "z") return 2;
+    return -1;
+}
+
 function round_to(num) {
     if (Math.abs(num - 1) < EPSILON)
         return 1;
