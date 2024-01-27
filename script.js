@@ -988,27 +988,28 @@ loop_rotate_face_till_90_deg = (axis, position) => {
 
     times_run = 0;
     rad = 0;
-    rad_step = Math.PI / 10;
+    rad_step = Math.PI / 50;
 
     rotate_interval = setInterval(() => {
         rad += rad_step;
         rad = rad % degToRad(DEGREE_OF_CIRCLE);
 
+        rotate_face(axis_string_to_number( axis ), position - DELTA, position + DELTA, rad);
+
+        vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
+        vertice_indices_length = vertice_indices.length;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
+
         if (Math.abs(rad - finished_rad) < 0.06) {
             clearInterval(rotate_interval);
-            rubik.rotate_face(axis, position);
-
-            vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-            vertice_indices_length = vertice_indices.length;
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
+            rubik.rotate_face(axis, position, rad);
+            
         }
-
-        rotate_face(axis_string_to_number( axis ), position - DELTA, position + DELTA, rad);
     }, smooth_transition);
 }
 

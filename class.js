@@ -126,7 +126,7 @@ class Rubik {
         return result;
     }
 
-    rotate_face(axis = "x", position = 0, angle = 90) {
+    rotate_face(axis = "x", position = 0, rad) {
         let cubies_to_rotate = this.get_cubies_in_position(axis, position);
 
         let identity_matrix = new Float32Array(16);
@@ -148,11 +148,13 @@ class Rubik {
         }
 
         let rotate_matrix = new Float32Array(16);
-        rotate(rotate_matrix, identity_matrix, degToRad(angle), axis_vector);
+        rotate(rotate_matrix, identity_matrix, -rad, axis_vector);
         
         let rotated_vector;
+        let rotated_vector2;
 
         for (let i = 0; i < cubies_to_rotate.length; i++) {
+
             rotated_vector = [];
 
             transformMat4(rotated_vector, [
@@ -170,18 +172,18 @@ class Rubik {
 
                 for (let k = 0; k < cubies_to_rotate[i].faces[j].vertices.length; k++) {
 
-                    rotated_vector = [];
+                    rotated_vector2 = [];
 
-                    transformMat4(rotated_vector, [
+                    transformMat4(rotated_vector2, [
                         cubies_to_rotate[i].faces[j].vertices[k].relative_position.x,
                         cubies_to_rotate[i].faces[j].vertices[k].relative_position.y,
                         cubies_to_rotate[i].faces[j].vertices[k].relative_position.z,
                         1
                     ], rotate_matrix);
         
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.x = rotated_vector[0];
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.y = rotated_vector[1];
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.z = rotated_vector[2];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.x = rotated_vector2[0];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.y = rotated_vector2[1];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.z = rotated_vector2[2];
                 }
             }
         }
