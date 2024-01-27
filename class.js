@@ -148,10 +148,13 @@ class Rubik {
         }
 
         let rotate_matrix = new Float32Array(16);
-        rotate(rotate_matrix, identity_matrix, degToRad( angle ), axis_vector);
+        rotate(rotate_matrix, identity_matrix, degToRad(angle), axis_vector);
+        
+        let rotated_vector;
 
         for (let i = 0; i < cubies_to_rotate.length; i++) {
-            let rotated_vector = [];
+            rotated_vector = [];
+
             transformMat4(rotated_vector, [
                 cubies_to_rotate[i].absolute_position.x,
                 cubies_to_rotate[i].absolute_position.y,
@@ -163,7 +166,24 @@ class Rubik {
             cubies_to_rotate[i].absolute_position.y = rotated_vector[1];
             cubies_to_rotate[i].absolute_position.z = rotated_vector[2];
 
-            console.log(cubies_to_rotate[i].absolute_position);
+            for (let j = 0; j < cubies_to_rotate[i].faces.length; j++) {
+
+                for (let k = 0; k < cubies_to_rotate[i].faces[j].vertices.length; k++) {
+
+                    rotated_vector = [];
+
+                    transformMat4(rotated_vector, [
+                        cubies_to_rotate[i].faces[j].vertices[k].relative_position.x,
+                        cubies_to_rotate[i].faces[j].vertices[k].relative_position.y,
+                        cubies_to_rotate[i].faces[j].vertices[k].relative_position.z,
+                        1
+                    ], rotate_matrix);
+        
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.x = rotated_vector[0];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.y = rotated_vector[1];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.z = rotated_vector[2];
+                }
+            }
         }
     }
 }

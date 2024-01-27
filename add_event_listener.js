@@ -52,8 +52,5 @@ document.querySelector("#hide-control").addEventListener("click", () => {
 });
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
-    rubik.rotate_face("x", 1, 45);
-    vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-    
-    // add_buffer_data();
+    loop_rotate_face_till_90_deg(0, -1.51, -0.5);
 });

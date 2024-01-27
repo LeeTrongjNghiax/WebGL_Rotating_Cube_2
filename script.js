@@ -108,6 +108,17 @@ let current_tick;
 let time;
 
 //
+// Rotate loop
+//
+
+let times_run;
+let rotate_interval;
+let rad;
+let rad_step;
+let finished_rad = Math.PI / 2;
+let smooth_transition = 100;
+
+//
 //
 //
 
@@ -154,6 +165,7 @@ let rad_uniform_location;
 //
 
 let world_matrix;
+let base_matrix;
 let view_matrix;
 let projection_matrix;
 
@@ -825,9 +837,6 @@ add_buffer_data = () => {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
 
-    // vertices = [];
-    vertice_indices = [];
-
     position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
     color_attribute_location = gl.getAttribLocation(program, 'vertColor');
 
@@ -879,10 +888,12 @@ set_up_support_matrix = () => {
     identity(identity_matrix);
 
     world_matrix = new Float32Array(16);
+    base_matrix = new Float32Array(16);
     view_matrix = new Float32Array(16);
     projection_matrix = new Float32Array(16);
 
     identity(world_matrix);
+    identity(base_matrix);
     lookAt(view_matrix, [
         camera_position.x,
         camera_position.y,
@@ -968,10 +979,43 @@ orbit_around_rubik = () => {
     multiply(world_matrix, world_matrix, z_rotation_matrix);
 
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
-    gl.uniform1i(axis_uniform_location, 2);
-    gl.uniform1f(min_plane_uniform_location, -1.5);
-    gl.uniform1f(max_plane_uniform_location, -.5);
-    gl.uniform1f(rad_uniform_location, angle * 8);
+}
+
+loop_rotate_face_till_90_deg = (axis, min, max) => {
+    clearInterval(rotate_interval);
+
+    times_run = 0;
+    rad = 0;
+    rad_step = Math.PI / 50;
+
+    rotate_interval = setInterval(() => {
+        rad += rad_step;
+        rad = rad % degToRad(DEGREE_OF_CIRCLE);
+
+        if (Math.abs(rad - finished_rad) < 0.06) {
+            clearInterval(rotate_interval);
+            rubik.rotate_face("x", 0.5);
+
+            vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
+            vertice_indices_length = vertice_indices.length;
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+            vertex_index_buffer_object = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
+        }
+
+        rotate_face(axis, min, max, rad);
+    }, smooth_transition);
+}
+
+rotate_face = (axis, min, max, rad) => {
+    gl.uniform1i(axis_uniform_location, axis);
+    gl.uniform1f(min_plane_uniform_location, min);
+    gl.uniform1f(max_plane_uniform_location, max);
+    gl.uniform1f(rad_uniform_location, rad);
 }
 
 count_fps = () => {
