@@ -45,11 +45,17 @@ let is_render_inner_cube;
 let is_render_outer_cube;
 let is_render_inner_plane;
 
+let rubik_rotated_x;
+let rubik_rotated_y;
+let rubik_rotated_z;
+
 let rotate_angle_x;
 let rotate_angle_y;
 let rotate_angle_z;
 let angle_per_second;
 let update_angle_method;
+let smooth_rotation;
+let angle_rotated_ratio;
 
 let fovy;
 let aspect_ratio;
@@ -116,7 +122,6 @@ let time;
 let rotate_interval;
 let rad;
 let rad_step;
-let smooth_transition = 10;
 
 //
 //
@@ -189,11 +194,17 @@ get_input_data = () => {
     is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
     is_render_inner_plane = document.querySelector("#render-inner-plane").checked;
 
+    rubik_rotated_x = document.querySelector("#rotated-x").value || 0;
+    rubik_rotated_y = document.querySelector("#rotated-y").value || 0;
+    rubik_rotated_z = document.querySelector("#rotated-z").value || 0;
+
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value;
     rotate_angle_z = +document.querySelector("#rotate-angle-z").value;
     angle_per_second = +document.querySelector("#angle-per-second").value || 90;
     update_angle_method = document.querySelector('input[name="update-angle-method"]:checked').value;
+    smooth_rotation = document.querySelector('#smooth-rotation').value || 10;
+    angle_rotated_ratio = document.querySelector('#angle-rotated-ratio').value || 25;
 
     camera_position = {
         x: +document.querySelector("#camera-x").value || 0,
@@ -981,11 +992,11 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, id, sticker_gap_1 = 0, sticker_gap_2 = 0) => {
+loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0) => {
     disable_rotate_function();
 
     rad = 0;
-    rad_step = finished_rad / 25;
+    rad_step = finished_rad / angle_rotated_ratio;
 
     rotate_interval = setInterval(() => {
         rad += rad_step;
@@ -1003,7 +1014,7 @@ loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, id, sticker_ga
             
             clearInterval(rotate_interval);
         }
-    }, smooth_transition);
+    }, smooth_rotation);
 }
 
 rotate_face = (axis, min, max, rad) => {

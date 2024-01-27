@@ -139,12 +139,11 @@
     <script src="add_event_listener.js" defer></script>
 </head>
 
-<body>
+<body class="dark-mode">
 
     <div class="button-block">
         <button id="change-theme">Change theme</button>
         <button id="create">Create rubik's cube</button>
-        <!-- <button id="create-random">Create random rubik's cube</button> -->
         <button id="toggle-rotate" class="is_stop_rotating">Start orbiting</button>
         <button id="show-control">Show control</button>
     </div>
@@ -165,10 +164,13 @@
             <div class="dropdown-content">
                 <div id="movement-controller">
                     <button id="rotate-U">U</button>
+                    <button id="rotate-E">E</button>
                     <button id="rotate-D">D</button>
                     <button id="rotate-F">F</button>
+                    <button id="rotate-S">S</button>
                     <button id="rotate-B">B</button>
                     <button id="rotate-R">R</button>
+                    <button id="rotate-M">M</button>
                     <button id="rotate-L">L</button>
                 </div>
             </div>
@@ -203,6 +205,34 @@
                     <label for="sticker-size">Sticker size:</label>
                     <input id="sticker-size" type="number" min="0" max="1" value="0.9" size="4" step="0.9">
                 </div>
+            </div>
+        </div>
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Orientation</p>
+
+            <div class="dropdown-content">
+                <div class="input-block">
+                    <label for="rotated-x">Rubik Rotated X:</label>
+                    <input id="rotated-x" type="number" min="-360" max="360" value="0" size="4" step="1">
+                </div>
+                <div class="input-block">
+                    <label for="rotated-y">Rubik Rotated Y:</label>
+                    <input id="rotated-y" type="number" min="-360" max="360" value="0" size="4" step="1">
+                </div>
+                <div class="input-block">
+                    <label for="rotated-z">Rubik Rotated Z:</label>
+                    <input id="rotated-z" type="number" min="-360" max="360" value="0" size="4" step="1">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dropdown">
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rendering</p>
+
+            <div class="dropdown-content">
                 <div class="input-block">
                     <label for="render-inner-cube">Render Inner cube:</label>
                     <input id="render-inner-cube" type="checkbox" checked>
@@ -220,32 +250,40 @@
 
 
         <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Orbit</p>
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Animation</p>
 
             <div class="dropdown-content">
                 <div class="input-block">
-                    <label for="rotate-angle-x">Rotate angle X:</label>
-                    <input id="rotate-angle-x" type="number" min="-10" max="10" value="1" size="2" step="0.1">
+                    <label for="rotate-angle-x">Rotate angle X speed:</label>
+                    <input id="rotate-angle-x" type="number" min="-10" max="10" value="0" size="2" step="0.1">
                 </div>
                 <div class="input-block">
-                    <label for="rotate-angle-y">Rotate angle Y:</label>
-                    <input id="rotate-angle-y" type="number" min="-10" max="10" value="1" size="2" step="0.1">
+                    <label for="rotate-angle-y">Rotate angle Y speed:</label>
+                    <input id="rotate-angle-y" type="number" min="-10" max="10" value="0" size="2" step="0.1">
                 </div>
                 <div class="input-block">
-                    <label for="rotate-angle-z">Rotate angle Z:</label>
-                    <input id="rotate-angle-z" type="number" min="-10" max="10" value="1" size="2" step="0.1">
+                    <label for="rotate-angle-z">Rotate angle Z speed:</label>
+                    <input id="rotate-angle-z" type="number" min="-10" max="10" value="0" size="2" step="0.1">
                 </div>
                 <div class="input-block">
-                    <label for="update-angle-1">Update angle per second method 1:</label>
+                    <label for="update-angle-1">Update angle per frame method 1:</label>
                     <input id="update-angle-1" name="update-angle-method" value="method1" type="radio" checked>
                 </div>
                 <div class="input-block">
-                    <label for="update-angle-2">Update angle per second method 2:</label>
+                    <label for="update-angle-2">Update angle per frame method 2:</label>
                     <input id="update-angle-2" name="update-angle-method" value="method2" type="radio">
                 </div>
                 <div class="input-block">
-                    <label for="angle-per-second">Angle per second for method 2:</label>
+                    <label for="angle-per-second">Angle per frame for method 2:</label>
                     <input id="angle-per-second" type="number" min="-360" max="360" value="90" size="2" step="0.1">
+                </div>
+                <div class="input-block">
+                    <label for="smooth-rotation">Smooth rotation per frame:</label>
+                    <input id="smooth-rotation" type="number" min="0" max="100" value="10" size="2" step="1">
+                </div>
+                <div class="input-block">
+                    <label for="angle-rotated-ratio">Angle rotated ratio per frame:</label>
+                    <input id="angle-rotated-ratio" type="number" min="0" max="360" value="25" size="2" step="1">
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@
     --light-color-semi-tran: #eeeeeeaa;
     --dark-color: #121212;
     --dark-color-semi-tran: #121212aa;
+    --all-color-transition-time: 0.25s;
 }
 
 .light-mode,
@@ -12,11 +13,13 @@
 .light-mode option {
     background: var(--light-color);
     color: var(--dark-color);
+    transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
 
 .light-mode #controller {
     background: var(--light-color-semi-tran);
     color: var(--dark-color);
+    transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
 
 .dark-mode,
@@ -26,11 +29,13 @@
 .dark-mode option {
     background: var(--dark-color);
     color: var(--light-color);
+    transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
 
 .dark-mode #controller {
     background: var(--dark-color-semi-tran);
     color: var(--light-color);
+    transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
 
 *,

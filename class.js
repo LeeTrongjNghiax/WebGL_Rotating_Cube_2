@@ -172,18 +172,18 @@ class Rubik {
 
                 for (let k = 0; k < cubies_to_rotate[i].faces[j].vertices.length; k++) {
 
-                    rotated_vector2 = [];
+                    rotated_vector = [];
 
-                    transformMat4(rotated_vector2, [
+                    transformMat4(rotated_vector, [
                         cubies_to_rotate[i].faces[j].vertices[k].relative_position.x,
                         cubies_to_rotate[i].faces[j].vertices[k].relative_position.y,
                         cubies_to_rotate[i].faces[j].vertices[k].relative_position.z,
                         1
                     ], rotate_matrix);
         
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.x = rotated_vector2[0];
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.y = rotated_vector2[1];
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.z = rotated_vector2[2];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.x = rotated_vector[0];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.y = rotated_vector[1];
+                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.z = rotated_vector[2];
                 }
             }
         }

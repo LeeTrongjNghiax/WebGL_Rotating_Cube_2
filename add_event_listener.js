@@ -2,8 +2,6 @@ document.addEventListener("resize", () => {
     setup_webgl_canvas();
 });
 
-document.body.classList.add("dark-mode");
-
 document.getElementById("change-theme").addEventListener('click', e => {
     if ( document.body.classList.contains("light-mode") ) 
         document.body.classList.replace("light-mode", "dark-mode");
@@ -52,20 +50,29 @@ document.querySelector("#hide-control").addEventListener("click", () => {
 });
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("y", 1.0, Math.PI / 2, "rotate-U", 0, rubik.sticker_gap);
+    loop_rotate_face_till_90_deg("y",  1.0,  Math.PI / 2, 0, rubik.sticker_gap);
+});
+document.querySelector("#rotate-E").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("y",  0.0, -Math.PI / 2, 0, 0);
 });
 document.querySelector("#rotate-D").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("y", -1.0, -Math.PI / 2, "rotate-D", rubik.sticker_gap, 0);
+    loop_rotate_face_till_90_deg("y", -1.0, -Math.PI / 2, rubik.sticker_gap, 0);
 });
 document.querySelector("#rotate-F").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("z", -1.0, -Math.PI / 2, "rotate-F", rubik.sticker_gap, 0);
+    loop_rotate_face_till_90_deg("z", -1.0, -Math.PI / 2, rubik.sticker_gap, 0);
+});
+document.querySelector("#rotate-S").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("z",  0.0, -Math.PI / 2, 0, 0);
 });
 document.querySelector("#rotate-B").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("z", 1.0, Math.PI / 2, "rotate-B", 0, rubik.sticker_gap);
+    loop_rotate_face_till_90_deg("z",  1.0,  Math.PI / 2, 0, rubik.sticker_gap);
 });
 document.querySelector("#rotate-R").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("x", -1.0, -Math.PI / 2, "rotate-R", rubik.sticker_gap, 0);
+    loop_rotate_face_till_90_deg("x", -1.0, -Math.PI / 2, rubik.sticker_gap, 0);
+});
+document.querySelector("#rotate-M").addEventListener("click", () => {
+    loop_rotate_face_till_90_deg("x",  0.0,  Math.PI / 2, 0, 0);
 });
 document.querySelector("#rotate-L").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("x", 1.0, Math.PI / 2, "rotate-L", 0, rubik.sticker_gap);
+    loop_rotate_face_till_90_deg("x",  1.0,  Math.PI / 2, 0, rubik.sticker_gap);
 });
