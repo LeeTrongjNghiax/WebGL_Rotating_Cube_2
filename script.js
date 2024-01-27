@@ -113,11 +113,9 @@ let time;
 // Rotate loop
 //
 
-let times_run;
 let rotate_interval;
 let rad;
 let rad_step;
-let finished_rad = Math.PI / 2;
 let smooth_transition = 10;
 
 //
@@ -983,32 +981,28 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg = (axis, position) => {
-    clearInterval(rotate_interval);
+loop_rotate_face_till_90_deg = (axis, position, finished_rad, id) => {
+    document.querySelector(`#${id}`).disabled = true;
 
-    times_run = 0;
     rad = 0;
-    rad_step = Math.PI / 50;
+    rad_step = finished_rad / 25;
 
     rotate_interval = setInterval(() => {
         rad += rad_step;
-        rad = rad % degToRad(DEGREE_OF_CIRCLE);
 
         rotate_face(axis_string_to_number( axis ), position - DELTA, position + DELTA, rad);
-
-        vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-        vertice_indices_length = vertice_indices.length;
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
-
-        if (Math.abs(rad - finished_rad) < 0.06) {
-            clearInterval(rotate_interval);
+        if (Math.abs(rad - finished_rad) < EPSILON) {
             rubik.rotate_face(axis, position, rad);
-            
+
+            vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
+
+            document.querySelector(`#${id}`).disabled = false;
+
+            clearInterval(rotate_interval);
         }
     }, smooth_transition);
 }

@@ -52,20 +52,20 @@ document.querySelector("#hide-control").addEventListener("click", () => {
 });
 
 document.querySelector("#rotate-U").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("y", 1.0);
+    loop_rotate_face_till_90_deg("y", 1.0, Math.PI / 2, "rotate-U");
 });
 document.querySelector("#rotate-D").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("y", -1.0);
+    loop_rotate_face_till_90_deg("y", -1.0, -Math.PI / 2, "rotate-D");
 });
 document.querySelector("#rotate-F").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("z", -1.0);
+    loop_rotate_face_till_90_deg("z", -1.0, -Math.PI / 2, "rotate-F");
 });
 document.querySelector("#rotate-B").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("z", 1.0);
+    loop_rotate_face_till_90_deg("z", 1.0, Math.PI / 2, "rotate-B");
 });
 document.querySelector("#rotate-R").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("x", 1.0);
+    loop_rotate_face_till_90_deg("x", -1.0, -Math.PI / 2, "rotate-R");
 });
 document.querySelector("#rotate-L").addEventListener("click", () => {
-    loop_rotate_face_till_90_deg("x", -1.0);
+    loop_rotate_face_till_90_deg("x", 1.0, Math.PI / 2, "rotate-L");
 });
