@@ -268,15 +268,10 @@ get_input_data = () => {
 }
 
 set_up_canvas_dimension = () => {
-    console.log(innerWidth);
-    console.log(innerHeight);
-
     if (innerWidth >= innerHeight) {
-        console.log("1");
         canvas.width = innerHeight * 9 / 10;
         canvas.height = innerHeight * 9 / 10;
     } else {
-        console.log("2");
         canvas.width = innerWidth * 9 / 10;
         canvas.height = innerWidth * 9 / 10;
     }

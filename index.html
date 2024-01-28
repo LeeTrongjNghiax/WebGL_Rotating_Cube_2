@@ -24,6 +24,15 @@
         uniform lowp float max; 
         uniform highp float rad; 
 
+        vec4 create_plane_from_3_points(vec3 a, vec3 b, vec3 c) {
+            highp float a0 = (b.y * c.z) - (b.y * a.z) - (a.y * c.z) - (b.z * c.y) + (b.z * a.y) + (a.z * c.y);
+            highp float b0 = (b.x * c.z) - (b.x * a.z) - (a.x * c.z) - (b.z * c.x) + (b.z * a.x) + (a.z * c.x);
+            highp float c0 = (b.x * c.y) - (b.x * a.y) - (a.x * c.y) - (b.y * c.x) + (b.y * a.x) + (a.y * c.x);
+            highp float d0 = a0 * a.x + b0 * a.y + c0 * a.z;
+
+            return vec4(a0, b0, c0, d0);
+        }
+
         mat4 create_identity_matrix() {
             mat4 iden;
             iden[0] = vec4(1.0,  .0,  .0,  .0);
@@ -82,11 +91,7 @@
             fragColor = vertColor;
             gl_PointSize = pointSize;
 
-            mat4 rot = check_vertex(
-                vertPosition, axis, 
-                min, max, 
-                rad
-            );
+            mat4 rot = check_vertex(vertPosition, axis, min, max, rad);
 
             gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
         }
