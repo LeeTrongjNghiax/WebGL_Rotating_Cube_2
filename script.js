@@ -2,6 +2,7 @@ const DELTA = 0.5;
 const QUARTER_OF_CIRCLE = Math.PI / 2;
 const HALF_OF_CIRCLE    = Math.PI;
 const FULL_OF_CIRCLE    = Math.PI * 2;
+const ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL = "′";
 
 //
 // Shader
@@ -267,8 +268,18 @@ get_input_data = () => {
 }
 
 set_up_canvas_dimension = () => {
-    canvas.width = innerWidth * 9 / 10;
-    canvas.height = innerHeight * 9 / 10;
+    console.log(innerWidth);
+    console.log(innerHeight);
+
+    if (innerWidth >= innerHeight) {
+        console.log("1");
+        canvas.width = innerHeight * 9 / 10;
+        canvas.height = innerHeight * 9 / 10;
+    } else {
+        console.log("2");
+        canvas.width = innerWidth * 9 / 10;
+        canvas.height = innerWidth * 9 / 10;
+    }
 }
 
 reset_canvas = () => {
@@ -885,7 +896,7 @@ create_rubik_control_set = () => {
         }
             
         rubik.add_control(new Control(suffix + rotation_name      , "x", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
-        rubik.add_control(new Control(suffix + rotation_name + "'", "x", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, "x", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
         rubik.add_control(new Control(suffix + rotation_name + "2", "x", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
     }
 
@@ -925,7 +936,7 @@ create_rubik_control_set = () => {
         }
 
         rubik.add_control(new Control(suffix + rotation_name      , "y", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
-        rubik.add_control(new Control(suffix + rotation_name + "'", "y", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, "y", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
         rubik.add_control(new Control(suffix + rotation_name + "2", "y", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
     }
 
@@ -965,7 +976,7 @@ create_rubik_control_set = () => {
         }
 
         rubik.add_control(new Control(suffix + rotation_name      , "z", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
-        rubik.add_control(new Control(suffix + rotation_name + "'", "z", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "", "z", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
         rubik.add_control(new Control(suffix + rotation_name + "2", "z", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
     }
 }
@@ -975,7 +986,7 @@ add_control_set_to_html = () => {
 
     for (i = 0; i < rubik.controls.length; i++) {
         rotate_button_elem = document.createElement("button");
-        rotate_button_elem.id = "rotate-" + rubik.controls[i].name;
+        rotate_button_elem.id = `rotate-${rubik.controls[i].name}`;
         rotate_button_elem.innerHTML = rubik.controls[i].name;
         document.querySelector("#movement-controller").appendChild(rotate_button_elem);
 
@@ -1162,6 +1173,8 @@ orbit_around_rubik = () => {
 }
 
 loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0) => {
+    disable_rotate_function();
+
     rad = 0;
     rad_step = finished_rad / angle_rotated_ratio;
 
@@ -1176,8 +1189,10 @@ loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 
             rubik.rotate_face(axis, position, rad);
             
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-            
+
             clearInterval(rotate_interval);
+
+            enable_rotate_function();
         }
     }, smooth_rotation);
 }
@@ -1237,19 +1252,11 @@ show_drop_down = e => {
 
 
 disable_rotate_function = () => {
-    document.querySelector(`#rotate-U`).disabled = true;
-    document.querySelector(`#rotate-D`).disabled = true;
-    document.querySelector(`#rotate-F`).disabled = true;
-    document.querySelector(`#rotate-B`).disabled = true;
-    document.querySelector(`#rotate-R`).disabled = true;
-    document.querySelector(`#rotate-L`).disabled = true;
+    for (let i = 0; i < rubik.controls.length; i++)
+        document.querySelector(`#rotate-${rubik.controls[i].name}`).disabled = true;    
 }
 
 enable_rotate_function = () => {
-    document.querySelector(`#rotate-U`).disabled = false;
-    document.querySelector(`#rotate-D`).disabled = false;
-    document.querySelector(`#rotate-F`).disabled = false;
-    document.querySelector(`#rotate-B`).disabled = false;
-    document.querySelector(`#rotate-R`).disabled = false;
-    document.querySelector(`#rotate-L`).disabled = false;
+    for (let i = 0; i < rubik.controls.length; i++)
+        document.querySelector(`#rotate-${rubik.controls[i].name}`).disabled = false;
 }
