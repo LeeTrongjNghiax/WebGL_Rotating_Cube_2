@@ -93,10 +93,13 @@ class Cubie {
 }
 
 class Control {
-    constructor(axis = "x", start = 0, end = 0) {
+    constructor(name = "", axis = "x", position = 0, rad = Math.PI / 2, sticker_gap_start = 0, sticker_gap_end = 0) {
+        this.name = name;
         this.axis = axis;
-        this.start = start;
-        this.end = end;
+        this.position = position;
+        this.rad = rad;
+        this.sticker_gap_start = sticker_gap_start;
+        this.sticker_gap_end = sticker_gap_end;
     }
 }
 

@@ -1,4 +1,7 @@
 const DELTA = 0.5;
+const QUARTER_OF_CIRCLE = Math.PI / 2;
+const HALF_OF_CIRCLE    = Math.PI;
+const FULL_OF_CIRCLE    = Math.PI * 2;
 
 //
 // Shader
@@ -14,7 +17,6 @@ let fragment_shader;
 // Color
 //
 
-const DEGREE_OF_CIRCLE = 360;
 const MILLISECOND_PER_SECOND = 1000;
 
 const LIGHT_COLOR = 255 / 255;
@@ -48,6 +50,10 @@ let is_render_inner_plane;
 let rubik_rotated_x;
 let rubik_rotated_y;
 let rubik_rotated_z;
+
+let rubik_rotate_matrix_x;
+let rubik_rotate_matrix_y;
+let rubik_rotate_matrix_z;
 
 let rotate_angle_x;
 let rotate_angle_y;
@@ -86,6 +92,13 @@ let shader_program_version;
 //
 
 let i, j, k, i2, j2, k2, count, i3;
+let rotation_name;
+let mean;
+let sticker_start;
+let sticker_end;
+let rotate_button_elem;
+let direction;
+let suffix;
 
 //
 // count_fps variable
@@ -170,7 +183,6 @@ let rad_uniform_location;
 //
 
 let world_matrix;
-let base_matrix;
 let view_matrix;
 let projection_matrix;
 
@@ -267,7 +279,7 @@ reset_canvas = () => {
     else
         gl.clearColor(DARK_COLOR, DARK_COLOR, DARK_COLOR, 1.0);
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 }
 
 setup_webgl_canvas = () => {
@@ -329,9 +341,6 @@ setup_webgl_canvas = () => {
 
 add_sticker_vertex = (i, j, k) => {
     sub_vertices = [];
-    cubie = new Cubie();
-    cubie.absolute_position = new Position(i, j, k);
-    faces = [];
 
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
@@ -448,6 +457,10 @@ add_sticker_vertex = (i, j, k) => {
             }
         }
     }
+
+    cubie = new Cubie();
+    cubie.absolute_position = new Position(i, j, k);
+    faces = [];
 
     sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
 
@@ -807,10 +820,7 @@ init_vertices = () => {
     start_y = -end_y;
     end_z = (rubik_size_z - 1) / 2;
     start_z = -end_z;
-
-    rubik.add_control(new Control("x", start_x, end_x));
-    rubik.add_control(new Control("y", start_y, end_y));
-    rubik.add_control(new Control("z", start_z, end_z));
+    
     rubik.sticker_gap = sticker_gap;
 
     vertices = [];
@@ -820,7 +830,6 @@ init_vertices = () => {
     for (i = start_x; i <= end_x; i += 1) {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
-
                 if (is_render_outer_cube)
                     add_sticker_vertex(i, j, k);
 
@@ -837,6 +846,153 @@ init_vertices = () => {
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
     vertice_indices_length = vertice_indices.length;
+}
+
+create_rubik_control_set = () => {
+    for (i = start_x; i <= end_x; i += 1) {
+        mean = (start_x + end_x) / 2;
+        sticker_start = 0;
+        sticker_end = 0;
+        suffix = rubik_size_x - Math.abs(i * 2) - 1 + "";
+
+        // If the choosen layer is at the outside or the middle of the cube, suffix wont appear
+        if (suffix == rubik_size_x || suffix == 0 || i == mean)
+            suffix = "";
+
+        suffix += "";
+
+        if (i < mean) {
+            rotation_name = "R";
+            direction = -1;
+        }
+        else if (i > mean) {
+            rotation_name = "L";
+            direction = 1;
+        }
+        else {
+            rotation_name = "M";
+            direction = 1;
+        }
+
+        // Cover extended sticker position when current layer position is outside
+        if (i == start_x && i != end_x)
+            sticker_start = rubik.sticker_gap;
+        else if (i != start_x && i == end_x)
+            sticker_end = rubik.sticker_gap;
+        else if (i == start_x && i == end_x) {
+            sticker_start = rubik.sticker_gap;
+            sticker_end = rubik.sticker_gap;
+        }
+            
+        rubik.add_control(new Control(suffix + rotation_name      , "x", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "'", "x", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "2", "x", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
+    }
+
+    for (i = start_y; i <= end_y; i += 1) {
+        mean = (start_y + end_y) / 2;
+        sticker_start = 0;
+        sticker_end = 0;
+        suffix = rubik_size_y - Math.abs(i * 2) - 1 + "";
+
+        // If the choosen layer is at the outside or the middle of the cube, suffix wont appear
+        if (suffix == rubik_size_y || suffix == 0 || i == mean)
+            suffix = "";
+
+        suffix += "";
+
+        if (i < mean) {
+            rotation_name = "D";
+            direction = -1;
+        }
+        else if (i > mean) {
+            rotation_name = "U";
+            direction = 1;
+        }
+        else {
+            rotation_name = "E";
+            direction = -1;
+        }
+
+        // Cover extended sticker position when current layer position is outside
+        if (i == start_y && i != end_y)
+            sticker_start = rubik.sticker_gap;
+        else if (i != start_y && i == end_y)
+            sticker_end = rubik.sticker_gap;
+        else if (i == start_y && i == end_y) {
+            sticker_start = rubik.sticker_gap;
+            sticker_end = rubik.sticker_gap;
+        }
+
+        rubik.add_control(new Control(suffix + rotation_name      , "y", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "'", "y", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "2", "y", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
+    }
+
+    for (i = start_z; i <= end_z; i += 1) {
+        mean = (start_z + end_z) / 2;
+        sticker_start = 0;
+        sticker_end = 0;
+        suffix = rubik_size_z - Math.abs(i * 2) - 1 + "";
+
+        // If the choosen layer is at the outside or the middle of the cube, suffix wont appear
+        if (suffix == rubik_size_z || suffix == 0 || i == mean)
+            suffix = "";
+
+        suffix += "";
+
+        if (i < mean) {
+            rotation_name = "F";
+            direction = -1;
+        }
+        else if (i > mean) {
+            rotation_name = "B";
+            direction = 1;
+        }
+        else {
+            rotation_name = "S";
+            direction = -1;
+        }
+
+        // Cover extended sticker position when current layer position is outside
+        if (i == start_z && i != end_z)
+            sticker_start = rubik.sticker_gap;
+        else if (i != start_z && i == end_z)
+            sticker_end = rubik.sticker_gap;
+        else if (i == start_z && i == end_z) {
+            sticker_start = rubik.sticker_gap;
+            sticker_end = rubik.sticker_gap;
+        }
+
+        rubik.add_control(new Control(suffix + rotation_name      , "z", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "'", "z", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "2", "z", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
+    }
+}
+
+add_control_set_to_html = () => {
+    document.querySelector("#movement-controller").replaceChildren();
+
+    for (i = 0; i < rubik.controls.length; i++) {
+        rotate_button_elem = document.createElement("button");
+        rotate_button_elem.id = "rotate-" + rubik.controls[i].name;
+        rotate_button_elem.innerHTML = rubik.controls[i].name;
+        document.querySelector("#movement-controller").appendChild(rotate_button_elem);
+
+        var axis = rubik.controls[i].axis;
+        var position = rubik.controls[i].position;
+        var rad = rubik.controls[i].rad;
+        var sticker_start = rubik.controls[i].sticker_gap_start;
+        var sticker_end = rubik.controls[i].sticker_gap_end;
+
+        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg(
+            '${axis}',
+            ${position},
+            ${rad},
+            ${sticker_start},
+            ${sticker_end},
+        )`);
+    }
 }
 
 add_buffer_data = () => {
@@ -899,12 +1055,22 @@ set_up_support_matrix = () => {
     identity(identity_matrix);
 
     world_matrix = new Float32Array(16);
-    base_matrix = new Float32Array(16);
     view_matrix = new Float32Array(16);
     projection_matrix = new Float32Array(16);
 
+    rubik_rotate_matrix_x = new Float32Array(16);
+    rubik_rotate_matrix_y = new Float32Array(16);
+    rubik_rotate_matrix_z = new Float32Array(16);
+
+    rotate(rubik_rotate_matrix_x, identity_matrix, rubik_rotated_x, [1, 0, 0]);
+    rotate(rubik_rotate_matrix_y, identity_matrix, rubik_rotated_x, [0, 1, 0]);
+    rotate(rubik_rotate_matrix_z, identity_matrix, rubik_rotated_z, [0, 0, 1]);
+
     identity(world_matrix);
-    identity(base_matrix);
+
+    multiply(world_matrix, rubik_rotate_matrix_x, rubik_rotate_matrix_y);
+    multiply(world_matrix, world_matrix, rubik_rotate_matrix_z);
+
     lookAt(view_matrix, [
         camera_position.x,
         camera_position.y,
@@ -968,7 +1134,7 @@ update_angle = (angle) => {
     current_tick = performance.now();
     time = (current_tick - last_tick) / MILLISECOND_PER_SECOND;
     last_tick = current_tick;
-    return (angle + angle_per_second * time) % (2 * Math.PI);
+    return (angle + angle_per_second * time) % FULL_OF_CIRCLE;
 }
 
 orbit_around_rubik = () => {
@@ -978,9 +1144,9 @@ orbit_around_rubik = () => {
     else if (update_angle_method == "method2")
         angle = update_angle(angle);
 
-    angle_x = angle * rotate_angle_x % (2 * Math.PI);
-    angle_y = angle * rotate_angle_y % (2 * Math.PI);
-    angle_z = angle * rotate_angle_z % (2 * Math.PI);
+    angle_x = angle * rotate_angle_x % FULL_OF_CIRCLE;
+    angle_y = angle * rotate_angle_y % FULL_OF_CIRCLE;
+    angle_z = angle * rotate_angle_z % FULL_OF_CIRCLE;
 
     rotate(x_rotation_matrix, identity_matrix, angle_x, [1, 0, 0]);
     rotate(y_rotation_matrix, identity_matrix, angle_y, [0, 1, 0]);
@@ -989,12 +1155,13 @@ orbit_around_rubik = () => {
     multiply(world_matrix, x_rotation_matrix, y_rotation_matrix);
     multiply(world_matrix, world_matrix, z_rotation_matrix);
 
+    multiply(world_matrix, rubik_rotate_matrix_x, rubik_rotate_matrix_y);
+    multiply(world_matrix, world_matrix, rubik_rotate_matrix_z);
+
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
 loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0) => {
-    disable_rotate_function();
-
     rad = 0;
     rad_step = finished_rad / angle_rotated_ratio;
 
@@ -1009,8 +1176,6 @@ loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 
             rubik.rotate_face(axis, position, rad);
             
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-            
-            enable_rotate_function();
             
             clearInterval(rotate_interval);
         }

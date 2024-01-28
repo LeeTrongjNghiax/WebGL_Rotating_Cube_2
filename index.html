@@ -10,9 +10,7 @@
     <link rel="stylesheet" href="style.css">
 
     <script id="vs" type="x-shader/x-vertex">
-        #define PI 3.141592653589793
-
-        attribute lowp vec3 vertPosition; 
+        attribute highp vec3 vertPosition; 
         attribute lowp vec4 vertColor; 
         
         varying lowp vec4 fragColor; 
@@ -22,9 +20,9 @@
         uniform mat4 mView; 
         uniform mat4 mProj; 
         uniform int axis; 
-        uniform float min; 
-        uniform float max; 
-        uniform float rad; 
+        uniform lowp float min; 
+        uniform lowp float max; 
+        uniform highp float rad; 
 
         mat4 create_identity_matrix() {
             mat4 iden;
@@ -64,17 +62,17 @@
 
         mat4 check_vertex(vec3 vertex, int axis, float min, float max, float rad) {
             if (axis == 0) 
-                if ((vertex.x >= min) && (vertex.x <= max))
+                if (vertex.x >= min && vertex.x <= max)
                     return create_rotation_x_matrix(rad);
                 else
                     return create_identity_matrix();
             else if (axis == 1) 
-                if ((vertex.y >= min) && (vertex.y <= max))
+                if (vertex.y >= min && vertex.y <= max)
                     return create_rotation_y_matrix(rad);
                 else
                     return create_identity_matrix();
             else if (axis == 2) 
-                if ((vertex.z >= min) && (vertex.z <= max))
+                if (vertex.z >= min && vertex.z <= max)
                     return create_rotation_z_matrix(rad); 
                 else
                     return create_identity_matrix();
@@ -144,7 +142,7 @@
     <div class="button-block">
         <button id="change-theme">Change theme</button>
         <button id="create">Create rubik's cube</button>
-        <button id="toggle-rotate" class="is_stop_rotating">Start orbiting</button>
+        <button id="toggle-rotate" class="is_stop_rotating" disabled>Start orbiting</button>
         <button id="show-control">Show control</button>
     </div>
 
@@ -163,15 +161,6 @@
 
             <div class="dropdown-content">
                 <div id="movement-controller">
-                    <button id="rotate-U">U</button>
-                    <button id="rotate-E">E</button>
-                    <button id="rotate-D">D</button>
-                    <button id="rotate-F">F</button>
-                    <button id="rotate-S">S</button>
-                    <button id="rotate-B">B</button>
-                    <button id="rotate-R">R</button>
-                    <button id="rotate-M">M</button>
-                    <button id="rotate-L">L</button>
                 </div>
             </div>
         </div>
@@ -215,11 +204,11 @@
             <div class="dropdown-content">
                 <div class="input-block">
                     <label for="rotated-x">Rubik Rotated X:</label>
-                    <input id="rotated-x" type="number" min="-360" max="360" value="0" size="4" step="1">
+                    <input id="rotated-x" type="number" min="-360" max="360" value="-0.7" size="4" step="0.1">
                 </div>
                 <div class="input-block">
                     <label for="rotated-y">Rubik Rotated Y:</label>
-                    <input id="rotated-y" type="number" min="-360" max="360" value="0" size="4" step="1">
+                    <input id="rotated-y" type="number" min="-360" max="360" value="1" size="4" step="1">
                 </div>
                 <div class="input-block">
                     <label for="rotated-z">Rubik Rotated Z:</label>
@@ -235,7 +224,7 @@
             <div class="dropdown-content">
                 <div class="input-block">
                     <label for="render-inner-cube">Render Inner cube:</label>
-                    <input id="render-inner-cube" type="checkbox" checked>
+                    <input id="render-inner-cube" type="checkbox">
                 </div>
                 <div class="input-block">
                     <label for="render-outer-cube">Render Outer cube:</label>
@@ -244,6 +233,22 @@
                 <div class="input-block">
                     <label for="render-inner-plane">Render inner plane:</label>
                     <input id="render-inner-plane" type="checkbox">
+                </div>
+                <div class="input-block">
+                    <label for="draw-mode">Draw mode:</label>
+                    <select name="draw-mode" id="draw-mode">
+                        <option value="points">Points</option>
+                        <option value="lines">Lines</option>
+                        <option value="line_loop">Line Loop</option>
+                        <option value="line_strip">Line Strip</option>
+                        <option selected value="triangles">Triangles</option>
+                        <option value="triangle_strip">Triangle Strip</option>
+                        <option value="triangle_fan">Triangle Fan</option>
+                    </select>
+                </div>
+                <div class="input-block">
+                    <label for="point-size">Point size:</label>
+                    <input id="point-size" type="number" min="0" max="1000" value="1" size="2" step="1">
                 </div>
             </div>
         </div>
@@ -354,32 +359,7 @@
 
 
         <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Draw mode</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="draw-mode">Draw mode:</label>
-                    <select name="draw-mode" id="draw-mode">
-                        <option value="points">Points</option>
-                        <option value="lines">Lines</option>
-                        <option value="line_loop">Line Loop</option>
-                        <option value="line_strip">Line Strip</option>
-                        <option selected value="triangles">Triangles</option>
-                        <option value="triangle_strip">Triangle Strip</option>
-                        <option value="triangle_fan">Triangle Fan</option>
-                    </select>
-                </div>
-
-                <div class="input-block">
-                    <label for="point-size">Point size:</label>
-                    <input id="point-size" type="number" min="0" max="1000" value="1" size="2" step="1">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Color</p>
+            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik's Color</p>
 
             <div class="dropdown-content">
                 <div class="input-block">
