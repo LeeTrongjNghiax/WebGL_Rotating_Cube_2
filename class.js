@@ -93,13 +93,15 @@ class Cubie {
 }
 
 class Control {
-    constructor(name = "", axis = "x", position = 0, rad = Math.PI / 2, sticker_gap_start = 0, sticker_gap_end = 0) {
+    constructor(name = "", axis = "x", position = 0, rad = Math.PI / 2, sticker_gap_start = 0, sticker_gap_end = 0, expanded_distance = 0, have_all_cubies = false) {
         this.name = name;
         this.axis = axis;
         this.position = position;
         this.rad = rad;
         this.sticker_gap_start = sticker_gap_start;
         this.sticker_gap_end = sticker_gap_end;
+        this.expanded_distance = expanded_distance;
+        this.have_all_cubies = have_all_cubies;
     }
 }
 
@@ -118,7 +120,10 @@ class Rubik {
         this.cubies.push(cubie);
     }
 
-    get_cubies_in_position(axis = "x", position = 0) {
+    get_cubies_in_position(axis = "x", position = 0, have_all_cubies = false) {
+        if (have_all_cubies)
+            return this.cubies;
+
         let result = [];
 
         for (let i = 0; i < this.cubies.length; i++) {
@@ -129,8 +134,8 @@ class Rubik {
         return result;
     }
 
-    rotate_face(axis = "x", position = 0, rad) {
-        let cubies_to_rotate = this.get_cubies_in_position(axis, position);
+    rotate_face(axis = "x", position = 0, rad, have_all_cubies = false) {
+        let cubies_to_rotate = this.get_cubies_in_position(axis, position, have_all_cubies);
 
         let identity_matrix = new Float32Array(16);
         identity(identity_matrix);
@@ -154,7 +159,6 @@ class Rubik {
         rotate(rotate_matrix, identity_matrix, -rad, axis_vector);
         
         let rotated_vector;
-        let rotated_vector2;
 
         for (let i = 0; i < cubies_to_rotate.length; i++) {
 

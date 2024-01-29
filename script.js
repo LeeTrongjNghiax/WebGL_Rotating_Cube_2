@@ -854,7 +854,7 @@ init_vertices = () => {
     vertice_indices_length = vertice_indices.length;
 }
 
-create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1) => {
+create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1, expanded_distance = DELTA, have_all_cubies = false) => {
     for (let i = start; i <= end; i += step) {
         mean = (start + end) / 2;
         sticker_start = 0;
@@ -893,14 +893,14 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
         // If the other axis had equal number of cubies, then it can had quarter rotation
         if (size[1] == size[2]) {
             rubik.add_control(
-                new Control(suffix + rotation_name, axis, i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end)
+                new Control(suffix + rotation_name, axis, i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end, expanded_distance, have_all_cubies)
             );
             rubik.add_control(
-                new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end)
+                new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end, expanded_distance, have_all_cubies)
             );
         }
 
-        rubik.add_control(new Control(suffix + rotation_name + "2", axis, i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + "2", axis, i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end, expanded_distance, have_all_cubies));
     }
 }
 
@@ -908,6 +908,10 @@ create_rubik_control_set = () => {
     create_rubik_control(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["R", "L", "M"], "x", 1);
     create_rubik_control(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["D", "U", "E"], "y", 1);
     create_rubik_control(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["F", "B", "S"], "z", 1);
+
+    create_rubik_control(0, 0, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["", "", "x"], "x", 1, rubik_size_x / 2, true);
+    create_rubik_control(0, 0, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["", "", "y"], "y", 1, rubik_size_y / 2, true);
+    create_rubik_control(0, 0, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["", "", "z"], "z", 1, rubik_size_z / 2, true);
 }
 
 add_control_set_to_html = () => {
@@ -931,6 +935,8 @@ add_control_set_to_html = () => {
             ${rad},
             ${sticker_start},
             ${sticker_end},
+            ${rubik.controls[i].expanded_distance},
+            ${rubik.controls[i].have_all_cubies},
         )`);
     }
 }
@@ -1100,7 +1106,7 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0) => {
+loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0, expanded_distance = DELTA, have_all_cubies = false) => {
     disable_rotate_function();
 
     rad = 0;
@@ -1111,10 +1117,10 @@ loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 
         
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-        rotate_face(axis_string_to_number( axis ), position - DELTA - sticker_gap_1, position + DELTA + sticker_gap_2, rad);
+        rotate_face(axis_string_to_number( axis ), position - expanded_distance - sticker_gap_1, position + expanded_distance + sticker_gap_2, rad);
 
         if (Math.abs(rad - finished_rad) < EPSILON) {
-            rubik.rotate_face(axis, position, rad);
+            rubik.rotate_face(axis, position, rad, have_all_cubies);
             
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
