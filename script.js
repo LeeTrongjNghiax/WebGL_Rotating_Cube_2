@@ -854,18 +854,16 @@ init_vertices = () => {
     vertice_indices_length = vertice_indices.length;
 }
 
-create_rubik_control = (start = 0, end = 0, size = 0, directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1) => {
+create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1) => {
     for (let i = start; i <= end; i += step) {
         mean = (start + end) / 2;
         sticker_start = 0;
         sticker_end = 0;
-        suffix = size - Math.abs(i * 2) - 1 + "";
+        suffix = (size[0] - Math.abs(i * 2) - 1) / 2 + 1;
 
         // If the choosen layer is at the outside or the middle of the cube, suffix wont appear
-        if (suffix == size || suffix == 0 || i == mean)
+        if (suffix == size[0] || suffix == 0 || suffix == 1 || i == mean)
             suffix = "";
-
-        suffix += "";
 
         // Set rotation direction and name
         if (i < mean) {
@@ -882,26 +880,34 @@ create_rubik_control = (start = 0, end = 0, size = 0, directions = [0, 0, 0], ro
         }
 
         // Cover extended sticker position when current layer position is outside
-        if (i == start_x && i != end_x)
+        if (i == start && i != end)
             sticker_start = rubik.sticker_gap;
-        else if (i != start_x && i == end_x)
+        else if (i != start && i == end)
             sticker_end = rubik.sticker_gap;
         // If current layer is the start and end layer (size = 1)
-        else if (i == start_x && i == end_x) {
+        else if (i == start && i == end) {
             sticker_start = rubik.sticker_gap;
             sticker_end = rubik.sticker_gap;
         }
-            
-        rubik.add_control(new Control(suffix + rotation_name      , axis, i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
-        rubik.add_control(new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        
+        // If the other axis had equal number of cubies, then it can had quarter rotation
+        if (size[1] == size[2]) {
+            rubik.add_control(
+                new Control(suffix + rotation_name, axis, i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end)
+            );
+            rubik.add_control(
+                new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end)
+            );
+        }
+
         rubik.add_control(new Control(suffix + rotation_name + "2", axis, i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
     }
 }
 
 create_rubik_control_set = () => {
-    create_rubik_control(start_x, end_x, rubik_size_x, [-1, 1,  1], ["R", "L", "M"], "x", 1);
-    create_rubik_control(start_y, end_y, rubik_size_y, [-1, 1, -1], ["D", "U", "E"], "y", 1);
-    create_rubik_control(start_z, end_z, rubik_size_z, [-1, 1, -1], ["F", "B", "S"], "z", 1);
+    create_rubik_control(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["R", "L", "M"], "x", 1);
+    create_rubik_control(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["D", "U", "E"], "y", 1);
+    create_rubik_control(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["F", "B", "S"], "z", 1);
 }
 
 add_control_set_to_html = () => {

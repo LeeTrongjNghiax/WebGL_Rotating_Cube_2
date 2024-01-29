@@ -39,44 +39,23 @@ document.querySelector("#toggle-rotate").addEventListener("click", e => {
 
 document.querySelector("#show-control").addEventListener("click", e => {
     if (document.querySelector("#controller").style.left == "0px") {
+
         document.querySelector("#controller").style.left = "-100%";
+        document.querySelector("main").style.width = "100%";
         e.target.innerHTML = "Show control";
+
     }
     else {
+
         document.querySelector("#controller").style.left = "0px";
+        document.querySelector("main").style.width ="75%";
         e.target.innerHTML = "Hide control";
+        
     }
 });
 
 document.querySelector("#hide-control").addEventListener("click", () => {
     document.querySelector("#controller").style.left = "-100%";
+    document.querySelector("main").style.width = "100%";
     document.querySelector("#show-control").innerHTML = "Show control";
 });
-
-// document.querySelector("#rotate-U").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("y",  1.0,  Math.PI / 2, 0, rubik.sticker_gap);
-// });
-// document.querySelector("#rotate-E").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("y",  0.0, -Math.PI / 2, 0, 0);
-// });
-// document.querySelector("#rotate-D").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("y", -1.0, -Math.PI / 2, rubik.sticker_gap, 0);
-// });
-// document.querySelector("#rotate-F").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("z", -1.0, -Math.PI / 2, rubik.sticker_gap, 0);
-// });
-// document.querySelector("#rotate-S").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("z",  0.0, -Math.PI / 2, 0, 0);
-// });
-// document.querySelector("#rotate-B").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("z",  1.0,  Math.PI / 2, 0, rubik.sticker_gap);
-// });
-// document.querySelector("#rotate-R").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("x", -1.0, -Math.PI / 2, rubik.sticker_gap, 0);
-// });
-// document.querySelector("#rotate-M").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("x",  0.0,  Math.PI / 2, 0, 0);
-// });
-// document.querySelector("#rotate-L").addEventListener("click", () => {
-//     loop_rotate_face_till_90_deg("x",  1.0,  Math.PI / 2, 0, rubik.sticker_gap);
-// });

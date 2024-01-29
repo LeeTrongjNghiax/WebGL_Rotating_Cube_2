@@ -50,7 +50,7 @@ body {
     display: flex;
     gap: 1rem;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-around;
 }
 
@@ -78,8 +78,10 @@ canvas {
 }
 
 #controller {
-    position: fixed;
+    position: absolute;
+    height: 100%;
     overflow: scroll;
+    overflow-x: hidden;
     top: 10px;
     left: -100%;
     padding: 1rem;
@@ -93,8 +95,8 @@ canvas {
     height: 100%;
     padding: 1rem;
     display: flex; 
+    justify-content: center;
     flex-flow: wrap;
-    gap: 0.5rem;
 }
 
 #movement-controller button {
@@ -150,7 +152,11 @@ input {
     display: flex;
 }
 
-@media (orientation: portrait) or (width < 720px) {
+@media (orientation: portrait) or (width < 760px) {
+    .button-block {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
     main {
         flex-direction: column;
     }

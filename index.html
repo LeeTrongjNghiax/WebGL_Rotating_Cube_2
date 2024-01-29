@@ -155,7 +155,7 @@
     <script src="add_event_listener.js" defer></script>
 </head>
 
-<body class="light-mode">
+<body class="dark-mode">
 
     <div class="button-block">
         <button id="change-theme">Change theme</button>
@@ -165,6 +165,257 @@
     </div>
 
     <main>
+        <div id="controller">
+            <button id="hide-control">Hide control</button>
+    
+            <p>FPS: <span id="fps"></span></p>
+    
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="size-x">Rubik Size X:</label>
+                        <input id="size-x" type="number" min="1" max="100" value="3" size="4" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="size-y">Rubik Size Y:</label>
+                        <input id="size-y" type="number" min="1" max="100" value="3" size="4" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="size-z">Rubik Size Z:</label>
+                        <input id="size-z" type="number" min="1" max="100" value="3" size="4" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="length">Rubik Length:</label>
+                        <input id="length" type="number" min="0" max="10" value="0.99999" size="4" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="sticker-gap">Sticker gap:</label>
+                        <input id="sticker-gap" type="number" min="-10" max="10" value="0.01" size="4" step="0.01">
+                    </div>
+                    <div class="input-block">
+                        <label for="sticker-size">Sticker size:</label>
+                        <input id="sticker-size" type="number" min="0" max="1" value="0.9" size="4" step="0.9">
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Orientation</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="rotated-x">Rubik Rotated X:</label>
+                        <input id="rotated-x" type="number" min="-360" max="360" value="-0.7" size="4" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="rotated-y">Rubik Rotated Y:</label>
+                        <input id="rotated-y" type="number" min="-360" max="360" value="1" size="4" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="rotated-z">Rubik Rotated Z:</label>
+                        <input id="rotated-z" type="number" min="-360" max="360" value="0" size="4" step="1">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Camera</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="camera-x">Camera position X:</label>
+                        <input id="camera-x" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="camera-y">Camera position Y:</label>
+                        <input id="camera-y" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="camera-z">Camera position Z:</label>
+                        <input id="camera-z" type="number" min="-100" max="100" value="-10" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="look-at-x">Camera look at X:</label>
+                        <input id="look-at-x" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="look-at-y">Camera look at Y:</label>
+                        <input id="look-at-y" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="look-at-z">Camera look at Z:</label>
+                        <input id="look-at-z" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="up-axis-x">Up axis X:</label>
+                        <input id="up-axis-x" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="up-axis-y">Up axis Y:</label>
+                        <input id="up-axis-y" type="number" min="-100" max="100" value="1" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="up-axis-z">Up axis Z:</label>
+                        <input id="up-axis-z" type="number" min="-100" max="100" value="0" size="2" step="1">
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rendering</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="render-inner-cube">Render Inner cube:</label>
+                        <input id="render-inner-cube" type="checkbox">
+                    </div>
+                    <div class="input-block">
+                        <label for="render-outer-cube">Render Outer cube:</label>
+                        <input id="render-outer-cube" type="checkbox" checked>
+                    </div>
+                    <div class="input-block">
+                        <label for="render-inner-plane">Render inner plane:</label>
+                        <input id="render-inner-plane" type="checkbox">
+                    </div>
+                    <div class="input-block">
+                        <label for="draw-mode">Draw mode:</label>
+                        <select name="draw-mode" id="draw-mode">
+                            <option value="points">Points</option>
+                            <option value="lines">Lines</option>
+                            <option value="line_loop">Line Loop</option>
+                            <option value="line_strip">Line Strip</option>
+                            <option selected value="triangles">Triangles</option>
+                            <option value="triangle_strip">Triangle Strip</option>
+                            <option value="triangle_fan">Triangle Fan</option>
+                        </select>
+                    </div>
+                    <div class="input-block">
+                        <label for="point-size">Point size:</label>
+                        <input id="point-size" type="number" min="0" max="1000" value="1" size="2" step="1">
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Animation</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="rotate-angle-x">Rotate angle X speed:</label>
+                        <input id="rotate-angle-x" type="number" min="-10" max="10" value="0" size="2" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="rotate-angle-y">Rotate angle Y speed:</label>
+                        <input id="rotate-angle-y" type="number" min="-10" max="10" value="0" size="2" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="rotate-angle-z">Rotate angle Z speed:</label>
+                        <input id="rotate-angle-z" type="number" min="-10" max="10" value="0" size="2" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="update-angle-1">Update angle per frame method 1:</label>
+                        <input id="update-angle-1" name="update-angle-method" value="method1" type="radio" checked>
+                    </div>
+                    <div class="input-block">
+                        <label for="update-angle-2">Update angle per frame method 2:</label>
+                        <input id="update-angle-2" name="update-angle-method" value="method2" type="radio">
+                    </div>
+                    <div class="input-block">
+                        <label for="angle-per-second">Angle per frame for method 2:</label>
+                        <input id="angle-per-second" type="number" min="-360" max="360" value="90" size="2" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="smooth-rotation">Smooth rotation per frame:</label>
+                        <input id="smooth-rotation" type="number" min="0" max="100" value="10" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="angle-rotated-ratio">Angle rotated ratio per frame:</label>
+                        <input id="angle-rotated-ratio" type="number" min="0" max="360" value="25" size="2" step="1">
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Scene</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="fovy">Field of view y (degree):</label>
+                        <input id="fovy" type="number" min="-360" max="360" value="45" size="2" step="1">
+                    </div>
+                    <div class="input-block">
+                        <label for="near">Near plane:</label>
+                        <input id="near" type="number" min="-10" max="10" value="0.1" size="2" step="0.1">
+                    </div>
+                    <div class="input-block">
+                        <label for="far">Far plane:</label>
+                        <input id="far" type="number" min="-1000" max="1000" value="100" size="2" step="10">
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik's Color</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="top-color">Top color:</label>
+                        <input id="top-color" type="color" value="#FFFFFF">
+                    </div>
+                    <div class="input-block">
+                        <label for="bottom-color">Bottom color:</label>
+                        <input id="bottom-color" type="color" value="#FFFF00">
+                    </div>
+                    <div class="input-block">
+                        <label for="front-color">Front color:</label>
+                        <input id="front-color" type="color" value="#00FF00">
+                    </div>
+                    <div class="input-block">
+                        <label for="back-color">Back color:</label>
+                        <input id="back-color" type="color" value="#0000FF">
+                    </div>
+                    <div class="input-block">
+                        <label for="right-color">Right color:</label>
+                        <input id="right-color" type="color" value="#FF0000">
+                    </div>
+                    <div class="input-block">
+                        <label for="left-color">Left color:</label>
+                        <input id="left-color" type="color" value="#FFA700">
+                    </div>
+                    <div class="input-block">
+                        <label for="inner-color">Inner color:</label>
+                        <input id="inner-color" type="color" value="#191919">
+                    </div>
+                    <div class="input-block">
+                        <label for="transparent">Transparent:</label>
+                        <input id="transparent" type="number" min="0" max="255" value="255" size="2" step="1">
+                    </div>
+                </div>
+            </div>
+    
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Shader Program</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="shader-program-version">Use higher precision shader program version:</label>
+                        <input id="shader-program-version" type="checkbox" size="2">
+                    </div>
+                </div>
+            </div>
+    
+    
+        </div>
+
         <canvas id="game-surface">
             Your browser does not support HTML5
         </canvas>
@@ -172,257 +423,6 @@
         <div id="movement-controller">
     </main>
     
-    </div>
-
-    <div id="controller">
-        <button id="hide-control">Hide control</button>
-
-        <p>FPS: <span id="fps"></span></p>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="size-x">Rubik Size X:</label>
-                    <input id="size-x" type="number" min="1" max="100" value="3" size="4" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="size-y">Rubik Size Y:</label>
-                    <input id="size-y" type="number" min="1" max="100" value="3" size="4" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="size-z">Rubik Size Z:</label>
-                    <input id="size-z" type="number" min="1" max="100" value="3" size="4" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="length">Rubik Length:</label>
-                    <input id="length" type="number" min="0" max="10" value="0.99999" size="4" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="sticker-gap">Sticker gap:</label>
-                    <input id="sticker-gap" type="number" min="-10" max="10" value="0.01" size="4" step="0.01">
-                </div>
-                <div class="input-block">
-                    <label for="sticker-size">Sticker size:</label>
-                    <input id="sticker-size" type="number" min="0" max="1" value="0.9" size="4" step="0.9">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Orientation</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="rotated-x">Rubik Rotated X:</label>
-                    <input id="rotated-x" type="number" min="-360" max="360" value="-0.7" size="4" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="rotated-y">Rubik Rotated Y:</label>
-                    <input id="rotated-y" type="number" min="-360" max="360" value="1" size="4" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="rotated-z">Rubik Rotated Z:</label>
-                    <input id="rotated-z" type="number" min="-360" max="360" value="0" size="4" step="1">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rendering</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="render-inner-cube">Render Inner cube:</label>
-                    <input id="render-inner-cube" type="checkbox">
-                </div>
-                <div class="input-block">
-                    <label for="render-outer-cube">Render Outer cube:</label>
-                    <input id="render-outer-cube" type="checkbox" checked>
-                </div>
-                <div class="input-block">
-                    <label for="render-inner-plane">Render inner plane:</label>
-                    <input id="render-inner-plane" type="checkbox">
-                </div>
-                <div class="input-block">
-                    <label for="draw-mode">Draw mode:</label>
-                    <select name="draw-mode" id="draw-mode">
-                        <option value="points">Points</option>
-                        <option value="lines">Lines</option>
-                        <option value="line_loop">Line Loop</option>
-                        <option value="line_strip">Line Strip</option>
-                        <option selected value="triangles">Triangles</option>
-                        <option value="triangle_strip">Triangle Strip</option>
-                        <option value="triangle_fan">Triangle Fan</option>
-                    </select>
-                </div>
-                <div class="input-block">
-                    <label for="point-size">Point size:</label>
-                    <input id="point-size" type="number" min="0" max="1000" value="1" size="2" step="1">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Animation</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="rotate-angle-x">Rotate angle X speed:</label>
-                    <input id="rotate-angle-x" type="number" min="-10" max="10" value="0" size="2" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="rotate-angle-y">Rotate angle Y speed:</label>
-                    <input id="rotate-angle-y" type="number" min="-10" max="10" value="0" size="2" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="rotate-angle-z">Rotate angle Z speed:</label>
-                    <input id="rotate-angle-z" type="number" min="-10" max="10" value="0" size="2" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="update-angle-1">Update angle per frame method 1:</label>
-                    <input id="update-angle-1" name="update-angle-method" value="method1" type="radio" checked>
-                </div>
-                <div class="input-block">
-                    <label for="update-angle-2">Update angle per frame method 2:</label>
-                    <input id="update-angle-2" name="update-angle-method" value="method2" type="radio">
-                </div>
-                <div class="input-block">
-                    <label for="angle-per-second">Angle per frame for method 2:</label>
-                    <input id="angle-per-second" type="number" min="-360" max="360" value="90" size="2" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="smooth-rotation">Smooth rotation per frame:</label>
-                    <input id="smooth-rotation" type="number" min="0" max="100" value="10" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="angle-rotated-ratio">Angle rotated ratio per frame:</label>
-                    <input id="angle-rotated-ratio" type="number" min="0" max="360" value="25" size="2" step="1">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Camera</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="camera-x">Camera position X:</label>
-                    <input id="camera-x" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="camera-y">Camera position Y:</label>
-                    <input id="camera-y" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="camera-z">Camera position Z:</label>
-                    <input id="camera-z" type="number" min="-100" max="100" value="-10" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="look-at-x">Camera look at X:</label>
-                    <input id="look-at-x" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="look-at-y">Camera look at Y:</label>
-                    <input id="look-at-y" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="look-at-z">Camera look at Z:</label>
-                    <input id="look-at-z" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="up-axis-x">Up axis X:</label>
-                    <input id="up-axis-x" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="up-axis-y">Up axis Y:</label>
-                    <input id="up-axis-y" type="number" min="-100" max="100" value="1" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="up-axis-z">Up axis Z:</label>
-                    <input id="up-axis-z" type="number" min="-100" max="100" value="0" size="2" step="1">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Scene</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="fovy">Field of view y (degree):</label>
-                    <input id="fovy" type="number" min="-360" max="360" value="45" size="2" step="1">
-                </div>
-                <div class="input-block">
-                    <label for="near">Near plane:</label>
-                    <input id="near" type="number" min="-10" max="10" value="0.1" size="2" step="0.1">
-                </div>
-                <div class="input-block">
-                    <label for="far">Far plane:</label>
-                    <input id="far" type="number" min="-1000" max="1000" value="100" size="2" step="10">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik's Color</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="top-color">Top color:</label>
-                    <input id="top-color" type="color" value="#FFFFFF">
-                </div>
-                <div class="input-block">
-                    <label for="bottom-color">Bottom color:</label>
-                    <input id="bottom-color" type="color" value="#FFFF00">
-                </div>
-                <div class="input-block">
-                    <label for="front-color">Front color:</label>
-                    <input id="front-color" type="color" value="#00FF00">
-                </div>
-                <div class="input-block">
-                    <label for="back-color">Back color:</label>
-                    <input id="back-color" type="color" value="#0000FF">
-                </div>
-                <div class="input-block">
-                    <label for="right-color">Right color:</label>
-                    <input id="right-color" type="color" value="#FF0000">
-                </div>
-                <div class="input-block">
-                    <label for="left-color">Left color:</label>
-                    <input id="left-color" type="color" value="#FFA700">
-                </div>
-                <div class="input-block">
-                    <label for="inner-color">Inner color:</label>
-                    <input id="inner-color" type="color" value="#191919">
-                </div>
-                <div class="input-block">
-                    <label for="transparent">Transparent:</label>
-                    <input id="transparent" type="number" min="0" max="255" value="255" size="2" step="1">
-                </div>
-            </div>
-        </div>
-
-        <div class="dropdown">
-            <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Shader Program</p>
-
-            <div class="dropdown-content">
-                <div class="input-block">
-                    <label for="shader-program-version">Use higher precision shader program version:</label>
-                    <input id="shader-program-version" type="checkbox" size="2">
-                </div>
-            </div>
-        </div>
-
-
     </div>
 </body>
 
