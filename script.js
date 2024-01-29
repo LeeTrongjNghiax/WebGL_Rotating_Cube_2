@@ -860,6 +860,9 @@ init_vertices = () => {
 }
 
 create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1, expanded_distance = DELTA, have_all_cubies = false) => {
+    if (start == end && have_all_cubies == false)
+        return;
+
     for (let i = start; i <= end; i += step) {
         mean = (start + end) / 2;
         sticker_start = 0;
