@@ -1003,7 +1003,7 @@ set_up_support_matrix = () => {
     rubik_rotate_matrix_z = new Float32Array(16);
 
     rotate(rubik_rotate_matrix_x, identity_matrix, rubik_rotated_x, [1, 0, 0]);
-    rotate(rubik_rotate_matrix_y, identity_matrix, rubik_rotated_x, [0, 1, 0]);
+    rotate(rubik_rotate_matrix_y, identity_matrix, rubik_rotated_y, [0, 1, 0]);
     rotate(rubik_rotate_matrix_z, identity_matrix, rubik_rotated_z, [0, 0, 1]);
 
     identity(world_matrix);
@@ -1078,7 +1078,6 @@ update_angle = (angle) => {
 }
 
 orbit_around_rubik = () => {
-
     if (update_angle_method == "method1")
         angle = performance.now() / MILLISECOND_PER_SECOND / 6;
     else if (update_angle_method == "method2")
@@ -1178,7 +1177,6 @@ show_drop_down = e => {
     else
         e.childNodes[0].innerHTML = "▽"
 }
-
 
 disable_rotate_function = () => {
     for (let i = 0; i < rubik.controls.length; i++)
