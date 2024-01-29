@@ -971,7 +971,7 @@ create_rubik_control_set = () => {
         }
 
         rubik.add_control(new Control(suffix + rotation_name      , "z", i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
-        rubik.add_control(new Control(suffix + rotation_name + "", "z", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
+        rubik.add_control(new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, "z", i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end));
         rubik.add_control(new Control(suffix + rotation_name + "2", "z", i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end));
     }
 }
