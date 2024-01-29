@@ -35,7 +35,17 @@ document.querySelector("#toggle-rotate").addEventListener("click", e => {
         e.target.classList.toggle("is_rotating");
         e.target.innerHTML = "Stop animation";
     }
-})
+});
+
+document.querySelector("#turn-randomly").addEventListener("click", () => {
+    if (document.querySelector("#turn-randomly").innerHTML == "Turning randomly") {
+        is_turning_randomly = true;
+        document.querySelector("#turn-randomly").innerHTML = "Stop turning randomly"
+    } else {
+        is_turning_randomly = false;
+        document.querySelector("#turn-randomly").innerHTML = "Turning randomly"
+    }
+});
 
 document.querySelector("#show-control").addEventListener("click", e => {
     if (document.querySelector("#controller").style.left == "0px") {

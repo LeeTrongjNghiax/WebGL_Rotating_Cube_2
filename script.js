@@ -129,6 +129,11 @@ let last_tick;
 let current_tick;
 let time;
 
+let controller_index;
+let controller;
+let is_rotation_finish = true;
+let is_turning_randomly = false;
+
 //
 // Rotate loop
 //
@@ -1107,6 +1112,7 @@ orbit_around_rubik = () => {
 }
 
 loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0, expanded_distance = DELTA, have_all_cubies = false) => {
+    is_rotation_finish = false;
     disable_rotate_function();
 
     rad = 0;
@@ -1123,6 +1129,8 @@ loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 
             rubik.rotate_face(axis, position, rad, have_all_cubies);
             
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
+
+            is_rotation_finish = true;
 
             clearInterval(rotate_interval);
 
@@ -1153,6 +1161,12 @@ count_fps = () => {
 
 loop = () => {
     last_tick = performance.now();
+
+    if (is_rotation_finish && is_turning_randomly) {
+        turn_randomly();
+        is_rotation_finish = false;
+    }
+
     count_fps();
     orbit_around_rubik();
     set_up_canvas_dimension();
@@ -1192,4 +1206,20 @@ disable_rotate_function = () => {
 enable_rotate_function = () => {
     for (let i = 0; i < rubik.controls.length; i++)
         document.querySelector(`#rotate-${rubik.controls[i].name}`).disabled = false;
+}
+
+function turn_randomly() {
+    controller_index = get_random_int(0, rubik.controls.length - 1);
+
+    controller = rubik.controls[controller_index];
+
+    loop_rotate_face_till_90_deg(
+        controller.axis,
+        controller.position,
+        controller.rad,
+        controller.sticker_gap_start,
+        controller.sticker_gap_end,
+        controller.expanded_distance,
+        controller.have_all_cubies
+    );
 }
