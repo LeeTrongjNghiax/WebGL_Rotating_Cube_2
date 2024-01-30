@@ -48,13 +48,13 @@ let is_render_inner_cube;
 let is_render_outer_cube;
 let is_render_inner_plane;
 
-let rubik_rotated_x;
-let rubik_rotated_y;
-let rubik_rotated_z;
+let rubik_orientation_x;
+let rubik_orientation_y;
+let rubik_orientation_z;
 
-let rubik_rotate_matrix_x;
-let rubik_rotate_matrix_y;
-let rubik_rotate_matrix_z;
+let rubik_orientation_matrix_x;
+let rubik_orientation_matrix_y;
+let rubik_orientation_matrix_z;
 
 let rotate_angle_x;
 let rotate_angle_y;
@@ -212,9 +212,9 @@ get_input_data = () => {
     is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
     is_render_inner_plane = document.querySelector("#render-inner-plane").checked;
 
-    rubik_rotated_x = document.querySelector("#rotated-x").value || 0;
-    rubik_rotated_y = document.querySelector("#rotated-y").value || 0;
-    rubik_rotated_z = document.querySelector("#rotated-z").value || 0;
+    rubik_orientation_x = document.querySelector("#orientation-x").value || 0;
+    rubik_orientation_y = document.querySelector("#orientation-y").value || 0;
+    rubik_orientation_z = document.querySelector("#orientation-z").value || 0;
 
     rotate_angle_x = +document.querySelector("#rotate-angle-x").value;
     rotate_angle_y = +document.querySelector("#rotate-angle-y").value;
@@ -274,11 +274,11 @@ get_input_data = () => {
 
 set_up_canvas_dimension = () => {
     if (innerWidth >= innerHeight) {
-        canvas.width = innerHeight * 9 / 10;
-        canvas.height = innerHeight * 9 / 10;
+        canvas.width  = innerHeight * 8 / 10;
+        canvas.height = innerHeight * 8 / 10;
     } else {
-        canvas.width = innerWidth * 9 / 10;
-        canvas.height = innerWidth * 9 / 10;
+        canvas.width  = innerWidth * 8 / 10;
+        canvas.height = innerWidth * 8 / 10;
     }
 }
 
@@ -1013,18 +1013,18 @@ set_up_support_matrix = () => {
     view_matrix = new Float32Array(16);
     projection_matrix = new Float32Array(16);
 
-    rubik_rotate_matrix_x = new Float32Array(16);
-    rubik_rotate_matrix_y = new Float32Array(16);
-    rubik_rotate_matrix_z = new Float32Array(16);
+    rubik_orientation_matrix_x = new Float32Array(16);
+    rubik_orientation_matrix_y = new Float32Array(16);
+    rubik_orientation_matrix_z = new Float32Array(16);
 
-    rotate(rubik_rotate_matrix_x, identity_matrix, rubik_rotated_x, [1, 0, 0]);
-    rotate(rubik_rotate_matrix_y, identity_matrix, rubik_rotated_y, [0, 1, 0]);
-    rotate(rubik_rotate_matrix_z, identity_matrix, rubik_rotated_z, [0, 0, 1]);
+    rotate(rubik_orientation_matrix_x, identity_matrix, rubik_orientation_x, [1, 0, 0]);
+    rotate(rubik_orientation_matrix_y, identity_matrix, rubik_orientation_y, [0, 1, 0]);
+    rotate(rubik_orientation_matrix_z, identity_matrix, rubik_orientation_z, [0, 0, 1]);
 
     identity(world_matrix);
 
-    multiply(world_matrix, rubik_rotate_matrix_x, rubik_rotate_matrix_y);
-    multiply(world_matrix, world_matrix, rubik_rotate_matrix_z);
+    multiply(world_matrix, rubik_orientation_matrix_x, rubik_orientation_matrix_y);
+    multiply(world_matrix, world_matrix, rubik_orientation_matrix_z);
 
     lookAt(view_matrix, [
         camera_position.x,
@@ -1109,8 +1109,8 @@ orbit_around_rubik = () => {
     multiply(world_matrix, x_rotation_matrix, y_rotation_matrix);
     multiply(world_matrix, world_matrix, z_rotation_matrix);
 
-    multiply(world_matrix, rubik_rotate_matrix_x, rubik_rotate_matrix_y);
-    multiply(world_matrix, world_matrix, rubik_rotate_matrix_z);
+    multiply(world_matrix, rubik_orientation_matrix_x, rubik_orientation_matrix_y);
+    multiply(world_matrix, world_matrix, rubik_orientation_matrix_z);
 
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
@@ -1167,7 +1167,7 @@ loop = () => {
     last_tick = performance.now();
 
     if (is_rotation_finish && is_turning_randomly) {
-        turn_randomly();
+        scrambling();
         is_rotation_finish = false;
     }
 
@@ -1212,7 +1212,7 @@ enable_rotate_function = () => {
         document.querySelector(`#rotate-${rubik.controls[i].name}`).disabled = false;
 }
 
-function turn_randomly() {
+scrambling = () => {
     controller_index = get_random_int(0, rubik.controls.length - 1);
 
     controller = rubik.controls[controller_index];
