@@ -20,7 +20,9 @@ document.querySelector("#create").addEventListener("click", () => {
     set_up_support_matrix();
     add_support_matrix_to_shader();
     draw();
+
     document.querySelector("#toggle-rotate").disabled = false;
+    document.querySelector("#show-movement-control").disabled = false;
 });
 
 document.querySelector("#toggle-rotate").addEventListener("click", e => {
@@ -37,13 +39,13 @@ document.querySelector("#toggle-rotate").addEventListener("click", e => {
     }
 });
 
-document.querySelector("#turn-randomly").addEventListener("click", () => {
-    if (document.querySelector("#turn-randomly").innerHTML == "Turning randomly") {
+document.querySelector("#scrambling").addEventListener("click", () => {
+    if (document.querySelector("#scrambling").innerHTML == "Start scrambling") {
         is_turning_randomly = true;
-        document.querySelector("#turn-randomly").innerHTML = "Stop turning randomly"
+        document.querySelector("#scrambling").innerHTML = "Stop scrambling"
     } else {
         is_turning_randomly = false;
-        document.querySelector("#turn-randomly").innerHTML = "Turning randomly"
+        document.querySelector("#scrambling").innerHTML = "Start scrambling"
     }
 });
 
@@ -60,6 +62,21 @@ document.querySelector("#show-control").addEventListener("click", e => {
         document.querySelector("#controller").style.left = "0px";
         document.querySelector("main").style.width ="75%";
         e.target.innerHTML = "Hide control";
+        
+    }
+});
+
+document.querySelector("#show-movement-control").addEventListener("click", e => {
+    if (document.querySelector("#movement-controller").style.display == "none") {
+
+        document.querySelector("#movement-controller").style.display = "flex"
+        e.target.innerHTML = "Hide movement control";
+
+    }
+    else {
+
+        document.querySelector("#movement-controller").style.display = "none"
+        e.target.innerHTML = "Show movement control";
         
     }
 });

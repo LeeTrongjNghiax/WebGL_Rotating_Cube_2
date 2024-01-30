@@ -860,6 +860,7 @@ init_vertices = () => {
 }
 
 create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1, expanded_distance = DELTA, have_all_cubies = false) => {
+    // Remove duplicated rotation
     if (start == end && have_all_cubies == false)
         return;
 
