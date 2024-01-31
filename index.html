@@ -21,30 +21,13 @@
         uniform mat4 mWorld; 
         uniform mat4 mView; 
         uniform mat4 mProj; 
-        uniform int axis; 
         uniform float min; 
         uniform float max; 
+
+        uniform int axis; 
         uniform float rad; 
-
-        vec4 create_plane_from_3_points(vec3 a, vec3 b, vec3 c) {
-            float a0 = (b.y * c.z) - (b.y * a.z) - (a.y * c.z) - (b.z * c.y) + (b.z * a.y) + (a.z * c.y);
-            float b0 = (b.x * c.z) - (b.x * a.z) - (a.x * c.z) - (b.z * c.x) + (b.z * a.x) + (a.z * c.x);
-            float c0 = (b.x * c.y) - (b.x * a.y) - (a.x * c.y) - (b.y * c.x) + (b.y * a.x) + (a.y * c.x);
-            float d0 = a0 * a.x + b0 * a.y + c0 * a.z;
-
-            return vec4(a0, b0, c0, d0);
-        }
-
-        float get_distance_from_point_to_plane(vec3 point, vec4 plane) {
-            return abs(plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w) / sqrt(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
-        }
-
-        bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
-            float dis1 = get_distance_from_point_to_plane(point, plane1);
-            float dis2 = get_distance_from_point_to_plane(point, plane2);
-
-            return dis1 == dis2;
-        }
+        uniform vec3 plane1[3]; 
+        uniform vec3 plane2[3]; 
 
         mat4 create_identity_matrix() {
             mat4 iden;
@@ -101,12 +84,55 @@
 
             return create_identity_matrix();
         }
+
+        vec4 create_plane_from_3_points(vec3 a, vec3 b, vec3 c) {
+            vec3 v1 = vec3(b.x - a.x, b.y - a.y, b.z - a.z);
+            vec3 v2 = vec3(c.x - a.x, c.y - a.y, c.z - a.z);
+            vec3 normal = cross(v1, v2);
+            float d0 = normal.x + a.x * normal.y + a.y * normal.z + a.z;
+
+            return vec4(normal, d0);
+        }
+
+        float get_distance_from_point_to_plane(vec3 point, vec4 plane) {
+            return abs(plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w) / sqrt(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
+        }
+
+        bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
+            float dis1 = get_distance_from_point_to_plane(point, plane1);
+            float dis2 = get_distance_from_point_to_plane(point, plane2);
+            float point_length = length(point);
+            
+            if (dis1 >= dis2) 
+                return (point_length >= dis2 && point_length <= dis1);
+            else
+                return (point_length >= dis1 && point_length <= dis2);
+        }
+
+        mat4 check_vertex2(vec3 points1[3], vec3 points2[3], vec3 vertex, int axis, float rad
+        ) {
+            vec4 plane1 = create_plane_from_3_points(points1[0], points1[1], points1[2]);
+            vec4 plane2 = create_plane_from_3_points(points2[0], points2[1], points2[2]);
+
+            if (check_if_point_between_2_planes(vertex, plane1, plane2)) {
+                if (axis == 0)
+                    return create_rotation_x_matrix(rad);
+                else if (axis == 1)
+                    return create_rotation_y_matrix(rad);
+                else if (axis == 2)
+                    return create_rotation_z_matrix(rad);
+                else 
+                    return create_identity_matrix();
+            } else 
+                return create_identity_matrix();
+        }
         
         void main() { 
             fragColor = vertColor;
             gl_PointSize = pointSize;
 
             mat4 rot = check_vertex(vertPosition, axis, min, max, rad);
+            mat4 rot2 = check_vertex2(plane1, plane2, vertPosition, axis, rad);
 
             gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
         }
