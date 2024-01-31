@@ -26,8 +26,12 @@
 
         uniform int axis; 
         uniform float rad; 
-        uniform vec3 plane1[3]; 
-        uniform vec3 plane2[3]; 
+        uniform vec3 plane1_a; 
+        uniform vec3 plane1_b; 
+        uniform vec3 plane1_c; 
+        uniform vec3 plane2_a; 
+        uniform vec3 plane2_b; 
+        uniform vec3 plane2_c; 
 
         mat4 create_identity_matrix() {
             mat4 iden;
@@ -86,45 +90,62 @@
         }
 
         vec4 create_plane_from_3_points(vec3 a, vec3 b, vec3 c) {
-            vec3 v1 = vec3(b.x - a.x, b.y - a.y, b.z - a.z);
-            vec3 v2 = vec3(c.x - a.x, c.y - a.y, c.z - a.z);
+            vec3 v1 = b.xyz - a.xyz;
+            vec3 v2 = c.xyz - a.xyz;
             vec3 normal = cross(v1, v2);
-            float d0 = normal.x + a.x * normal.y + a.y * normal.z + a.z;
+            float d0 = -dot(normal, a);
 
             return vec4(normal, d0);
         }
 
-        float get_distance_from_point_to_plane(vec3 point, vec4 plane) {
-            return abs(plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w) / sqrt(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
+        float get_dot_product_of_plane_and_vector(vec3 point, vec4 plane) {
+            return dot(point.xyz, plane.xyz) + plane.w;
         }
 
         bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
-            float dis1 = get_distance_from_point_to_plane(point, plane1);
-            float dis2 = get_distance_from_point_to_plane(point, plane2);
-            float point_length = length(point);
-            
-            if (dis1 >= dis2) 
-                return (point_length >= dis2 && point_length <= dis1);
-            else
-                return (point_length >= dis1 && point_length <= dis2);
+            float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
+            float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
+
+            float sign1 = sign(dis1);
+            float sign2 = sign(dis2);
+
+            if (sign1 == 0.0 || sign2 == 0.0)
+                return true;
+
+            if (sign1 != sign2)
+                return true;
+
+            return false;
         }
 
-        mat4 check_vertex2(vec3 points1[3], vec3 points2[3], vec3 vertex, int axis, float rad
+        mat4 check_vertex2(
+            vec3 points1_a, 
+            vec3 points1_b, 
+            vec3 points1_c, 
+            vec3 points2_a, 
+            vec3 points2_b, 
+            vec3 points2_c, 
+            vec3 vertex, 
+            int axis, 
+            float rad
         ) {
-            vec4 plane1 = create_plane_from_3_points(points1[0], points1[1], points1[2]);
-            vec4 plane2 = create_plane_from_3_points(points2[0], points2[1], points2[2]);
+            vec4 plane1 = create_plane_from_3_points(points1_a, points1_b, points1_c);
+            vec4 plane2 = create_plane_from_3_points(points2_a, points2_b, points2_c);
+            mat4 rotation_matrix = create_identity_matrix();
 
-            if (check_if_point_between_2_planes(vertex, plane1, plane2)) {
+            if ( check_if_point_between_2_planes(vertex, plane1, plane2) ) {
                 if (axis == 0)
-                    return create_rotation_x_matrix(rad);
+                    rotation_matrix = create_rotation_x_matrix(rad);
                 else if (axis == 1)
-                    return create_rotation_y_matrix(rad);
+                    rotation_matrix = create_rotation_y_matrix(rad);
                 else if (axis == 2)
-                    return create_rotation_z_matrix(rad);
+                    rotation_matrix = create_rotation_z_matrix(rad);
                 else 
-                    return create_identity_matrix();
+                    rotation_matrix = create_identity_matrix();
             } else 
-                return create_identity_matrix();
+                rotation_matrix = create_identity_matrix();
+
+            return rotation_matrix;
         }
         
         void main() { 
@@ -132,7 +153,18 @@
             gl_PointSize = pointSize;
 
             mat4 rot = check_vertex(vertPosition, axis, min, max, rad);
-            mat4 rot2 = check_vertex2(plane1, plane2, vertPosition, axis, rad);
+
+            mat4 rot2 = check_vertex2(
+                plane1_a, 
+                plane1_b, 
+                plane1_c, 
+                plane2_a, 
+                plane2_b, 
+                plane2_c, 
+                vertPosition, 
+                axis, 
+                rad
+            );
 
             gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
         }

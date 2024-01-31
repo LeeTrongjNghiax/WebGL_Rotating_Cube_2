@@ -184,6 +184,13 @@ let min_plane_uniform_location;
 let max_plane_uniform_location;
 let rad_uniform_location;
 
+let plane1_a_uniform_location;
+let plane1_b_uniform_location;
+let plane1_c_uniform_location;
+let plane2_a_uniform_location;
+let plane2_b_uniform_location;
+let plane2_c_uniform_location;
+
 //
 // Matrix
 //
@@ -996,6 +1003,13 @@ get_matrix_in_shader = () => {
     min_plane_uniform_location = gl.getUniformLocation(program, 'min');
     max_plane_uniform_location = gl.getUniformLocation(program, 'max');
     rad_uniform_location = gl.getUniformLocation(program, 'rad');
+
+    plane1_a_uniform_location = gl.getUniformLocation(program, 'plane1_a');
+    plane1_b_uniform_location = gl.getUniformLocation(program, 'plane1_b');
+    plane1_c_uniform_location = gl.getUniformLocation(program, 'plane1_c');
+    plane2_a_uniform_location = gl.getUniformLocation(program, 'plane2_a');
+    plane2_b_uniform_location = gl.getUniformLocation(program, 'plane2_b');
+    plane2_c_uniform_location = gl.getUniformLocation(program, 'plane2_c');
 }
 
 set_up_support_matrix = () => {
@@ -1174,6 +1188,49 @@ loop = () => {
     count_fps();
     orbit_around_rubik();
     set_up_canvas_dimension();
+
+    //
+    // Test y
+    //
+
+    // gl.uniform1i(axis_uniform_location, 1);
+    // gl.uniform1f(rad_uniform_location, Math.PI / 2);
+    
+    // gl.uniform3fv(plane1_a_uniform_location, [0.0, 0.5, 0.0] );
+    // gl.uniform3fv(plane1_b_uniform_location, [0.0, 0.5, 1.0] );
+    // gl.uniform3fv(plane1_c_uniform_location, [1.0, 0.5, 1.0] );
+    // gl.uniform3fv(plane2_a_uniform_location, [0.0, 2.0, 0.0] );
+    // gl.uniform3fv(plane2_b_uniform_location, [0.0, 2.0, 1.0] );
+    // gl.uniform3fv(plane2_c_uniform_location, [1.0, 2.0, 1.0] );
+
+    //
+    // Test x
+    //
+
+    // gl.uniform1i(axis_uniform_location, 0);
+    // gl.uniform1f(rad_uniform_location, Math.PI / 2);
+
+    // gl.uniform3fv(plane1_a_uniform_location, [0.5, 0.0, 0.0] );
+    // gl.uniform3fv(plane1_b_uniform_location, [0.5, 0.0, 1.0] );
+    // gl.uniform3fv(plane1_c_uniform_location, [0.5, 1.0, 1.0] );
+    // gl.uniform3fv(plane2_a_uniform_location, [2.0, 0.0, 0.0] );
+    // gl.uniform3fv(plane2_b_uniform_location, [2.0, 0.0, 1.0] );
+    // gl.uniform3fv(plane2_c_uniform_location, [2.0, 1.0, 1.0] );
+
+    //
+    // Test z
+    //
+
+    // gl.uniform1i(axis_uniform_location, 2);
+    // gl.uniform1f(rad_uniform_location, Math.PI / 2);
+
+    // gl.uniform3fv(plane1_a_uniform_location, [0.0, 0.0, 0.5] );
+    // gl.uniform3fv(plane1_b_uniform_location, [0.0, 1.0, 0.5] );
+    // gl.uniform3fv(plane1_c_uniform_location, [1.0, 1.0, 0.5] );
+    // gl.uniform3fv(plane2_a_uniform_location, [0.0, 0.0, 2.0] );
+    // gl.uniform3fv(plane2_b_uniform_location, [0.0, 1.0, 2.0] );
+    // gl.uniform3fv(plane2_c_uniform_location, [1.0, 1.0, 2.0] );
+
     draw();
 
     request_animation_frame = requestAnimationFrame(loop);

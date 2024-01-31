@@ -11,9 +11,10 @@ function normalize(out, a) {
     let y = a[1];
     let z = a[2];
     let len = x * x + y * y + z * z;
+    
     if (len > 0) {
       //TODO: evaluate use of glm_invsqrt here?
-      len = 1 / Math.sqrt(len);
+        len = 1 / Math.sqrt(len);
     }
     out[0] = a[0] * len;
     out[1] = a[1] * len;
@@ -23,16 +24,16 @@ function normalize(out, a) {
 
 function cross(out, a, b) {
     let ax = a[0],
-      ay = a[1],
-      az = a[2];
+        ay = a[1],
+        az = a[2];
     let bx = b[0],
-      by = b[1],
-      bz = b[2];
+        by = b[1],
+        bz = b[2];
     out[0] = ay * bz - az * by;
     out[1] = az * bx - ax * bz;
     out[2] = ax * by - ay * bx;
     return out;
-  }
+}
 
 function get_random_int(min, max) {
     min = Math.ceil(min);
