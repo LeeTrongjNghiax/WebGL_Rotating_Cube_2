@@ -26,12 +26,9 @@
 
         uniform int axis; 
         uniform float rad; 
-        uniform vec3 plane1_a; 
-        uniform vec3 plane1_b; 
-        uniform vec3 plane1_c; 
-        uniform vec3 plane2_a; 
-        uniform vec3 plane2_b; 
-        uniform vec3 plane2_c; 
+
+        uniform vec4 plane1; 
+        uniform vec4 plane2; 
 
         mat4 create_identity_matrix() {
             mat4 iden;
@@ -69,35 +66,6 @@
             return rot;
         }
 
-        mat4 check_vertex(vec3 vertex, int axis, float min, float max, float rad) {
-            if (axis == 0) 
-                if (vertex.x >= min && vertex.x <= max)
-                    return create_rotation_x_matrix(rad);
-                else
-                    return create_identity_matrix();
-            else if (axis == 1) 
-                if (vertex.y >= min && vertex.y <= max)
-                    return create_rotation_y_matrix(rad);
-                else
-                    return create_identity_matrix();
-            else if (axis == 2) 
-                if (vertex.z >= min && vertex.z <= max)
-                    return create_rotation_z_matrix(rad); 
-                else
-                    return create_identity_matrix();
-
-            return create_identity_matrix();
-        }
-
-        vec4 create_plane_from_3_points(vec3 a, vec3 b, vec3 c) {
-            vec3 v1 = b.xyz - a.xyz;
-            vec3 v2 = c.xyz - a.xyz;
-            vec3 normal = cross(v1, v2);
-            float d0 = -dot(normal, a);
-
-            return vec4(normal, d0);
-        }
-
         float get_dot_product_of_plane_and_vector(vec3 point, vec4 plane) {
             return dot(point.xyz, plane.xyz) + plane.w;
         }
@@ -109,28 +77,19 @@
             float sign1 = sign(dis1);
             float sign2 = sign(dis2);
 
-            if (sign1 == 0.0 || sign2 == 0.0)
-                return true;
-
             if (sign1 != sign2)
                 return true;
 
             return false;
         }
 
-        mat4 check_vertex2(
-            vec3 points1_a, 
-            vec3 points1_b, 
-            vec3 points1_c, 
-            vec3 points2_a, 
-            vec3 points2_b, 
-            vec3 points2_c, 
+        mat4 check_vertex3(
+            vec4 plane1, 
+            vec4 plane2, 
             vec3 vertex, 
             int axis, 
             float rad
         ) {
-            vec4 plane1 = create_plane_from_3_points(points1_a, points1_b, points1_c);
-            vec4 plane2 = create_plane_from_3_points(points2_a, points2_b, points2_c);
             mat4 rotation_matrix = create_identity_matrix();
 
             if ( check_if_point_between_2_planes(vertex, plane1, plane2) ) {
@@ -152,15 +111,9 @@
             fragColor = vertColor;
             gl_PointSize = pointSize;
 
-            mat4 rot = check_vertex(vertPosition, axis, min, max, rad);
-
-            mat4 rot2 = check_vertex2(
-                plane1_a, 
-                plane1_b, 
-                plane1_c, 
-                plane2_a, 
-                plane2_b, 
-                plane2_c, 
+            mat4 rot = check_vertex3(
+                plane1, 
+                plane2, 
                 vertPosition, 
                 axis, 
                 rad

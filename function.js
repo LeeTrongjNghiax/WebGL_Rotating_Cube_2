@@ -1,10 +1,42 @@
-/*
-D1 = (n2 - m2)(o3 - m3) - (n3 - m3)(o2 - m2)
-D2 = (n1 - m1)(o3 - m3) - (n3 - m3)(o1 - m1)
-D3 = (n1 - m1)(o2 - m2) - (n2 - m2)(o1 - m1)
-*/
-
 const EPSILON = 0.000001;
+
+function create_plane_from_3_points(a = new Position(), b = new Position(), c = new Position()) {
+    let v1 = new Float32Array(3);
+    v1[0] = b.x - a.x;
+    v1[1] = b.y - a.y;
+    v1[2] = b.z - a.z;
+
+    let v2 = new Float32Array(3);
+    v2[0] = c.x - a.x;
+    v2[1] = c.y - a.y;
+    v2[2] = c.z - a.z;
+
+    let normal = new Float32Array(3);
+    cross(normal, v1, v2);
+
+    let a0 = new Float32Array(3);
+    a0[0] = a.x;
+    a0[1] = a.y;
+    a0[2] = a.z;
+
+    let d = -dot(normal, a0);
+
+    return new Plane(normal[0], normal[1], normal[2], d);
+}
+
+function get_dot_product_of_plane_and_vector(point = new Position(), plane = new Plane()) {
+    let point2 = new Float32Array(3);
+    point2[0] = point.x;
+    point2[1] = point.y;
+    point2[2] = point.z;
+
+    let plane2 = new Float32Array(3);
+    plane2[0] = plane.a;
+    plane2[1] = plane.b;
+    plane2[2] = plane.c;
+
+    return dot(point2, plane2) + plane.d;
+}
 
 function normalize(out, a) {
     let x = a[0];
@@ -20,7 +52,7 @@ function normalize(out, a) {
     out[1] = a[1] * len;
     out[2] = a[2] * len;
     return out;
-  }
+}
 
 function cross(out, a, b) {
     let ax = a[0],
@@ -34,6 +66,10 @@ function cross(out, a, b) {
     out[2] = ax * by - ay * bx;
     return out;
 }
+
+function dot(a, b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  }
 
 function get_random_int(min, max) {
     min = Math.ceil(min);
@@ -447,13 +483,13 @@ function readTextFile(file) {
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", file, false);
     rawFile.onreadystatechange = function () {
-      if(rawFile.readyState === 4)  {
-        if(rawFile.status === 200 || rawFile.status == 0) {
-            var allText = rawFile.responseText;
-            console.log(allText);
-          return allText;
-         }
-      }
+        if(rawFile.readyState === 4)  {
+            if(rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+                console.log(allText);
+            return allText;
+            }
+        }
     }
     rawFile.send(null);
-  }
+}

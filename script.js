@@ -101,6 +101,16 @@ let rotate_button_elem;
 let direction;
 let suffix;
 
+let points1;
+let points2;
+let plane1;
+let plane2;
+let point_index_0_to_change;
+let point_index_1_to_change;
+let point_index_2_to_change;
+let sticker_gap_start;
+let sticker_gap_end;
+
 //
 // count_fps variable
 //
@@ -129,6 +139,7 @@ let last_tick;
 let current_tick;
 let time;
 
+let control
 let controller_index;
 let controller;
 let is_rotation_finish = true;
@@ -180,16 +191,9 @@ let point_size_uniform_location;
 let mat_world_uniform_location;
 let mat_view_uniform_location;
 let axis_uniform_location;
-let min_plane_uniform_location;
-let max_plane_uniform_location;
 let rad_uniform_location;
-
-let plane1_a_uniform_location;
-let plane1_b_uniform_location;
-let plane1_c_uniform_location;
-let plane2_a_uniform_location;
-let plane2_b_uniform_location;
-let plane2_c_uniform_location;
+let plane1_uniform_location;
+let plane2_uniform_location;
 
 //
 // Matrix
@@ -866,16 +870,85 @@ init_vertices = () => {
     vertice_indices_length = vertice_indices.length;
 }
 
-create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1, expanded_distance = DELTA, have_all_cubies = false) => {
-    // Remove duplicated rotation
-    if (start == end && have_all_cubies == false)
-        return;
-
+create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1) => {
     for (let i = start; i <= end; i += step) {
         mean = (start + end) / 2;
         sticker_start = 0;
         sticker_end = 0;
         suffix = (size[0] - Math.abs(i * 2) - 1) / 2 + 1;
+
+        // Cover extended sticker position when current layer position is outside
+        if (i == start && i != end)
+            sticker_start = rubik.sticker_gap;
+        else if (i != start && i == end)
+            sticker_end = rubik.sticker_gap;
+        // If current layer is the start and end layer (size = 1)
+        else if (i == start && i == end) {
+            sticker_start = rubik.sticker_gap;
+            sticker_end = rubik.sticker_gap;
+        }
+
+        points1 = [
+            new Position(), 
+            new Position(), 
+            new Position(), 
+        ];
+        points2 = [
+            new Position(), 
+            new Position(), 
+            new Position(), 
+        ];
+
+        plane1 = new Plane();
+        plane2 = new Plane();
+
+        // Define condition to find 3 points to determine a plane
+        switch (axis) {
+            case "x":
+                point_index_0_to_change = "x";
+                point_index_1_to_change = "y";
+                point_index_2_to_change = "z";
+                break;
+            case "y":
+                point_index_0_to_change = "y";
+                point_index_1_to_change = "x";
+                point_index_2_to_change = "z";
+                break;
+            case "z":
+                point_index_0_to_change = "z";
+                point_index_1_to_change = "x";
+                point_index_2_to_change = "y";
+                break;
+            default:
+                return;
+        }
+
+        // Set up those 3 points that define a plane
+        points1[0][point_index_0_to_change] = i - DELTA - sticker_start;
+        points1[1][point_index_0_to_change] = i - DELTA - sticker_start;
+        points1[2][point_index_0_to_change] = i - DELTA - sticker_start;
+        points2[0][point_index_0_to_change] = i + DELTA + sticker_end;
+        points2[1][point_index_0_to_change] = i + DELTA + sticker_end;
+        points2[2][point_index_0_to_change] = i + DELTA + sticker_end;
+
+        points1[0][point_index_1_to_change] = 0.0;
+        points1[1][point_index_1_to_change] = 0.0;
+        points1[2][point_index_1_to_change] = 1.0;
+        points2[0][point_index_1_to_change] = 0.0;
+        points2[1][point_index_1_to_change] = 0.0;
+        points2[2][point_index_1_to_change] = 1.0;
+
+        points1[0][point_index_2_to_change] = 0.0;
+        points1[1][point_index_2_to_change] = 1.0;
+        points1[2][point_index_2_to_change] = 1.0;
+        points2[0][point_index_2_to_change] = 0.0;
+        points2[1][point_index_2_to_change] = 1.0;
+        points2[2][point_index_2_to_change] = 1.0;
+
+        // Create planes from that 3 points
+        plane1 = create_plane_from_3_points(points1[0], points1[1], points1[2]);
+
+        plane2 = create_plane_from_3_points(points2[0], points2[1], points2[2]);
 
         // If the choosen layer is at the outside or the middle of the cube, suffix wont appear
         if (suffix == size[0] || suffix == 0 || suffix == 1 || i == mean)
@@ -894,66 +967,37 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
             rotation_name = rotation_names[2];
             direction = directions[2];
         }
-
-        // Cover extended sticker position when current layer position is outside
-        if (i == start && i != end)
-            sticker_start = rubik.sticker_gap;
-        else if (i != start && i == end)
-            sticker_end = rubik.sticker_gap;
-        // If current layer is the start and end layer (size = 1)
-        else if (i == start && i == end) {
-            sticker_start = rubik.sticker_gap;
-            sticker_end = rubik.sticker_gap;
-        }
         
         // If the other axis had equal number of cubies, then it can had quarter rotation
         if (size[1] == size[2]) {
             rubik.add_control(
-                new Control(suffix + rotation_name, axis, i, QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end, expanded_distance, have_all_cubies)
+                new Control2(suffix + rotation_name, axis,  QUARTER_OF_CIRCLE * direction, plane1, plane2)
             );
             rubik.add_control(
-                new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, i, -QUARTER_OF_CIRCLE * direction, sticker_start, sticker_end, expanded_distance, have_all_cubies)
+                new Control2(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, -QUARTER_OF_CIRCLE * direction, plane1, plane2)
             );
         }
 
-        rubik.add_control(new Control(suffix + rotation_name + "2", axis, i, HALF_OF_CIRCLE * direction, sticker_start, sticker_end, expanded_distance, have_all_cubies));
+        rubik.add_control(new Control2(suffix + rotation_name + "2", axis, HALF_OF_CIRCLE * direction, plane1, plane2));
     }
 }
 
-create_rubik_control_set = () => {
-    create_rubik_control(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["R", "L", "M"], "x", 1);
-    create_rubik_control(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["D", "U", "E"], "y", 1);
-    create_rubik_control(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["F", "B", "S"], "z", 1);
-
-    create_rubik_control(0, 0, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["", "", "x"], "x", 1, rubik_size_x / 2, true);
-    create_rubik_control(0, 0, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["", "", "y"], "y", 1, rubik_size_y / 2, true);
-    create_rubik_control(0, 0, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["", "", "z"], "z", 1, rubik_size_z / 2, true);
+create_rubik_control_set2 = () => {
+    create_rubik_control2(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["R", "L", "M"], "x", 1);
+    create_rubik_control2(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["D", "U", "E"], "y", 1);
+    create_rubik_control2(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["F", "B", "S"], "z", 1);
 }
 
-add_control_set_to_html = () => {
+add_control_set_to_html2 = () => {
     document.querySelector("#movement-controller").replaceChildren();
 
     for (i = 0; i < rubik.controls.length; i++) {
         rotate_button_elem = document.createElement("button");
-        rotate_button_elem.id = `rotate-${rubik.controls[i].name}`;
+        rotate_button_elem.id = `${rubik.controls[i].name}`;
         rotate_button_elem.innerHTML = rubik.controls[i].name;
         document.querySelector("#movement-controller").appendChild(rotate_button_elem);
 
-        var axis = rubik.controls[i].axis;
-        var position = rubik.controls[i].position;
-        var rad = rubik.controls[i].rad;
-        var sticker_start = rubik.controls[i].sticker_gap_start;
-        var sticker_end = rubik.controls[i].sticker_gap_end;
-
-        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg(
-            '${axis}',
-            ${position},
-            ${rad},
-            ${sticker_start},
-            ${sticker_end},
-            ${rubik.controls[i].expanded_distance},
-            ${rubik.controls[i].have_all_cubies},
-        )`);
+        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg_2(this)`);
     }
 }
 
@@ -1000,16 +1044,10 @@ get_matrix_in_shader = () => {
     mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
 
     axis_uniform_location = gl.getUniformLocation(program, 'axis');
-    min_plane_uniform_location = gl.getUniformLocation(program, 'min');
-    max_plane_uniform_location = gl.getUniformLocation(program, 'max');
     rad_uniform_location = gl.getUniformLocation(program, 'rad');
 
-    plane1_a_uniform_location = gl.getUniformLocation(program, 'plane1_a');
-    plane1_b_uniform_location = gl.getUniformLocation(program, 'plane1_b');
-    plane1_c_uniform_location = gl.getUniformLocation(program, 'plane1_c');
-    plane2_a_uniform_location = gl.getUniformLocation(program, 'plane2_a');
-    plane2_b_uniform_location = gl.getUniformLocation(program, 'plane2_b');
-    plane2_c_uniform_location = gl.getUniformLocation(program, 'plane2_c');
+    plane1_uniform_location = gl.getUniformLocation(program, 'plane1');
+    plane2_uniform_location = gl.getUniformLocation(program, 'plane2');
 }
 
 set_up_support_matrix = () => {
@@ -1129,39 +1167,66 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg = (axis, position = 0, finished_rad, sticker_gap_1 = 0, sticker_gap_2 = 0, expanded_distance = DELTA, have_all_cubies = false) => {
+loop_rotate_face_till_90_deg_2 = e => {
+    control = null;
+
+    for (i = 0; i < rubik.controls.length; i++) 
+        if (rubik.controls[i].name == e.id) {
+            control = rubik.controls[i];
+            break;
+        }
+
     is_rotation_finish = false;
-    disable_rotate_function();
 
     rad = 0;
-    rad_step = finished_rad / angle_rotated_ratio;
+    rad_step = control.rad / angle_rotated_ratio;
 
     rotate_interval = setInterval(() => {
         rad += rad_step;
         
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-        rotate_face(axis_string_to_number( axis ), position - expanded_distance - sticker_gap_1, position + expanded_distance + sticker_gap_2, rad);
+        rotate_face3(
+            axis_string_to_number( control.axis ),
+            rad, control.plane1, control.plane2
+        );
 
-        if (Math.abs(rad - finished_rad) < EPSILON) {
-            rubik.rotate_face(axis, position, rad, have_all_cubies);
+        if (Math.abs(rad - control.rad) < EPSILON) {
+            
+            rubik.rotate_face2(
+                control.axis,
+                rad,
+                control.plane1,
+                control.plane2
+            );
             
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
             is_rotation_finish = true;
 
             clearInterval(rotate_interval);
-
-            enable_rotate_function();
         }
     }, smooth_rotation);
 }
 
-rotate_face = (axis, min, max, rad) => {
+rotate_face3 = (axis, rad, plane1, plane2) => {
+    let plane1_ = new Float32Array(4);
+    plane1_[0] = plane1.a;
+    plane1_[1] = plane1.b;
+    plane1_[2] = plane1.c;
+    plane1_[3] = plane1.d;
+
+    let plane2_ = new Float32Array(4);
+    plane2_[0] = plane2.a;
+    plane2_[1] = plane2.b;
+    plane2_[2] = plane2.c;
+    plane2_[3] = plane2.d;
+
     gl.uniform1i(axis_uniform_location, axis);
-    gl.uniform1f(min_plane_uniform_location, min);
-    gl.uniform1f(max_plane_uniform_location, max);
     gl.uniform1f(rad_uniform_location, rad);
+
+    gl.uniform4fv(plane1_uniform_location, plane1_ );
+    gl.uniform4fv(plane2_uniform_location, plane2_ );
 }
 
 count_fps = () => {
@@ -1188,49 +1253,7 @@ loop = () => {
     count_fps();
     orbit_around_rubik();
     set_up_canvas_dimension();
-
-    //
-    // Test y
-    //
-
-    // gl.uniform1i(axis_uniform_location, 1);
-    // gl.uniform1f(rad_uniform_location, Math.PI / 2);
     
-    // gl.uniform3fv(plane1_a_uniform_location, [0.0, 0.5, 0.0] );
-    // gl.uniform3fv(plane1_b_uniform_location, [0.0, 0.5, 1.0] );
-    // gl.uniform3fv(plane1_c_uniform_location, [1.0, 0.5, 1.0] );
-    // gl.uniform3fv(plane2_a_uniform_location, [0.0, 2.0, 0.0] );
-    // gl.uniform3fv(plane2_b_uniform_location, [0.0, 2.0, 1.0] );
-    // gl.uniform3fv(plane2_c_uniform_location, [1.0, 2.0, 1.0] );
-
-    //
-    // Test x
-    //
-
-    // gl.uniform1i(axis_uniform_location, 0);
-    // gl.uniform1f(rad_uniform_location, Math.PI / 2);
-
-    // gl.uniform3fv(plane1_a_uniform_location, [0.5, 0.0, 0.0] );
-    // gl.uniform3fv(plane1_b_uniform_location, [0.5, 0.0, 1.0] );
-    // gl.uniform3fv(plane1_c_uniform_location, [0.5, 1.0, 1.0] );
-    // gl.uniform3fv(plane2_a_uniform_location, [2.0, 0.0, 0.0] );
-    // gl.uniform3fv(plane2_b_uniform_location, [2.0, 0.0, 1.0] );
-    // gl.uniform3fv(plane2_c_uniform_location, [2.0, 1.0, 1.0] );
-
-    //
-    // Test z
-    //
-
-    // gl.uniform1i(axis_uniform_location, 2);
-    // gl.uniform1f(rad_uniform_location, Math.PI / 2);
-
-    // gl.uniform3fv(plane1_a_uniform_location, [0.0, 0.0, 0.5] );
-    // gl.uniform3fv(plane1_b_uniform_location, [0.0, 1.0, 0.5] );
-    // gl.uniform3fv(plane1_c_uniform_location, [1.0, 1.0, 0.5] );
-    // gl.uniform3fv(plane2_a_uniform_location, [0.0, 0.0, 2.0] );
-    // gl.uniform3fv(plane2_b_uniform_location, [0.0, 1.0, 2.0] );
-    // gl.uniform3fv(plane2_c_uniform_location, [1.0, 1.0, 2.0] );
-
     draw();
 
     request_animation_frame = requestAnimationFrame(loop);
@@ -1274,13 +1297,7 @@ scrambling = () => {
 
     controller = rubik.controls[controller_index];
 
-    loop_rotate_face_till_90_deg(
-        controller.axis,
-        controller.position,
-        controller.rad,
-        controller.sticker_gap_start,
-        controller.sticker_gap_end,
-        controller.expanded_distance,
-        controller.have_all_cubies
+    loop_rotate_face_till_90_deg_2(
+        document.querySelector( "#" + controller.name )
     );
 }
