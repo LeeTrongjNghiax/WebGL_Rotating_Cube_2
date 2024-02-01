@@ -117,19 +117,6 @@ class Cubie {
 }
 
 class Control {
-    constructor(name = "", axis = "x", position = 0, rad = Math.PI / 2, sticker_gap_start = 0, sticker_gap_end = 0, expanded_distance = 0, have_all_cubies = false) {
-        this.name = name;
-        this.axis = axis;
-        this.position = position;
-        this.rad = rad;
-        this.sticker_gap_start = sticker_gap_start;
-        this.sticker_gap_end = sticker_gap_end;
-        this.expanded_distance = expanded_distance;
-        this.have_all_cubies = have_all_cubies;
-    }
-}
-
-class Control2 {
     constructor(name = "", axis = "x", rad = Math.PI / 2, plane1 = new Plane(), plane2 = new Plane()) {
         this.name = name;
         this.axis = axis;
@@ -154,20 +141,6 @@ class Rubik {
         this.cubies.push(cubie);
     }
 
-    get_cubies_in_position(axis = "x", position = 0, have_all_cubies = false) {
-        if (have_all_cubies)
-            return this.cubies;
-
-        let result = [];
-
-        for (let i = 0; i < this.cubies.length; i++) {
-            if (this.cubies[i].get_absolute_position()[axis] == position)
-                result.push(this.cubies[i]);
-        }
-
-        return result;
-    }
-
     get_cubies_in_between_2_parallel_planes(plane1 = new Plane(), plane2 = new Plane()) {
         let result = [];
 
@@ -190,69 +163,7 @@ class Rubik {
         return result;
     }
 
-    rotate_face(axis = "x", position = 0, rad, have_all_cubies = false) {
-        let cubies_to_rotate = this.get_cubies_in_position(axis, position, have_all_cubies);
-
-        let identity_matrix = new Float32Array(16);
-        identity(identity_matrix);
-
-        let axis_vector;
-        switch(axis) {
-            case "x":
-                axis_vector = [1, 0, 0];
-                break;
-            case "y":
-                axis_vector = [0, 1, 0];
-                break;
-            case "z":
-                axis_vector = [0, 0, 1];
-                break;
-            default:
-                axis_vector = [0, 0, 0];
-        }
-
-        let rotate_matrix = new Float32Array(16);
-        rotate(rotate_matrix, identity_matrix, -rad, axis_vector);
-        
-        let rotated_vector;
-
-        for (let i = 0; i < cubies_to_rotate.length; i++) {
-
-            rotated_vector = [];
-
-            transformMat4(rotated_vector, [
-                cubies_to_rotate[i].absolute_position.x,
-                cubies_to_rotate[i].absolute_position.y,
-                cubies_to_rotate[i].absolute_position.z,
-                1
-            ], rotate_matrix);
-
-            cubies_to_rotate[i].absolute_position.x = rotated_vector[0];
-            cubies_to_rotate[i].absolute_position.y = rotated_vector[1];
-            cubies_to_rotate[i].absolute_position.z = rotated_vector[2];
-
-            for (let j = 0; j < cubies_to_rotate[i].faces.length; j++) {
-
-                for (let k = 0; k < cubies_to_rotate[i].faces[j].vertices.length; k++) {
-
-                    rotated_vector = [];
-
-                    transformMat4(rotated_vector, [
-                        cubies_to_rotate[i].faces[j].vertices[k].relative_position.x,
-                        cubies_to_rotate[i].faces[j].vertices[k].relative_position.y,
-                        cubies_to_rotate[i].faces[j].vertices[k].relative_position.z,
-                        1
-                    ], rotate_matrix);
-        
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.x = rotated_vector[0];
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.y = rotated_vector[1];
-                    cubies_to_rotate[i].faces[j].vertices[k].relative_position.z = rotated_vector[2];
-                }
-            }
-        }
-    }
-
-    rotate_face2(axis = "x", rad = 0, plane1 = new Plane(), plane2 = new Plane()) {
+    rotate_face(axis = "x", rad = 0, plane1 = new Plane(), plane2 = new Plane()) {
         let cubies_to_rotate = this.get_cubies_in_between_2_parallel_planes(plane1, plane2);
 
         let identity_matrix = new Float32Array(16);

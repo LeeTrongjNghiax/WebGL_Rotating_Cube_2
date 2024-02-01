@@ -1,8 +1,17 @@
+//
+// Constants
+//
+
 const DELTA = 0.5;
 const QUARTER_OF_CIRCLE = Math.PI / 2;
 const HALF_OF_CIRCLE    = Math.PI;
 const FULL_OF_CIRCLE    = Math.PI * 2;
 const ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL = "′";
+
+const MILLISECOND_PER_SECOND = 1000;
+
+const LIGHT_COLOR = 255 / 255;
+const DARK_COLOR = 18 / 255;
 
 //
 // Shader
@@ -18,12 +27,9 @@ let fragment_shader;
 // Color
 //
 
-const MILLISECOND_PER_SECOND = 1000;
-
-const LIGHT_COLOR = 255 / 255;
-const DARK_COLOR = 0 / 255;
 
 let transparent = 1.0;
+let transparent_plane = 0.5;
 let up_color = [1.0, 1.0, 1.0];
 let down_color = [1.0, 1.0, 0.0];
 let front_color = [0.0, 1.0, 0.0];
@@ -110,6 +116,8 @@ let point_index_1_to_change;
 let point_index_2_to_change;
 let sticker_gap_start;
 let sticker_gap_end;
+let plane1_;
+let plane2_;
 
 //
 // count_fps variable
@@ -494,7 +502,7 @@ add_sticker_vertex = (i, j, k) => {
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
         faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
 
-        for (let j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
             faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
         }
 
@@ -523,7 +531,7 @@ add_sticker_vertex = (i, j, k) => {
     rubik.add_cubie(cubie);
 }
 
-add_inner_vertex = (i, j, k) => {
+add_inner_outline_vertex = (i, j, k) => {
     sub_vertices = [];
     cubie = new Cubie();
     faces = [];
@@ -649,7 +657,171 @@ add_inner_vertex = (i, j, k) => {
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
         faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
 
-        for (let j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+        }
+
+        vertice_indices.push(
+            count + 0,
+            count + 1,
+            count + 2,
+
+            count + 0,
+            count + 2,
+            count + 1,
+
+            count + 3,
+            count + 1,
+            count + 2,
+
+            count + 3,
+            count + 2,
+            count + 1,
+        );
+
+        count += number_of_vertex_per_face;
+        cubie.add_face(faces[i3]);
+    }
+
+    rubik.add_cubie(cubie);
+}
+
+add_inner_vertex = (i, j, k) => {
+    sub_vertices = [];
+    cubie = new Cubie();
+    faces = [];
+
+    for (i2 = -1; i2 < 2; i2 += 2) {
+        for (j2 = -1; j2 < 2; j2 += 2) {
+            for (k2 = -1; k2 < 2; k2 += 2) {
+
+                if (i == start_x)
+                    if (i2 == -1)
+                        sub_vertices.push(
+                            new Vertex(
+                                new Position(
+                                    i + rubik_half_length * i2,
+                                    j + rubik_half_length * j2,
+                                    k + rubik_half_length * k2,
+                                ),
+                                new Color(
+                                    inner_color[0],
+                                    inner_color[1],
+                                    inner_color[2],
+                                    transparent
+                                ),
+                                "left", rubik.cubies.length
+                            )
+                        );
+                
+                if (i == end_x)
+                    if (i2 == 1)
+                        sub_vertices.push(
+                            new Vertex(
+                                new Position(
+                                    i + rubik_half_length * i2,
+                                    j + rubik_half_length * j2,
+                                    k + rubik_half_length * k2,
+                                ),
+                                new Color(
+                                    inner_color[0],
+                                    inner_color[1],
+                                    inner_color[2],
+                                    transparent
+                                ),
+                                "left", rubik.cubies.length
+                            )
+                        );
+
+                if (j == start_y)
+                    if (j2 == -1)
+                        sub_vertices.push(
+                            new Vertex(
+                                new Position(
+                                    i + rubik_half_length * i2,
+                                    j + rubik_half_length * j2,
+                                    k + rubik_half_length * k2,
+                                ),
+                                new Color(
+                                    inner_color[0],
+                                    inner_color[1],
+                                    inner_color[2],
+                                    transparent
+                                ),
+                                "down", rubik.cubies.length
+                            )
+                        );
+
+                if (j == end_y)
+                    if (j2 == 1)
+                        sub_vertices.push(
+                            new Vertex(
+                                new Position(
+                                    i + rubik_half_length * i2,
+                                    j + rubik_half_length * j2,
+                                    k + rubik_half_length * k2,
+                                ),
+                                new Color(
+                                    inner_color[0],
+                                    inner_color[1],
+                                    inner_color[2],
+                                    transparent
+                                ),
+                                "up", rubik.cubies.length
+                            )
+                        );
+
+                if (k == start_z)
+                    if (k2 == -1)
+                        sub_vertices.push(
+                            new Vertex(
+                                new Position(
+                                    i + rubik_half_length * i2,
+                                    j + rubik_half_length * j2,
+                                    k + rubik_half_length * k2,
+                                ),
+                                new Color(
+                                    inner_color[0],
+                                    inner_color[1],
+                                    inner_color[2],
+                                    transparent
+                                ),
+                                "front", rubik.cubies.length
+                            )
+                        );
+
+                if (k == end_z)
+                    if (k2 == 1)
+                        sub_vertices.push(
+                            new Vertex(
+                                new Position(
+                                    i + rubik_half_length * i2,
+                                    j + rubik_half_length * j2,
+                                    k + rubik_half_length * k2,
+                                ),
+                                new Color(
+                                    inner_color[0],
+                                    inner_color[1],
+                                    inner_color[2],
+                                    transparent
+                                ),
+                                "back", rubik.cubies.length
+                            )
+                        );
+            }
+        }
+    }
+
+    sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
+
+    number_of_face = sub_vertices.length / number_of_vertex_per_face;
+    for (i3 = 0; i3 < number_of_face; i3++)
+        faces[i3] = new Face();
+
+    for (i3 = 0; i3 < number_of_face; i3 += 1) {
+        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
             faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
         }
 
@@ -699,7 +871,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[0],
                                 inner_color[1],
                                 inner_color[2],
-                                transparent
+                                transparent_plane
                             ),
                             "left", rubik.cubies.length
                         )
@@ -716,7 +888,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[0],
                                 inner_color[1],
                                 inner_color[2],
-                                transparent
+                                transparent_plane
                             ),
                             "left", rubik.cubies.length
                         )
@@ -734,7 +906,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[0],
                                 inner_color[1],
                                 inner_color[2],
-                                transparent
+                                transparent_plane
                             ),
                             "down", rubik.cubies.length
                         )
@@ -751,7 +923,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[0],
                                 inner_color[1],
                                 inner_color[2],
-                                transparent
+                                transparent_plane
                             ),
                             "up", rubik.cubies.length
                         )
@@ -769,7 +941,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[0],
                                 inner_color[1],
                                 inner_color[2],
-                                transparent
+                                transparent_plane
                             ),
                             "front", rubik.cubies.length
                         )
@@ -786,7 +958,7 @@ add_inner_plane_vertex = (i, j, k) => {
                                 inner_color[0],
                                 inner_color[1],
                                 inner_color[2],
-                                transparent
+                                transparent_plane
                             ),
                             "back", rubik.cubies.length
                         )
@@ -804,7 +976,7 @@ add_inner_plane_vertex = (i, j, k) => {
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
         faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
 
-        for (let j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
             faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
         }
 
@@ -860,7 +1032,8 @@ init_vertices = () => {
 
                 if (is_render_inner_plane)
                     add_inner_plane_vertex(i, j, k);
-
+                
+                // add_inner_outline_vertex(i, j, k);
             }
         }
     }
@@ -870,8 +1043,12 @@ init_vertices = () => {
     vertice_indices_length = vertice_indices.length;
 }
 
-create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", step = 1) => {
-    for (let i = start; i <= end; i += step) {
+create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", distance = DELTA, have_all_cubies = false) => {
+    // Remove redundant controller
+    if (start == end && have_all_cubies == false)
+        return;
+    
+    for (i = start; i <= end; i += 1) {
         mean = (start + end) / 2;
         sticker_start = 0;
         sticker_end = 0;
@@ -924,12 +1101,12 @@ create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 
         }
 
         // Set up those 3 points that define a plane
-        points1[0][point_index_0_to_change] = i - DELTA - sticker_start;
-        points1[1][point_index_0_to_change] = i - DELTA - sticker_start;
-        points1[2][point_index_0_to_change] = i - DELTA - sticker_start;
-        points2[0][point_index_0_to_change] = i + DELTA + sticker_end;
-        points2[1][point_index_0_to_change] = i + DELTA + sticker_end;
-        points2[2][point_index_0_to_change] = i + DELTA + sticker_end;
+        points1[0][point_index_0_to_change] = i - distance - sticker_start;
+        points1[1][point_index_0_to_change] = i - distance - sticker_start;
+        points1[2][point_index_0_to_change] = i - distance - sticker_start;
+        points2[0][point_index_0_to_change] = i + distance + sticker_end;
+        points2[1][point_index_0_to_change] = i + distance + sticker_end;
+        points2[2][point_index_0_to_change] = i + distance + sticker_end;
 
         points1[0][point_index_1_to_change] = 0.0;
         points1[1][point_index_1_to_change] = 0.0;
@@ -947,7 +1124,6 @@ create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 
 
         // Create planes from that 3 points
         plane1 = create_plane_from_3_points(points1[0], points1[1], points1[2]);
-
         plane2 = create_plane_from_3_points(points2[0], points2[1], points2[2]);
 
         // If the choosen layer is at the outside or the middle of the cube, suffix wont appear
@@ -971,33 +1147,37 @@ create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 
         // If the other axis had equal number of cubies, then it can had quarter rotation
         if (size[1] == size[2]) {
             rubik.add_control(
-                new Control2(suffix + rotation_name, axis,  QUARTER_OF_CIRCLE * direction, plane1, plane2)
+                new Control(suffix + rotation_name, axis,  QUARTER_OF_CIRCLE * direction, plane1, plane2)
             );
             rubik.add_control(
-                new Control2(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, -QUARTER_OF_CIRCLE * direction, plane1, plane2)
+                new Control(suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL, axis, -QUARTER_OF_CIRCLE * direction, plane1, plane2)
             );
         }
 
-        rubik.add_control(new Control2(suffix + rotation_name + "2", axis, HALF_OF_CIRCLE * direction, plane1, plane2));
+        rubik.add_control(new Control(suffix + rotation_name + "2", axis, HALF_OF_CIRCLE * direction, plane1, plane2));
     }
 }
 
-create_rubik_control_set2 = () => {
-    create_rubik_control2(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["R", "L", "M"], "x", 1);
-    create_rubik_control2(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["D", "U", "E"], "y", 1);
-    create_rubik_control2(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["F", "B", "S"], "z", 1);
+create_rubik_control_set = () => {
+    create_rubik_control(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [-1, 1,  1], ["R", "L", "M"], "x");
+    create_rubik_control(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1, 1, -1], ["D", "U", "E"], "y");
+    create_rubik_control(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [-1, 1, -1], ["F", "B", "S"], "z");
+
+    create_rubik_control(0, 0, [rubik_size_x, rubik_size_y, rubik_size_z], [null, null, -1], [null, null, "x"], "x", rubik_size_x / 2, true);
+    create_rubik_control(0, 0, [rubik_size_y, rubik_size_x, rubik_size_z], [null, null, 1],  [null, null, "y"], "y", rubik_size_y / 2, true);
+    create_rubik_control(0, 0, [rubik_size_z, rubik_size_x, rubik_size_y], [null, null, -1], [null, null, "z"], "z", rubik_size_z / 2, true);
 }
 
-add_control_set_to_html2 = () => {
+add_control_set_to_html = () => {
     document.querySelector("#movement-controller").replaceChildren();
 
     for (i = 0; i < rubik.controls.length; i++) {
         rotate_button_elem = document.createElement("button");
-        rotate_button_elem.id = `${rubik.controls[i].name}`;
+        rotate_button_elem.id = `rotate-${rubik.controls[i].name}`;
         rotate_button_elem.innerHTML = rubik.controls[i].name;
         document.querySelector("#movement-controller").appendChild(rotate_button_elem);
 
-        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg_2(this)`);
+        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg(this)`);
     }
 }
 
@@ -1167,56 +1347,71 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg_2 = e => {
+loop_rotate_face_till_90_deg = e => {
+    disable_rotate_function();
+    
     control = null;
 
+    // Get rotation that corresponding to the button name from the list
     for (i = 0; i < rubik.controls.length; i++) 
-        if (rubik.controls[i].name == e.id) {
+        if (rubik.controls[i].name == e.id.replace("rotate-", "")) {
             control = rubik.controls[i];
             break;
         }
-
+    
+    // Set the finish flag
     is_rotation_finish = false;
 
     rad = 0;
+
+    // Set the radian step each frame
     rad_step = control.rad / angle_rotated_ratio;
 
+    // Main rotation loop
     rotate_interval = setInterval(() => {
+        // Add the angle to rotate each time
         rad += rad_step;
         
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-        rotate_face3(
+        // Set the uniform in the shader to perform a rotation
+        rotate_face(
             axis_string_to_number( control.axis ),
             rad, control.plane1, control.plane2
         );
 
+        // If it had rotated to the pre-determinated arc
         if (Math.abs(rad - control.rad) < EPSILON) {
-            
-            rubik.rotate_face2(
+           
+            // Rotate the coressponding face in the rubik object
+            rubik.rotate_face(
                 control.axis,
                 rad,
                 control.plane1,
                 control.plane2
             );
             
+            // Re-init the buffer data
             vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
+            // Set the rotation flag
             is_rotation_finish = true;
+
+            enable_rotate_function();
 
             clearInterval(rotate_interval);
         }
     }, smooth_rotation);
 }
 
-rotate_face3 = (axis, rad, plane1, plane2) => {
-    let plane1_ = new Float32Array(4);
+rotate_face = (axis, rad, plane1, plane2) => {
+    plane1_ = new Float32Array(4);
     plane1_[0] = plane1.a;
     plane1_[1] = plane1.b;
     plane1_[2] = plane1.c;
     plane1_[3] = plane1.d;
 
-    let plane2_ = new Float32Array(4);
+    plane2_ = new Float32Array(4);
     plane2_[0] = plane2.a;
     plane2_[1] = plane2.b;
     plane2_[2] = plane2.c;
@@ -1283,12 +1478,12 @@ show_drop_down = e => {
 }
 
 disable_rotate_function = () => {
-    for (let i = 0; i < rubik.controls.length; i++)
+    for (i = 0; i < rubik.controls.length; i++)
         document.querySelector(`#rotate-${rubik.controls[i].name}`).disabled = true;    
 }
 
 enable_rotate_function = () => {
-    for (let i = 0; i < rubik.controls.length; i++)
+    for (i = 0; i < rubik.controls.length; i++)
         document.querySelector(`#rotate-${rubik.controls[i].name}`).disabled = false;
 }
 
@@ -1297,7 +1492,7 @@ scrambling = () => {
 
     controller = rubik.controls[controller_index];
 
-    loop_rotate_face_till_90_deg_2(
-        document.querySelector( "#" + controller.name )
+    loop_rotate_face_till_90_deg(
+        document.querySelector( "#rotate-" + controller.name )
     );
 }

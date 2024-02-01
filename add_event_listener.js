@@ -13,9 +13,8 @@ document.querySelector("#create").addEventListener("click", () => {
     get_input_data();
     setup_webgl_canvas();
     init_vertices();
-    // create_rubik_control_set();
-    create_rubik_control_set2();
-    add_control_set_to_html2();
+    create_rubik_control_set();
+    add_control_set_to_html();
     add_buffer_data();
     get_matrix_in_shader();
     set_up_support_matrix();
