@@ -114,12 +114,12 @@ class Cubie {
 }
 
 class Control {
-    constructor(name = "", axis = "x", rad = Math.PI / 2, plane1 = new Plane(), plane2 = new Plane()) {
+    constructor(name, axis = new Position(), rad = Math.PI / 2, upper_limit = 0, lower_limit = 0) {
         this.name = name;
         this.axis = axis;
         this.rad = rad;
-        this.plane1 = plane1;
-        this.plane2 = plane2;
+        this.upper_limit = upper_limit;
+        this.lower_limit = lower_limit;
     }
 }
 
@@ -160,26 +160,19 @@ class Rubik {
         return result;
     }
 
-    rotate_face(axis = "x", rad = 0, plane1 = new Plane(), plane2 = new Plane()) {
-        let cubies_to_rotate = this.get_cubies_in_between_2_parallel_planes(plane1, plane2);
+    rotate_face(axis = new Position(), rad = 0, upper_limit = 0, lower_limit = 0) {
+        let cubies_to_rotate = this.get_cubies_in_between_2_parallel_planes(
+            new Plane(axis.x, axis.y, axis.z, upper_limit), 
+            new Plane(axis.x, axis.y, axis.z, lower_limit), 
+        );
 
         let identity_matrix = new Float32Array(16);
         identity(identity_matrix);
 
-        let axis_vector;
-        switch(axis) {
-            case "x":
-                axis_vector = [1, 0, 0];
-                break;
-            case "y":
-                axis_vector = [0, 1, 0];
-                break;
-            case "z":
-                axis_vector = [0, 0, 1];
-                break;
-            default:
-                axis_vector = [0, 0, 0];
-        }
+        let axis_vector = new Float32Array(16);
+        axis_vector[0] = axis.x;
+        axis_vector[1] = axis.y;
+        axis_vector[2] = axis.z;
 
         let rotate_matrix = new Float32Array(16);
         rotate(rotate_matrix, identity_matrix, -rad, axis_vector);
