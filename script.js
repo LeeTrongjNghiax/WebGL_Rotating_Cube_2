@@ -203,7 +203,6 @@ let color_attribute_location;
 let point_size_uniform_location;
 let mat_world_uniform_location;
 let mat_view_uniform_location;
-let axis_uniform_location;
 let axis_vector_uniform_location;
 let rad_uniform_location;
 let plane1_uniform_location;
@@ -1144,7 +1143,6 @@ get_uniforms_in_shader = () => {
     mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
     mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
 
-    axis_uniform_location = gl.getUniformLocation(program, 'axis');
     axis_vector_uniform_location = gl.getUniformLocation(program, 'axis_vec');
     rad_uniform_location = gl.getUniformLocation(program, 'rad');
 
