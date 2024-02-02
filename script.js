@@ -35,7 +35,7 @@ let fragment_shader;
 
 
 let transparent = 1.0;
-let transparent_inner_cube = 0.5;
+let transparent_inner_cube = 1.0;
 let up_color = [1.0, 1.0, 1.0];
 let down_color = [1.0, 1.0, 0.0];
 let front_color = [0.0, 1.0, 0.0];
@@ -286,6 +286,7 @@ get_input_data = () => {
     left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
     inner_color = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
     transparent = +document.querySelector("#transparent").value / 255 || 1.0;
+    transparent_inner_cube = +document.querySelector("#transparent-inner-cube").value / 255 || 1.0;
 
     shader_program_version = document.querySelector("#shader-program-version").checked;
 
