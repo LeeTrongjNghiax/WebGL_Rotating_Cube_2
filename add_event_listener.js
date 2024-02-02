@@ -16,9 +16,9 @@ document.querySelector("#create").addEventListener("click", () => {
     create_rubik_control_set();
     add_control_set_to_html();
     add_buffer_data();
-    get_matrix_in_shader();
+    get_uniforms_in_shader();
     set_up_support_matrix();
-    add_support_matrix_to_shader();
+    add_uniforms_to_shader();
     draw();
 
     document.querySelector("#toggle-rotate").disabled = false;

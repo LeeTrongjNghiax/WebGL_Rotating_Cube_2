@@ -13,6 +13,10 @@ const MILLISECOND_PER_SECOND = 1000;
 const LIGHT_COLOR = 255 / 255;
 const DARK_COLOR = 18 / 255;
 
+const DECIMAL_PLACES = 2;
+const UPDATE_EACH_SECOND = 1;
+const DECIMAL_PLACES_RATIO = Math.pow(10, DECIMAL_PLACES);
+
 //
 // Shader
 //
@@ -124,9 +128,6 @@ let plane2_;
 // count_fps variable
 //
 
-const DECIMAL_PLACES = 2;
-const UPDATE_EACH_SECOND = 1;
-const DECIMAL_PLACES_RATIO = Math.pow(10, DECIMAL_PLACES);
 let show_fps_element;
 let timeMeasurements = [];
 
@@ -1113,7 +1114,7 @@ add_buffer_data = () => {
     gl.useProgram(program);
 };
 
-get_matrix_in_shader = () => {
+get_uniforms_in_shader = () => {
     point_size_uniform_location = gl.getUniformLocation(program, 'pointSize');
     mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
     mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
@@ -1176,7 +1177,7 @@ set_up_support_matrix = () => {
     );
 }
 
-add_support_matrix_to_shader = () => {
+add_uniforms_to_shader = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
     gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
     gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
