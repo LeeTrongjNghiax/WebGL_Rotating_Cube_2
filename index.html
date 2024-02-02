@@ -7,8 +7,6 @@
 
     <title>WebGL Rotating Cube 2</title>
 
-    <link rel="stylesheet" href="style.css">
-
     <script id="vs" type="x-shader/x-vertex">
         precision highp float;
 
@@ -159,13 +157,15 @@
         }
     </script>
 
+    <link rel="stylesheet" href="style.css">
+
     <script src="class.js"></script>
     <script src="function.js"></script>
     <script src="script.js" defer></script>
     <script src="add_event_listener.js" defer></script>
 </head>
 
-<body class="dark-mode">
+<body class="light-mode">
 
     <div class="button-block">
         <button id="change-theme">Change theme</button>
@@ -285,15 +285,19 @@
     
                 <div class="dropdown-content">
                     <div class="input-block">
-                        <label for="render-inner-cube">Render Inner cube:</label>
-                        <input id="render-inner-cube" type="checkbox">
-                    </div>
-                    <div class="input-block">
-                        <label for="render-outer-cube">Render Outer cube:</label>
+                        <label for="render-outer-cube">Render Stickers:</label>
                         <input id="render-outer-cube" type="checkbox" checked>
                     </div>
                     <div class="input-block">
-                        <label for="render-inner-plane">Render Inner plane:</label>
+                        <label for="render-inner-outline-cube">Render Inner Outline Cubes:</label>
+                        <input id="render-inner-outline-cube" type="checkbox">
+                    </div>
+                    <div class="input-block">
+                        <label for="render-inner-cube">Render Inner Cubes:</label>
+                        <input id="render-inner-cube" type="checkbox">
+                    </div>
+                    <div class="input-block">
+                        <label for="render-inner-plane">Render Inner Planes:</label>
                         <input id="render-inner-plane" type="checkbox">
                     </div>
                     <div class="input-block">

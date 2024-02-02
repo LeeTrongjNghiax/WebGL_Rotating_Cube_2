@@ -48,13 +48,10 @@ class Position {
 }
 
 class Vertex {
-    constructor(
-        relative_position, color, color_name, index
-    ) {
+    constructor(relative_position, color, color_name) {
         this.relative_position = relative_position;
         this.color = color;
         this.color_name = color_name;
-        this.index = index;
     }
 
     to_string() {
