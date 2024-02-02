@@ -944,7 +944,7 @@ init_vertices = () => {
     vertice_indices_length = vertice_indices.length;
 }
 
-create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", distance = DELTA, have_all_cubies = false) => {
+create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", distance = DELTA, have_all_cubies = false) => {
     // Remove redundant controller
     if (start == end && have_all_cubies == false)
         return;
@@ -1065,14 +1065,14 @@ create_rubik_control2 = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 
     }
 }
 
-create_rubik_control_set2 = () => {
-    create_rubik_control2(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [ 1, -1, -1], ["R", "L", "M"], "x");
-    create_rubik_control2(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1,  1, -1], ["D", "U", "E"], "y");
-    create_rubik_control2(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [ 1, -1,  1], ["F", "B", "S"], "z");
+create_rubik_control_set = () => {
+    create_rubik_control(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [ 1, -1, -1], ["R", "L", "M"], "x");
+    create_rubik_control(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1,  1, -1], ["D", "U", "E"], "y");
+    create_rubik_control(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [ 1, -1,  1], ["F", "B", "S"], "z");
 
-    create_rubik_control2(0, 0, [rubik_size_x, rubik_size_y, rubik_size_z], [null, null, 1], [null, null, "x"], "x", rubik_size_x / 2, true);
-    create_rubik_control2(0, 0, [rubik_size_y, rubik_size_x, rubik_size_z], [null, null, 1],  [null, null, "y"], "y", rubik_size_y / 2, true);
-    create_rubik_control2(0, 0, [rubik_size_z, rubik_size_x, rubik_size_y], [null, null, 1], [null, null, "z"], "z", rubik_size_z / 2, true);
+    create_rubik_control(0, 0, [rubik_size_x, rubik_size_y, rubik_size_z], [null, null, 1], [null, null, "x"], "x", rubik_size_x / 2, true);
+    create_rubik_control(0, 0, [rubik_size_y, rubik_size_x, rubik_size_z], [null, null, 1],  [null, null, "y"], "y", rubik_size_y / 2, true);
+    create_rubik_control(0, 0, [rubik_size_z, rubik_size_x, rubik_size_y], [null, null, 1], [null, null, "z"], "z", rubik_size_z / 2, true);
 }
 
 add_control_set_to_html = () => {
@@ -1085,19 +1085,6 @@ add_control_set_to_html = () => {
         document.querySelector("#movement-controller").appendChild(rotate_button_elem);
 
         rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg(this)`);
-    }
-}
-
-add_control_set_to_html2 = () => {
-    document.querySelector("#movement-controller").replaceChildren();
-
-    for (i = 0; i < rubik.controls.length; i++) {
-        rotate_button_elem = document.createElement("button");
-        rotate_button_elem.id = `rotate-${rubik.controls[i].name}`;
-        rotate_button_elem.innerHTML = rubik.controls[i].name;
-        document.querySelector("#movement-controller").appendChild(rotate_button_elem);
-
-        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg_2(this)`);
     }
 }
 
@@ -1267,7 +1254,7 @@ orbit_around_rubik = () => {
     gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
 }
 
-loop_rotate_face_till_90_deg_2 = e => {
+loop_rotate_face_till_90_deg = e => {
     disable_rotate_function();
     
     control = null;
@@ -1295,7 +1282,7 @@ loop_rotate_face_till_90_deg_2 = e => {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
         // Set the uniform in the shader to perform a rotation
-        rotate_face2(
+        rotate_face(
             control.axis, rad, 
             new Plane(
                 control.axis.x, 
@@ -1335,7 +1322,7 @@ loop_rotate_face_till_90_deg_2 = e => {
     }, smooth_rotation);
 }
 
-rotate_face2 = (axis_vector, rad, plane1, plane2) => {
+rotate_face = (axis_vector, rad, plane1, plane2) => {
     axis_vector_ = new Float32Array(3);
     axis_vector_[0] = axis_vector.x;
     axis_vector_[1] = axis_vector.y;
@@ -1428,7 +1415,7 @@ scrambling = () => {
 
     controller = rubik.controls[controller_index];
 
-    loop_rotate_face_till_90_deg_2(
+    loop_rotate_face_till_90_deg(
         document.querySelector( "#rotate-" + controller.name )
     );
 }
