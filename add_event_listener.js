@@ -1,15 +1,4 @@
-document.addEventListener("resize", () => {
-    setup_webgl_canvas();
-});
-
-document.getElementById("change-theme").addEventListener('click', e => {
-    if ( document.body.classList.contains("light-mode") ) 
-        document.body.classList.replace("light-mode", "dark-mode");
-    else
-        document.body.classList.replace("dark-mode", "light-mode");
-});
-
-document.querySelector("#create").addEventListener("click", () => {
+create_rubik_cube = () => {
     get_input_data();
     setup_webgl_canvas();
     init_vertices();
@@ -22,8 +11,21 @@ document.querySelector("#create").addEventListener("click", () => {
     draw();
 
     document.querySelector("#toggle-rotate").disabled = false;
-    document.querySelector("#show-movement-control").disabled = false;
+    document.querySelector("#toggle-movement-control").disabled = false;
+}
+
+document.addEventListener("resize", () => {
+    setup_webgl_canvas();
 });
+
+document.getElementById("toggle-theme").addEventListener('click', () => {
+    if ( document.body.classList.contains("light-mode") ) 
+        document.body.classList.replace("light-mode", "dark-mode");
+    else
+        document.body.classList.replace("dark-mode", "light-mode");
+});
+
+document.querySelector("#create").addEventListener("click", () => create_rubik_cube());
 
 document.querySelector("#toggle-rotate").addEventListener("click", e => {
     if (e.target.classList.contains("is_rotating")) {
@@ -49,7 +51,7 @@ document.querySelector("#scrambling").addEventListener("click", () => {
     }
 });
 
-document.querySelector("#show-control").addEventListener("click", e => {
+document.querySelector("#toggle-control").addEventListener("click", e => {
     if (document.querySelector("#controller").style.left == "0px") {
 
         document.querySelector("#controller").style.left = "-100%";
@@ -66,7 +68,7 @@ document.querySelector("#show-control").addEventListener("click", e => {
     }
 });
 
-document.querySelector("#show-movement-control").addEventListener("click", e => {
+document.querySelector("#toggle-movement-control").addEventListener("click", e => {
     if (document.querySelector("#movement-controller").style.display == "none") {
 
         document.querySelector("#movement-controller").style.display = "flex"
@@ -84,5 +86,5 @@ document.querySelector("#show-movement-control").addEventListener("click", e => 
 document.querySelector("#hide-control").addEventListener("click", () => {
     document.querySelector("#controller").style.left = "-100%";
     document.querySelector("main").style.width = "100%";
-    document.querySelector("#show-control").innerHTML = "Show control";
+    document.querySelector("#toggle-control").innerHTML = "Show control";
 });
