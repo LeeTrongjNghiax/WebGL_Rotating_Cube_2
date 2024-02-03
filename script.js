@@ -23,73 +23,124 @@ const DECIMAL_PLACES_RATIO = Math.pow(10, DECIMAL_PLACES);
 // Shader
 //
 
-let vertex_shader_text;
-let fragment_shader_text;
-
-let vertex_shader;
-let fragment_shader;
+let SHADER_vertex;
+let SHADER_fragment;
 
 //
-// Color
+// HTML Elements
 //
 
-
-let transparent = 1.0;
-let transparent_inner_cube = 1.0;
-let up_color = [1.0, 1.0, 1.0];
-let down_color = [1.0, 1.0, 0.0];
-let front_color = [0.0, 1.0, 0.0];
-let back_color = [0.0, 0.0, 1.0];
-let right_color = [1.0, 0.0, 0.0];
-let left_color = [1.0, 0.5, 0.0];
-let inner_color = [0.125, 0.125, 0.125];
+let ELEM_canvas;
+let ELEM_draw_mode;
+let ELEM_rotate_button;
+let ELEM_show_fps;
 
 //
-// Input
+// Inputs
 //
 
-let canvas;
+let INP_vertex_shader_text;
+let INP_fragment_shader_text;
+let INP_rubik_size_x;
+let INP_rubik_size_y;
+let INP_rubik_size_z;
+let INP_rubik_length;
+let INP_sticker_gap;
+let INP_sticker_size;
+let INP_is_render_outer_cube;
+let INP_is_render_inner_outline_cube;
+let INP_is_render_inner_cube;
+let INP_is_render_inner_plane;
 
-let rubik_size_x;
-let rubik_size_y;
-let rubik_size_z;
-let rubik_length;
-let sticker_gap;
-let sticker_size;
-let is_render_outer_cube;
-let is_render_inner_outline_cube;
-let is_render_inner_cube;
-let is_render_inner_plane;
+let INP_rubik_orientation_x;
+let INP_rubik_orientation_y;
+let INP_rubik_orientation_z;
 
-let rubik_orientation_x;
-let rubik_orientation_y;
-let rubik_orientation_z;
+let INP_rubik_orientation_matrix_x;
+let INP_rubik_orientation_matrix_y;
+let INP_rubik_orientation_matrix_z;
 
-let rubik_orientation_matrix_x;
-let rubik_orientation_matrix_y;
-let rubik_orientation_matrix_z;
+let INP_rotate_angle_x;
+let INP_rotate_angle_y;
+let INP_rotate_angle_z;
+let INP_angle_per_second;
+let INP_update_angle_method;
+let INP_smooth_rotation;
+let INP_angle_rotated_ratio;
 
-let rotate_angle_x;
-let rotate_angle_y;
-let rotate_angle_z;
-let angle_per_second;
-let update_angle_method;
-let smooth_rotation;
-let angle_rotated_ratio;
+let INP_fovy;
+let INP_aspect_ratio;
+let INP_near;
+let INP_far;
 
-let fovy;
-let aspect_ratio;
-let near;
-let far;
+let INP_draw_mode_value;
+let INP_point_size;
 
-let draw_mode;
-let draw_mode_value;
-let draw_mode_constant;
-let point_size;
+let INP_camera_position;
+let INP_camera_look_at;
+let INP_up_axis;
 
-let camera_position;
-let camera_look_at;
-let up_axis;
+let INP_transparent_sticker = 1.0;
+let INP_transparent_inner_cube = 1.0;
+let INP_COLOR_up = [1.0, 1.0, 1.0];
+let INP_COLOR_down = [1.0, 1.0, 0.0];
+let INP_COLOR_front = [0.0, 1.0, 0.0];
+let INP_COLOR_back = [0.0, 0.0, 1.0];
+let INP_COLOR_right = [1.0, 0.0, 0.0];
+let INP_COLOR_left = [1.0, 0.5, 0.0];
+let INP_COLOR_inner = [0.125, 0.125, 0.125];
+
+let INP_shader_program_version;
+
+//
+// Shader buffers
+//
+
+let SHADER_BUFFER_vectex;
+let SHADER_BUFFER_vectex_index;
+
+//
+// Attributes location
+//
+
+let ATTR_LOC_position;
+let ATTR_LOC_color;
+
+//
+// Uniforms location
+//
+
+let UNI_LOC_point_size;
+let UNI_LOC_mat_world;
+let UNI_LOC_mat_view;
+let UNI_LOC_mat_projection;
+let UNI_LOC_axis_vector;
+let UNI_LOC_rad;
+let UNI_LOC_plane1;
+let UNI_LOC_plane2;
+
+//
+// Matrices
+//
+
+let MAT_world;
+let MAT_view;
+let MAT_projection;
+
+let MAT_x_rotation;
+let MAT_y_rotation;
+let MAT_z_rotation;
+let MAT_identity;
+
+//
+// Index
+//
+
+let i, j, k, i2, j2, k2, count, i3;
+
+//
+// In the init
+//
 
 let rubik_half_length;
 let end_x;
@@ -99,30 +150,19 @@ let start_y;
 let end_z;
 let start_z;
 
-let shader_program_version;
-
 //
-// Index
+// Creating controls set
 //
 
-let i, j, k, i2, j2, k2, count, i3;
 let rotation_name;
 let mean;
 let sticker_start;
 let sticker_end;
-let rotate_button_elem;
 let direction;
 let suffix;
 
-let points1;
-let points2;
 let plane1;
 let plane2;
-let point_index_0_to_change;
-let point_index_1_to_change;
-let point_index_2_to_change;
-let sticker_gap_start;
-let sticker_gap_end;
 let plane1_;
 let plane2_;
 let axis_vector_;
@@ -131,16 +171,16 @@ let axis_vector_;
 // count_fps variable
 //
 
-let show_fps_element;
 let timeMeasurements = [];
-
 let fps = 0;
+let draw_mode_value;
 
 //
 // loop variable
 //
 
 let request_animation_frame;
+
 let angle_x = 0;
 let angle_y = 0;
 let angle_z = 0;
@@ -152,7 +192,7 @@ let last_tick;
 let current_tick;
 let time;
 
-let control
+let control;
 let controller_index;
 let controller;
 let is_rotation_finish = true;
@@ -184,132 +224,94 @@ let vertices;
 let vertice_indices;
 let vertice_indices_length;
 
-let point_size_buffer_object;
-let vertex_buffer_object;
-let vertex_index_buffer_object;
-
-//
-// Attribute location
-//
-
-
-let position_attribute_location;
-let color_attribute_location;
-
-//
-// Uniform location
-//
-
-let point_size_uniform_location;
-let mat_world_uniform_location;
-let mat_view_uniform_location;
-let axis_vector_uniform_location;
-let rad_uniform_location;
-let plane1_uniform_location;
-let plane2_uniform_location;
-
-//
-// Matrix
-//
-
-let world_matrix;
-let view_matrix;
-let projection_matrix;
-
-let x_rotation_matrix;
-let y_rotation_matrix;
-let z_rotation_matrix;
-let identity_matrix;
-
 get_input_data = () => {
-    show_fps_element = document.querySelector("#fps");
+    ELEM_show_fps = document.querySelector("#fps");
+    ELEM_canvas = document.querySelector('#game-surface');
 
-    canvas = document.querySelector('#game-surface');
+    INP_rubik_size_x = +document.querySelector("#size-x").value || 2;
+    INP_rubik_size_y = +document.querySelector("#size-y").value || 2;
+    INP_rubik_size_z = +document.querySelector("#size-z").value || 2;
+    INP_rubik_length = +document.querySelector("#length").value || 1;
+    INP_sticker_gap = +document.querySelector("#sticker-gap").value || 0;
+    INP_sticker_size = +document.querySelector("#sticker-size").value || 1;
+    INP_is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
+    INP_is_render_inner_cube = document.querySelector("#render-inner-cube").checked;
+    INP_is_render_inner_outline_cube = document.querySelector("#render-inner-outline-cube").checked;
+    INP_is_render_inner_plane = document.querySelector("#render-inner-plane").checked;
 
-    rubik_size_x = +document.querySelector("#size-x").value || 2;
-    rubik_size_y = +document.querySelector("#size-y").value || 2;
-    rubik_size_z = +document.querySelector("#size-z").value || 2;
-    rubik_length = +document.querySelector("#length").value || 1;
-    sticker_gap = +document.querySelector("#sticker-gap").value || 0;
-    sticker_size = +document.querySelector("#sticker-size").value || 1;
-    is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
-    is_render_inner_cube = document.querySelector("#render-inner-cube").checked;
-    is_render_inner_outline_cube = document.querySelector("#render-inner-outline-cube").checked;
-    is_render_inner_plane = document.querySelector("#render-inner-plane").checked;
+    INP_rubik_orientation_x = document.querySelector("#orientation-x").value || 0;
+    INP_rubik_orientation_y = document.querySelector("#orientation-y").value || 0;
+    INP_rubik_orientation_z = document.querySelector("#orientation-z").value || 0;
 
-    rubik_orientation_x = document.querySelector("#orientation-x").value || 0;
-    rubik_orientation_y = document.querySelector("#orientation-y").value || 0;
-    rubik_orientation_z = document.querySelector("#orientation-z").value || 0;
+    INP_rotate_angle_x = +document.querySelector("#rotate-angle-x").value;
+    INP_rotate_angle_y = +document.querySelector("#rotate-angle-y").value;
+    INP_rotate_angle_z = +document.querySelector("#rotate-angle-z").value;
+    INP_angle_per_second = +document.querySelector("#angle-per-second").value || 90;
+    INP_update_angle_method = document.querySelector('input[name="update-angle-method"]:checked').value;
+    INP_smooth_rotation = document.querySelector('#smooth-rotation').value || 10;
+    INP_angle_rotated_ratio = document.querySelector('#angle-rotated-ratio').value || 25;
 
-    rotate_angle_x = +document.querySelector("#rotate-angle-x").value;
-    rotate_angle_y = +document.querySelector("#rotate-angle-y").value;
-    rotate_angle_z = +document.querySelector("#rotate-angle-z").value;
-    angle_per_second = +document.querySelector("#angle-per-second").value || 90;
-    update_angle_method = document.querySelector('input[name="update-angle-method"]:checked').value;
-    smooth_rotation = document.querySelector('#smooth-rotation').value || 10;
-    angle_rotated_ratio = document.querySelector('#angle-rotated-ratio').value || 25;
-
-    camera_position = {
+    INP_camera_position = {
         x: +document.querySelector("#camera-x").value || 0,
         y: +document.querySelector("#camera-y").value || 0,
         z: +document.querySelector("#camera-z").value || -5,
     };
 
-    camera_look_at = {
+    INP_camera_look_at = {
         x: +document.querySelector("#look-at-x").value || 0,
         y: +document.querySelector("#look-at-y").value || 0,
         z: +document.querySelector("#look-at-z").value || 0,
     }
 
-    up_axis = {
+    INP_up_axis = {
         x: +document.querySelector("#up-axis-x").value || 0,
         y: +document.querySelector("#up-axis-y").value || 1,
         z: +document.querySelector("#up-axis-z").value || 0,
     }
 
-    fovy = +document.querySelector("#fovy").value || toRadian(45);
+    INP_fovy = +document.querySelector("#fovy").value || toRadian(45);
     set_up_canvas_dimension();
-    aspect_ratio = canvas.width / canvas.height;
-    near = +document.querySelector("#near").value || 0.1;
-    far = +document.querySelector("#far").value || 100;
+    INP_aspect_ratio = ELEM_canvas.width / ELEM_canvas.height;
+    INP_near = +document.querySelector("#near").value || 0.1;
+    INP_far = +document.querySelector("#far").value || 100;
 
-    draw_mode = document.getElementById("draw-mode");
-    draw_mode_value = draw_mode.options[draw_mode.selectedIndex].value;
-    point_size = +document.querySelector("#point-size").value || 1;
+    ELEM_draw_mode = document.getElementById("draw-mode");
+    INP_draw_mode_value = ELEM_draw_mode.options[ELEM_draw_mode.selectedIndex].value;
+    INP_point_size = +document.querySelector("#point-size").value || 1;
 
-    up_color = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
-    down_color = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
-    front_color = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
-    back_color = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
-    left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.0, 0.0];
-    left_color = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
-    inner_color = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
-    transparent = +document.querySelector("#transparent").value / 255 || 1.0;
-    transparent_inner_cube = +document.querySelector("#transparent-inner-cube").value / 255 || 1.0;
+    INP_COLOR_up = hex_to_normalize_rgb(document.querySelector("#top-color").value) || [1.0, 1.0, 1.0];
+    INP_COLOR_down = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
+    INP_COLOR_front = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
+    INP_COLOR_back = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
+    INP_COLOR_left = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.0, 0.0];
+    INP_COLOR_left = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
+    INP_COLOR_inner = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
+    INP_transparent_sticker = +document.querySelector("#transparent").value / 255 || 1.0;
+    INP_transparent_inner_cube = +document.querySelector("#transparent-inner-cube").value / 255 || 1.0;
 
-    shader_program_version = document.querySelector("#shader-program-version").checked;
+    INP_shader_program_version = document.querySelector("#shader-program-version").checked;
 
-    if (shader_program_version) {
-        vertex_shader_text = document.querySelector("#vs300").innerHTML;
-        fragment_shader_text = document.querySelector("#fs300").innerHTML;
+    if (INP_shader_program_version) {
+        INP_vertex_shader_text = document.querySelector("#vs300").innerHTML;
+        INP_fragment_shader_text = document.querySelector("#fs300").innerHTML;
     } else {
-        vertex_shader_text = document.querySelector("#vs").innerHTML;
-        fragment_shader_text = document.querySelector("#fs").innerHTML;
+        INP_vertex_shader_text = document.querySelector("#vs").innerHTML;
+        INP_fragment_shader_text = document.querySelector("#fs").innerHTML;
     }
 }
 
 set_up_canvas_dimension = () => {
     if (innerWidth >= innerHeight) {
-        canvas.width  = innerHeight * 8 / 10;
-        canvas.height = innerHeight * 8 / 10;
+        ELEM_canvas.width  = innerHeight * 8 / 10;
+        ELEM_canvas.height = innerHeight * 8 / 10;
     } else {
-        canvas.width  = innerWidth * 8 / 10;
-        canvas.height = innerWidth * 8 / 10;
+        ELEM_canvas.width  = innerWidth * 8 / 10;
+        ELEM_canvas.height = innerWidth * 8 / 10;
     }
 }
 
 reset_canvas = () => {
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.viewport(0, 0, ELEM_canvas.width, ELEM_canvas.height);
 
     if (document.body.classList.contains("light-mode"))
         gl.clearColor(LIGHT_COLOR, LIGHT_COLOR, LIGHT_COLOR, 1.0);
@@ -322,7 +324,7 @@ reset_canvas = () => {
 setup_webgl_canvas = () => {
     set_up_canvas_dimension();
 
-    gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    gl = ELEM_canvas.getContext('webgl2') || ELEM_canvas.getContext('webgl') || ELEM_canvas.getContext('experimental-webgl');
 
     if (!gl) {
         alert('Your browser does not support WebGL');
@@ -341,27 +343,27 @@ setup_webgl_canvas = () => {
     //
     // Create shaders
     // 
-    vertex_shader = gl.createShader(gl.VERTEX_SHADER);
-    fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
+    SHADER_vertex = gl.createShader(gl.VERTEX_SHADER);
+    SHADER_fragment = gl.createShader(gl.FRAGMENT_SHADER);
 
-    gl.shaderSource(vertex_shader, vertex_shader_text);
-    gl.shaderSource(fragment_shader, fragment_shader_text);
+    gl.shaderSource(SHADER_vertex, INP_vertex_shader_text);
+    gl.shaderSource(SHADER_fragment, INP_fragment_shader_text);
 
-    gl.compileShader(vertex_shader);
-    if (!gl.getShaderParameter(vertex_shader, gl.COMPILE_STATUS)) {
-        console.error('ERROR compiling vertex shader!', gl.getShaderInfoLog(vertex_shader));
+    gl.compileShader(SHADER_vertex);
+    if (!gl.getShaderParameter(SHADER_vertex, gl.COMPILE_STATUS)) {
+        console.error('ERROR compiling vertex shader!', gl.getShaderInfoLog(SHADER_vertex));
         return;
     }
 
-    gl.compileShader(fragment_shader);
-    if (!gl.getShaderParameter(fragment_shader, gl.COMPILE_STATUS)) {
-        console.error('ERROR compiling fragment shader!', gl.getShaderInfoLog(fragment_shader));
+    gl.compileShader(SHADER_fragment);
+    if (!gl.getShaderParameter(SHADER_fragment, gl.COMPILE_STATUS)) {
+        console.error('ERROR compiling fragment shader!', gl.getShaderInfoLog(SHADER_fragment));
         return;
     }
 
     program = gl.createProgram();
-    gl.attachShader(program, vertex_shader);
-    gl.attachShader(program, fragment_shader);
+    gl.attachShader(program, SHADER_vertex);
+    gl.attachShader(program, SHADER_fragment);
 
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
@@ -390,15 +392,15 @@ add_sticker_vertex = (i, j, k) => {
                     sub_vertices.push(
                         new Vertex(
                             new Position(
-                                i + rubik_half_length * i2 - sticker_gap,
-                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
+                                i + rubik_half_length * i2 - INP_sticker_gap,
+                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
                             ),
                             new Color(
-                                right_color[0],
-                                right_color[1],
-                                right_color[2],
-                                transparent
+                                INP_COLOR_right[0],
+                                INP_COLOR_right[1],
+                                INP_COLOR_right[2],
+                                INP_transparent_sticker
                             ),
                             "left"
                         )
@@ -408,15 +410,15 @@ add_sticker_vertex = (i, j, k) => {
                     sub_vertices.push(
                         new Vertex(
                             new Position(
-                                i + rubik_half_length * i2 + sticker_gap,
-                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
+                                i + rubik_half_length * i2 + INP_sticker_gap,
+                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
                             ),
                             new Color(
-                                left_color[0],
-                                left_color[1],
-                                left_color[2],
-                                transparent
+                                INP_COLOR_left[0],
+                                INP_COLOR_left[1],
+                                INP_COLOR_left[2],
+                                INP_transparent_sticker
                             ),
                             "right"
                         )
@@ -426,15 +428,15 @@ add_sticker_vertex = (i, j, k) => {
                     sub_vertices.push(
                         new Vertex(
                             new Position(
-                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - sticker_gap,
-                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
+                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 - INP_sticker_gap,
+                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
                             ),
                             new Color(
-                                down_color[0],
-                                down_color[1],
-                                down_color[2],
-                                transparent
+                                INP_COLOR_down[0],
+                                INP_COLOR_down[1],
+                                INP_COLOR_down[2],
+                                INP_transparent_sticker
                             ),
                             "down"
                         )
@@ -444,15 +446,15 @@ add_sticker_vertex = (i, j, k) => {
                     sub_vertices.push(
                         new Vertex(
                             new Position(
-                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 + sticker_gap,
-                                k + rubik_half_length * k2 - (sticker_size % 1) * k2,
+                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 + INP_sticker_gap,
+                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
                             ),
                             new Color(
-                                up_color[0],
-                                up_color[1],
-                                up_color[2],
-                                transparent
+                                INP_COLOR_up[0],
+                                INP_COLOR_up[1],
+                                INP_COLOR_up[2],
+                                INP_transparent_sticker
                             ),
                             "up"
                         )
@@ -462,15 +464,15 @@ add_sticker_vertex = (i, j, k) => {
                     sub_vertices.push(
                         new Vertex(
                             new Position(
-                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - sticker_gap,
+                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 - INP_sticker_gap,
                             ),
                             new Color(
-                                front_color[0],
-                                front_color[1],
-                                front_color[2],
-                                transparent
+                                INP_COLOR_front[0],
+                                INP_COLOR_front[1],
+                                INP_COLOR_front[2],
+                                INP_transparent_sticker
                             ),
                             "front"
                         )
@@ -480,15 +482,15 @@ add_sticker_vertex = (i, j, k) => {
                     sub_vertices.push(
                         new Vertex(
                             new Position(
-                                i + rubik_half_length * i2 - (sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - (sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 + sticker_gap,
+                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
+                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
+                                k + rubik_half_length * k2 + INP_sticker_gap,
                             ),
                             new Color(
-                                back_color[0],
-                                back_color[1],
-                                back_color[2],
-                                transparent
+                                INP_COLOR_back[0],
+                                INP_COLOR_back[1],
+                                INP_COLOR_back[2],
+                                INP_transparent_sticker
                             ),
                             "back"
                         )
@@ -518,10 +520,10 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "left"
                         )
@@ -536,10 +538,10 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "right"
                         )
@@ -554,10 +556,10 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "down"
                         )
@@ -572,10 +574,10 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "up"
                         )
@@ -590,10 +592,10 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "front"
                         )
@@ -608,10 +610,10 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "back"
                         )
@@ -641,10 +643,10 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "left"
                         )
@@ -659,10 +661,10 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "left"
                         )
@@ -677,10 +679,10 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "down"
                         )
@@ -695,10 +697,10 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "up"
                         )
@@ -713,10 +715,10 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "front"
                         )
@@ -731,10 +733,10 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "back"
                         )
@@ -764,10 +766,10 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "left"
                         )
@@ -781,10 +783,10 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "left"
                         )
@@ -799,10 +801,10 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "down"
                         )
@@ -816,10 +818,10 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "up"
                         )
@@ -834,10 +836,10 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "front"
                         )
@@ -851,10 +853,10 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                inner_color[0],
-                                inner_color[1],
-                                inner_color[2],
-                                transparent_inner_cube
+                                INP_COLOR_inner[0],
+                                INP_COLOR_inner[1],
+                                INP_COLOR_inner[2],
+                                INP_transparent_inner_cube
                             ),
                             "back"
                         )
@@ -907,15 +909,15 @@ add_cubies_to_rubik = () => {
 
 init_vertices = () => {
     rubik = new Rubik();
-    rubik_half_length = rubik_length / 2
-    end_x = (rubik_size_x - 1) / 2;
+    rubik_half_length = INP_rubik_length / 2
+    end_x = (INP_rubik_size_x - 1) / 2;
     start_x = -end_x;
-    end_y = (rubik_size_y - 1) / 2;
+    end_y = (INP_rubik_size_y - 1) / 2;
     start_y = -end_y;
-    end_z = (rubik_size_z - 1) / 2;
+    end_z = (INP_rubik_size_z - 1) / 2;
     start_z = -end_z;
     
-    rubik.sticker_gap = sticker_gap;
+    rubik.INP_sticker_gap = INP_sticker_gap;
 
     vertices = [];
     vertice_indices = [];
@@ -924,16 +926,16 @@ init_vertices = () => {
     for (i = start_x; i <= end_x; i += 1) {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
-                if (is_render_outer_cube)
+                if (INP_is_render_outer_cube)
                     add_sticker_vertex(i, j, k);
 
-                if (is_render_inner_outline_cube)
+                if (INP_is_render_inner_outline_cube)
                     add_inner_outline_vertex(i, j, k);
 
-                if (is_render_inner_cube)
+                if (INP_is_render_inner_cube)
                     add_inner_vertex(i, j, k);
 
-                if (is_render_inner_plane)
+                if (INP_is_render_inner_plane)
                     add_inner_plane_vertex(i, j, k);
             }
         }
@@ -957,13 +959,13 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
 
         // Cover extended sticker position when current layer position is outside
         if (i == start && i != end)
-            sticker_start = rubik.sticker_gap;
+            sticker_start = rubik.INP_sticker_gap;
         else if (i != start && i == end)
-            sticker_end = rubik.sticker_gap;
+            sticker_end = rubik.INP_sticker_gap;
         // If current layer is the start and end layer (size = 1)
         else if (i == start && i == end) {
-            sticker_start = rubik.sticker_gap;
-            sticker_end = rubik.sticker_gap;
+            sticker_start = rubik.INP_sticker_gap;
+            sticker_end = rubik.INP_sticker_gap;
         }
 
         plane1 = new Plane();
@@ -1066,42 +1068,42 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
 }
 
 create_rubik_control_set = () => {
-    create_rubik_control(start_x, end_x, [rubik_size_x, rubik_size_y, rubik_size_z], [ 1, -1, -1], ["R", "L", "M"], "x");
-    create_rubik_control(start_y, end_y, [rubik_size_y, rubik_size_x, rubik_size_z], [-1,  1, -1], ["D", "U", "E"], "y");
-    create_rubik_control(start_z, end_z, [rubik_size_z, rubik_size_x, rubik_size_y], [ 1, -1,  1], ["F", "B", "S"], "z");
+    create_rubik_control(start_x, end_x, [INP_rubik_size_x, INP_rubik_size_y, INP_rubik_size_z], [ 1, -1, -1], ["R", "L", "M"], "x");
+    create_rubik_control(start_y, end_y, [INP_rubik_size_y, INP_rubik_size_x, INP_rubik_size_z], [-1,  1, -1], ["D", "U", "E"], "y");
+    create_rubik_control(start_z, end_z, [INP_rubik_size_z, INP_rubik_size_x, INP_rubik_size_y], [ 1, -1,  1], ["F", "B", "S"], "z");
 
-    create_rubik_control(0, 0, [rubik_size_x, rubik_size_y, rubik_size_z], [null, null, 1], [null, null, "x"], "x", rubik_size_x / 2, true);
-    create_rubik_control(0, 0, [rubik_size_y, rubik_size_x, rubik_size_z], [null, null, 1],  [null, null, "y"], "y", rubik_size_y / 2, true);
-    create_rubik_control(0, 0, [rubik_size_z, rubik_size_x, rubik_size_y], [null, null, 1], [null, null, "z"], "z", rubik_size_z / 2, true);
+    create_rubik_control(0, 0, [INP_rubik_size_x, INP_rubik_size_y, INP_rubik_size_z], [null, null, 1], [null, null, "x"], "x", INP_rubik_size_x / 2, true);
+    create_rubik_control(0, 0, [INP_rubik_size_y, INP_rubik_size_x, INP_rubik_size_z], [null, null, 1],  [null, null, "y"], "y", INP_rubik_size_y / 2, true);
+    create_rubik_control(0, 0, [INP_rubik_size_z, INP_rubik_size_x, INP_rubik_size_y], [null, null, 1], [null, null, "z"], "z", INP_rubik_size_z / 2, true);
 }
 
 add_control_set_to_html = () => {
     document.querySelector("#movement-controller").replaceChildren();
 
     for (i = 0; i < rubik.controls.length; i++) {
-        rotate_button_elem = document.createElement("button");
-        rotate_button_elem.id = `rotate-${rubik.controls[i].name}`;
-        rotate_button_elem.innerHTML = rubik.controls[i].name;
-        document.querySelector("#movement-controller").appendChild(rotate_button_elem);
+        ELEM_rotate_button = document.createElement("button");
+        ELEM_rotate_button.id = `rotate-${rubik.controls[i].name}`;
+        ELEM_rotate_button.innerHTML = rubik.controls[i].name;
+        document.querySelector("#movement-controller").appendChild(ELEM_rotate_button);
 
-        rotate_button_elem.setAttribute('onclick', `loop_rotate_face_till_90_deg(this)`);
+        ELEM_rotate_button.setAttribute('onclick', `loop_rotate_face_till_90_deg(this)`);
     }
 }
 
 add_buffer_data = () => {
-    vertex_buffer_object = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_object);
+    SHADER_BUFFER_vectex = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, SHADER_BUFFER_vectex);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-    vertex_index_buffer_object = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertex_index_buffer_object);
+    SHADER_BUFFER_vectex_index = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, SHADER_BUFFER_vectex_index);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertice_indices), gl.STATIC_DRAW);
 
-    position_attribute_location = gl.getAttribLocation(program, 'vertPosition');
-    color_attribute_location = gl.getAttribLocation(program, 'vertColor');
+    ATTR_LOC_position = gl.getAttribLocation(program, 'vertPosition');
+    ATTR_LOC_color = gl.getAttribLocation(program, 'vertColor');
 
     gl.vertexAttribPointer(
-        position_attribute_location, // Attribute location
+        ATTR_LOC_position, // Attribute location
         3, // Number of elements per attribute
         gl.FLOAT, // Type of elements
         gl.FALSE,
@@ -1109,7 +1111,7 @@ add_buffer_data = () => {
         0 // Offset from the beginning of a single vertex to this attribute
     );
     gl.vertexAttribPointer(
-        color_attribute_location, // Attribute location
+        ATTR_LOC_color, // Attribute location
         4, // Number of elements per attribute
         gl.FLOAT, // Type of elements
         gl.FALSE,
@@ -1117,141 +1119,140 @@ add_buffer_data = () => {
         3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
     );
 
-    gl.enableVertexAttribArray(position_attribute_location);
-    gl.enableVertexAttribArray(color_attribute_location);
+    gl.enableVertexAttribArray(ATTR_LOC_position);
+    gl.enableVertexAttribArray(ATTR_LOC_color);
 
     // Tell OpenGL state machine which program should be active.
     gl.useProgram(program);
 };
 
 get_uniforms_in_shader = () => {
-    point_size_uniform_location = gl.getUniformLocation(program, 'pointSize');
-    mat_world_uniform_location = gl.getUniformLocation(program, 'mWorld');
-    mat_view_uniform_location = gl.getUniformLocation(program, 'mView');
-    mat_projection_uniform_location = gl.getUniformLocation(program, 'mProj');
+    UNI_LOC_point_size = gl.getUniformLocation(program, 'pointSize');
+    UNI_LOC_mat_world = gl.getUniformLocation(program, 'mWorld');
+    UNI_LOC_mat_view = gl.getUniformLocation(program, 'mView');
+    UNI_LOC_mat_projection = gl.getUniformLocation(program, 'mProj');
 
-    axis_vector_uniform_location = gl.getUniformLocation(program, 'axis_vec');
-    rad_uniform_location = gl.getUniformLocation(program, 'rad');
+    UNI_LOC_axis_vector = gl.getUniformLocation(program, 'axis_vec');
+    UNI_LOC_rad = gl.getUniformLocation(program, 'rad');
 
-    plane1_uniform_location = gl.getUniformLocation(program, 'plane1');
-    plane2_uniform_location = gl.getUniformLocation(program, 'plane2');
+    UNI_LOC_plane1 = gl.getUniformLocation(program, 'plane1');
+    UNI_LOC_plane2 = gl.getUniformLocation(program, 'plane2');
 }
 
 set_up_support_matrix = () => {
-    x_rotation_matrix = new Float32Array(16);
-    y_rotation_matrix = new Float32Array(16);
-    z_rotation_matrix = new Float32Array(16);
-    identity_matrix = new Float32Array(16);
+    MAT_x_rotation = new Float32Array(16);
+    MAT_y_rotation = new Float32Array(16);
+    MAT_z_rotation = new Float32Array(16);
+    MAT_identity = new Float32Array(16);
 
-    identity(x_rotation_matrix);
-    identity(y_rotation_matrix);
-    identity(z_rotation_matrix);
-    identity(identity_matrix);
+    identity(MAT_x_rotation);
+    identity(MAT_y_rotation);
+    identity(MAT_z_rotation);
+    identity(MAT_identity);
 
-    world_matrix = new Float32Array(16);
-    view_matrix = new Float32Array(16);
-    projection_matrix = new Float32Array(16);
+    MAT_world = new Float32Array(16);
+    MAT_view = new Float32Array(16);
+    MAT_projection = new Float32Array(16);
 
-    rubik_orientation_matrix_x = new Float32Array(16);
-    rubik_orientation_matrix_y = new Float32Array(16);
-    rubik_orientation_matrix_z = new Float32Array(16);
+    INP_rubik_orientation_matrix_x = new Float32Array(16);
+    INP_rubik_orientation_matrix_y = new Float32Array(16);
+    INP_rubik_orientation_matrix_z = new Float32Array(16);
 
-    rotate(rubik_orientation_matrix_x, identity_matrix, rubik_orientation_x, [1, 0, 0]);
-    rotate(rubik_orientation_matrix_y, identity_matrix, rubik_orientation_y, [0, 1, 0]);
-    rotate(rubik_orientation_matrix_z, identity_matrix, rubik_orientation_z, [0, 0, 1]);
+    rotate(INP_rubik_orientation_matrix_x, MAT_identity, INP_rubik_orientation_x, [1, 0, 0]);
+    rotate(INP_rubik_orientation_matrix_y, MAT_identity, INP_rubik_orientation_y, [0, 1, 0]);
+    rotate(INP_rubik_orientation_matrix_z, MAT_identity, INP_rubik_orientation_z, [0, 0, 1]);
 
-    identity(world_matrix);
+    identity(MAT_world);
 
-    multiply(world_matrix, rubik_orientation_matrix_x, rubik_orientation_matrix_y);
-    multiply(world_matrix, world_matrix, rubik_orientation_matrix_z);
+    multiply(MAT_world, INP_rubik_orientation_matrix_x, INP_rubik_orientation_matrix_y);
+    multiply(MAT_world, MAT_world, INP_rubik_orientation_matrix_z);
 
-    lookAt(view_matrix, [
-        camera_position.x,
-        camera_position.y,
-        camera_position.z,
+    lookAt(MAT_view, [
+        INP_camera_position.x,
+        INP_camera_position.y,
+        INP_camera_position.z,
     ], [
-        camera_look_at.x,
-        camera_look_at.y,
-        camera_look_at.z,
+        INP_camera_look_at.x,
+        INP_camera_look_at.y,
+        INP_camera_look_at.z,
     ], [
-        up_axis.x,
-        up_axis.y,
-        up_axis.z,
+        INP_up_axis.x,
+        INP_up_axis.y,
+        INP_up_axis.z,
     ]);
     perspective(
-        projection_matrix,
-        toRadian(fovy),
-        aspect_ratio,
-        near,
-        far
+        MAT_projection,
+        toRadian(INP_fovy),
+        INP_aspect_ratio,
+        INP_near,
+        INP_far
     );
 }
 
 add_uniforms_to_shader = () => {
-    gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
-    gl.uniformMatrix4fv(mat_view_uniform_location, gl.FALSE, view_matrix);
-    gl.uniformMatrix4fv(mat_projection_uniform_location, gl.FALSE, projection_matrix);
-    gl.uniform1f(point_size_uniform_location, point_size);
-    gl.uniform1f(rad_uniform_location, 0.1);
+    gl.uniformMatrix4fv(UNI_LOC_mat_world, gl.FALSE, MAT_world);
+    gl.uniformMatrix4fv(UNI_LOC_mat_view, gl.FALSE, MAT_view);
+    gl.uniformMatrix4fv(UNI_LOC_mat_projection, gl.FALSE, MAT_projection);
+    gl.uniform1f(UNI_LOC_point_size, INP_point_size);
 }
 
 draw = () => {
     reset_canvas();
 
-    switch (draw_mode_value) {
+    switch (INP_draw_mode_value) {
         case "points":
-            draw_mode_constant = gl.POINTS;
+            draw_mode_value = gl.POINTS;
             break;
         case "lines":
-            draw_mode_constant = gl.LINES;
+            draw_mode_value = gl.LINES;
             break;
         case "line_loop":
-            draw_mode_constant = gl.LINE_LOOP;
+            draw_mode_value = gl.LINE_LOOP;
             break;
         case "line_strip":
-            draw_mode_constant = gl.LINE_STRIP;
+            draw_mode_value = gl.LINE_STRIP;
             break;
         case "triangle_strip":
-            draw_mode_constant = gl.TRIANGLE_STRIP;
+            draw_mode_value = gl.TRIANGLE_STRIP;
             break;
         case "triangle_fan":
-            draw_mode_constant = gl.TRIANGLE_FAN;
+            draw_mode_value = gl.TRIANGLE_FAN;
             break;
         case "triangles": default:
-            draw_mode_constant = gl.TRIANGLES;
+            draw_mode_value = gl.TRIANGLES;
     }
 
-    gl.drawElements(draw_mode_constant, vertice_indices_length, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(draw_mode_value, vertice_indices_length, gl.UNSIGNED_SHORT, 0);
 }
 
 update_angle = (angle) => {
     current_tick = performance.now();
     time = (current_tick - last_tick) / MILLISECOND_PER_SECOND;
     last_tick = current_tick;
-    return (angle + angle_per_second * time) % FULL_OF_CIRCLE;
+    return (angle + INP_angle_per_second * time) % FULL_OF_CIRCLE;
 }
 
 orbit_around_rubik = () => {
-    if (update_angle_method == "method1")
+    if (INP_update_angle_method == "method1")
         angle = performance.now() / MILLISECOND_PER_SECOND / 6;
-    else if (update_angle_method == "method2")
+    else if (INP_update_angle_method == "method2")
         angle = update_angle(angle);
 
-    angle_x = angle * rotate_angle_x % FULL_OF_CIRCLE;
-    angle_y = angle * rotate_angle_y % FULL_OF_CIRCLE;
-    angle_z = angle * rotate_angle_z % FULL_OF_CIRCLE;
+    angle_x = angle * INP_rotate_angle_x % FULL_OF_CIRCLE;
+    angle_y = angle * INP_rotate_angle_y % FULL_OF_CIRCLE;
+    angle_z = angle * INP_rotate_angle_z % FULL_OF_CIRCLE;
 
-    rotate(x_rotation_matrix, identity_matrix, angle_x, [1, 0, 0]);
-    rotate(y_rotation_matrix, identity_matrix, angle_y, [0, 1, 0]);
-    rotate(z_rotation_matrix, identity_matrix, angle_z, [0, 0, 1]);
+    rotate(MAT_x_rotation, MAT_identity, angle_x, [1, 0, 0]);
+    rotate(MAT_y_rotation, MAT_identity, angle_y, [0, 1, 0]);
+    rotate(MAT_z_rotation, MAT_identity, angle_z, [0, 0, 1]);
 
-    multiply(world_matrix, x_rotation_matrix, y_rotation_matrix);
-    multiply(world_matrix, world_matrix, z_rotation_matrix);
+    multiply(MAT_world, MAT_x_rotation, MAT_y_rotation);
+    multiply(MAT_world, MAT_world, MAT_z_rotation);
 
-    multiply(world_matrix, rubik_orientation_matrix_x, rubik_orientation_matrix_y);
-    multiply(world_matrix, world_matrix, rubik_orientation_matrix_z);
+    multiply(MAT_world, INP_rubik_orientation_matrix_x, INP_rubik_orientation_matrix_y);
+    multiply(MAT_world, MAT_world, INP_rubik_orientation_matrix_z);
 
-    gl.uniformMatrix4fv(mat_world_uniform_location, gl.FALSE, world_matrix);
+    gl.uniformMatrix4fv(UNI_LOC_mat_world, gl.FALSE, MAT_world);
 }
 
 loop_rotate_face_till_90_deg = e => {
@@ -1272,7 +1273,7 @@ loop_rotate_face_till_90_deg = e => {
     rad = 0;
 
     // Set the radian step each frame
-    rad_step = control.rad / angle_rotated_ratio;
+    rad_step = control.rad / INP_angle_rotated_ratio;
 
     // Main rotation loop
     rotate_interval = setInterval(() => {
@@ -1319,7 +1320,7 @@ loop_rotate_face_till_90_deg = e => {
 
             clearInterval(rotate_interval);
         }
-    }, smooth_rotation);
+    }, INP_smooth_rotation);
 }
 
 rotate_face = (axis_vector, rad, plane1, plane2) => {
@@ -1340,11 +1341,11 @@ rotate_face = (axis_vector, rad, plane1, plane2) => {
     plane2_[2] = plane2.c;
     plane2_[3] = plane2.d;
 
-    gl.uniform3fv(axis_vector_uniform_location, axis_vector_);
-    gl.uniform1f(rad_uniform_location, rad);
+    gl.uniform3fv(UNI_LOC_axis_vector, axis_vector_);
+    gl.uniform1f(UNI_LOC_rad, rad);
 
-    gl.uniform4fv(plane1_uniform_location, plane1_ );
-    gl.uniform4fv(plane2_uniform_location, plane2_ );
+    gl.uniform4fv(UNI_LOC_plane1, plane1_ );
+    gl.uniform4fv(UNI_LOC_plane2, plane2_ );
 }
 
 count_fps = () => {
@@ -1357,7 +1358,7 @@ count_fps = () => {
         timeMeasurements = [];
     }
 
-    show_fps_element.innerText = fps;
+    ELEM_show_fps.innerText = fps;
 }
 
 loop = () => {
