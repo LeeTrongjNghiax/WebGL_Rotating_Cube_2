@@ -907,11 +907,13 @@ add_inner_plane_vertex = (i, j, k) => {
 }
 
 create_grid_plane = () => {
+    init_vertex_cubie_face();
+
     let planes_x = [];
     let planes_y = [];
     let planes_z = [];
 
-    let new_vertices = [];
+    let sub_vertices = [];
 
     for (i = start_x; i <= end_x; i += 1)
         for (i2 = -1; i2 < 2; i2 += 2)
@@ -954,36 +956,27 @@ create_grid_plane = () => {
 
                 transformMat3(result_vector, d_vector, inverse);
 
-                new_vertices.push(
+                sub_vertices.push(
                     new Vertex(
                         new Position(result_vector[0], result_vector[1], result_vector[2]), 
-                        new Color(1, 0, 0)
+                        new Color(1, 0, 0, 1)
                     ), 
                 );
             }
         }
     }
 
-    // console.log( new_vertices );
-    console.log( [].concat(...new_vertices.map(vertex => vertex.to_string())) );
+    vertice_indices = [0, 1, 2, 0, 2, 1, 3, 1, 2, 3, 2, 1, 4, 5, 6, 4, 6, 5, 7, 5, 6, 7, 6, 5, 8, 9, 10, 8, 10, 9, 11, 9, 10, 11, 10, 9, 12, 13, 14, 12, 14, 13, 15, 13, 14, 15, 14, 13, 16, 17, 18, 16, 18, 17, 19, 17, 18, 19, 18, 17, 20, 21, 22, 20, 22, 21, 23, 21, 22, 23, 22, 21];
+
+    add_cubies_to_rubik();
+    
+    console.log( sub_vertices );
+    console.log( vertice_indices );
+
+    vertices = [].concat(...sub_vertices.map(vertex => vertex.to_string()))
 }
 
-init_vertices = () => {
-    rubik = new Rubik();
-    rubik_half_length = INP_rubik_length / 2
-    end_x = (INP_rubik_size_x - 1) / 2;
-    start_x = -end_x;
-    end_y = (INP_rubik_size_y - 1) / 2;
-    start_y = -end_y;
-    end_z = (INP_rubik_size_z - 1) / 2;
-    start_z = -end_z;
-    
-    rubik.INP_sticker_gap = INP_sticker_gap;
-
-    vertices = [];
-    vertice_indices = [];
-    count = 0;
-
+create_vertex_base_on_rendering = () => {
     for (i = start_x; i <= end_x; i += 1) {
         for (j = start_y; j <= end_y; j += 1) {
             for (k = start_z; k <= end_z; k += 1) {
@@ -1001,6 +994,26 @@ init_vertices = () => {
             }
         }
     }
+}
+
+init_rubik_parameter = () => {
+    rubik = new Rubik();
+    rubik_half_length = INP_rubik_length / 2
+    end_x = (INP_rubik_size_x - 1) / 2;
+    start_x = -end_x;
+    end_y = (INP_rubik_size_y - 1) / 2;
+    start_y = -end_y;
+    end_z = (INP_rubik_size_z - 1) / 2;
+    start_z = -end_z;
+    
+    rubik.INP_sticker_gap = INP_sticker_gap;
+
+    vertices = [];
+    vertice_indices = [];
+    count = 0;
+
+    create_vertex_base_on_rendering();
+    // create_grid_plane();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
