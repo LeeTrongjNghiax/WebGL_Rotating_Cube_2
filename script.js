@@ -378,12 +378,56 @@ setup_webgl_canvas = () => {
     }
 }
 
-add_sticker_vertex = (i, j, k) => {
+init_vertex_cubie_face = () => {
     sub_vertices = [];
     cubie = new Cubie();
-    cubie.absolute_position = new Position(i, j, k);
     faces = [];
+}
 
+add_cubies_to_rubik = () => {
+    sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
+
+    number_of_face = sub_vertices.length / number_of_vertex_per_face;
+    for (i3 = 0; i3 < number_of_face; i3++)
+        faces[i3] = new Face();
+
+    for (i3 = 0; i3 < number_of_face; i3 += 1) {
+        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+        }
+
+        vertice_indices.push(
+            count + 0,
+            count + 1,
+            count + 2,
+
+            count + 0,
+            count + 2,
+            count + 1,
+
+            count + 3,
+            count + 1,
+            count + 2,
+
+            count + 3,
+            count + 2,
+            count + 1,
+        );
+
+        count += number_of_vertex_per_face;
+        cubie.add_face(faces[i3]);
+    }
+
+    rubik.add_cubie(cubie);
+}
+
+add_sticker_vertex = (i, j, k) => {
+    init_vertex_cubie_face();
+
+    cubie.absolute_position = new Position(i, j, k);
+    
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
             for (k2 = -1; k2 < 2; k2 += 2) {
@@ -503,9 +547,7 @@ add_sticker_vertex = (i, j, k) => {
 }
 
 add_inner_outline_vertex = (i, j, k) => {
-    sub_vertices = [];
-    cubie = new Cubie();
-    faces = [];
+    init_vertex_cubie_face();
 
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
@@ -626,9 +668,7 @@ add_inner_outline_vertex = (i, j, k) => {
 }
 
 add_inner_vertex = (i, j, k) => {
-    sub_vertices = [];
-    cubie = new Cubie();
-    faces = [];
+    init_vertex_cubie_face();
 
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
@@ -749,9 +789,7 @@ add_inner_vertex = (i, j, k) => {
 }
 
 add_inner_plane_vertex = (i, j, k) => {
-    sub_vertices = [];
-    cubie = new Cubie();
-    faces = [];
+    init_vertex_cubie_face();
 
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
@@ -868,43 +906,66 @@ add_inner_plane_vertex = (i, j, k) => {
     add_cubies_to_rubik();
 }
 
-add_cubies_to_rubik = () => {
-    sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
+create_grid_plane = () => {
+    let planes_x = [];
+    let planes_y = [];
+    let planes_z = [];
 
-    number_of_face = sub_vertices.length / number_of_vertex_per_face;
-    for (i3 = 0; i3 < number_of_face; i3++)
-        faces[i3] = new Face();
+    let new_vertices = [];
 
-    for (i3 = 0; i3 < number_of_face; i3 += 1) {
-        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+    for (i = start_x; i <= end_x; i += 1)
+        for (i2 = -1; i2 < 2; i2 += 2)
+            planes_x.push( new Plane(1, 0, 0, -(i + rubik_half_length * i2)) );
 
-        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
-            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+    for (j = start_y; j <= end_y; j += 1)
+        for (j2 = -1; j2 < 2; j2 += 2)
+            planes_y.push( new Plane(0, 1, 0, -(j + rubik_half_length * j2)) );
+
+    for (k = start_z; k <= end_z; k += 1)
+        for (k2 = -1; k2 < 2; k2 += 2)
+            planes_z.push( new Plane(0, 0, 1, -(k + rubik_half_length * k2)) );
+
+    for (i = 0; i < planes_x.length; i += 1) {
+        for (j = 0; j < planes_y.length; j += 1) {
+            for (k = 0; k < planes_z.length; k += 1) {
+                let plane_equation = new Float32Array(9);
+
+                plane_equation[0] = planes_x[i].a;
+                plane_equation[1] = planes_x[i].b;
+                plane_equation[2] = planes_x[i].c;
+
+                plane_equation[3] = planes_y[j].a;
+                plane_equation[4] = planes_y[j].b;
+                plane_equation[5] = planes_y[j].c;
+
+                plane_equation[6] = planes_z[k].a;
+                plane_equation[7] = planes_z[k].b;
+                plane_equation[8] = planes_z[k].c;
+
+                let inverse = new Float32Array(9);
+                invert(inverse, plane_equation);
+
+                let d_vector = new Float32Array(3);
+                d_vector[0] = -planes_x[i].d;
+                d_vector[1] = -planes_y[j].d;
+                d_vector[2] = -planes_z[k].d;
+
+                let result_vector = new Float32Array(3);
+
+                transformMat3(result_vector, d_vector, inverse);
+
+                new_vertices.push(
+                    new Vertex(
+                        new Position(result_vector[0], result_vector[1], result_vector[2]), 
+                        new Color(1, 0, 0)
+                    ), 
+                );
+            }
         }
-
-        vertice_indices.push(
-            count + 0,
-            count + 1,
-            count + 2,
-
-            count + 0,
-            count + 2,
-            count + 1,
-
-            count + 3,
-            count + 1,
-            count + 2,
-
-            count + 3,
-            count + 2,
-            count + 1,
-        );
-
-        count += number_of_vertex_per_face;
-        cubie.add_face(faces[i3]);
     }
 
-    rubik.add_cubie(cubie);
+    // console.log( new_vertices );
+    console.log( [].concat(...new_vertices.map(vertex => vertex.to_string())) );
 }
 
 init_vertices = () => {
