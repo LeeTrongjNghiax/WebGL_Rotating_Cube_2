@@ -1,9 +1,10 @@
 class Plane {
-    constructor(a = 0, b = 0, c = 0, d = 0) {
+    constructor(a = 0, b = 0, c = 0, d = 0, color = "") {
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
+        this.color = color;
     }
 
     get_length_of_normal_vector() {

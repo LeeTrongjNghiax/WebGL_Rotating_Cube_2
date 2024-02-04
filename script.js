@@ -82,13 +82,19 @@ let INP_up_axis;
 
 let INP_transparent_sticker = 1.0;
 let INP_transparent_inner_cube = 1.0;
-let INP_COLOR_up = [1.0, 1.0, 1.0];
-let INP_COLOR_down = [1.0, 1.0, 0.0];
+let INP_COLOR_up    = [1.0, 1.0, 1.0];
+let INP_COLOR_down  = [1.0, 1.0, 0.0];
 let INP_COLOR_front = [0.0, 1.0, 0.0];
-let INP_COLOR_back = [0.0, 0.0, 1.0];
+let INP_COLOR_back  = [0.0, 0.0, 1.0];
 let INP_COLOR_right = [1.0, 0.0, 0.0];
-let INP_COLOR_left = [1.0, 0.5, 0.0];
-let INP_COLOR_inner = [0.125, 0.125, 0.125];
+let INP_COLOR_left  = [1.0, 0.5, 0.0];
+
+let INP_COLOR_inner_up    = [1.0, 1.0, 1.0];
+let INP_COLOR_inner_down  = [1.0, 1.0, 0.0];
+let INP_COLOR_inner_front = [0.0, 1.0, 0.0];
+let INP_COLOR_inner_back  = [0.0, 0.0, 1.0];
+let INP_COLOR_inner_right = [1.0, 0.0, 0.0];
+let INP_COLOR_inner_left  = [1.0, 0.5, 0.0];
 
 let INP_shader_program_version;
 
@@ -283,9 +289,16 @@ get_input_data = () => {
     INP_COLOR_down = hex_to_normalize_rgb(document.querySelector("#bottom-color").value) || [1.0, 1.0, 0.0];
     INP_COLOR_front = hex_to_normalize_rgb(document.querySelector("#front-color").value) || [0.0, 1.0, 0.0];
     INP_COLOR_back = hex_to_normalize_rgb(document.querySelector("#back-color").value) || [0.0, 0.0, 1.0];
-    INP_COLOR_left = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.0, 0.0];
+    INP_COLOR_right = hex_to_normalize_rgb(document.querySelector("#right-color").value) || [1.0, 0.0, 0.0];
     INP_COLOR_left = hex_to_normalize_rgb(document.querySelector("#left-color").value) || [1.0, 0.5, 0.0];
-    INP_COLOR_inner = hex_to_normalize_rgb(document.querySelector("#inner-color").value) || [0.125, 0.125, 0.125];
+
+    INP_COLOR_inner_up = hex_to_normalize_rgb(document.querySelector("#inner-top-color").value) || [1.0, 1.0, 1.0];
+    INP_COLOR_inner_down = hex_to_normalize_rgb(document.querySelector("#inner-bottom-color").value) || [1.0, 1.0, 0.0];
+    INP_COLOR_inner_front = hex_to_normalize_rgb(document.querySelector("#inner-front-color").value) || [0.0, 1.0, 0.0];
+    INP_COLOR_inner_back = hex_to_normalize_rgb(document.querySelector("#inner-back-color").value) || [0.0, 0.0, 1.0];
+    INP_COLOR_inner_right = hex_to_normalize_rgb(document.querySelector("#inner-right-color").value) || [1.0, 0.0, 0.0];
+    INP_COLOR_inner_left = hex_to_normalize_rgb(document.querySelector("#inner-left-color").value) || [1.0, 0.5, 0.0];
+    
     INP_transparent_sticker = +document.querySelector("#transparent").value / 255 || 1.0;
     INP_transparent_inner_cube = +document.querySelector("#transparent-inner-cube").value / 255 || 1.0;
 
@@ -381,6 +394,7 @@ setup_webgl_canvas = () => {
 init_vertex_cubie_face = () => {
     sub_vertices = [];
     cubie = new Cubie();
+    cubie.absolute_position = new Position(i, j, k);
     faces = [];
 }
 
@@ -425,8 +439,6 @@ add_cubies_to_rubik = () => {
 
 add_sticker_vertex = (i, j, k) => {
     init_vertex_cubie_face();
-
-    cubie.absolute_position = new Position(i, j, k);
     
     for (i2 = -1; i2 < 2; i2 += 2) {
         for (j2 = -1; j2 < 2; j2 += 2) {
@@ -562,12 +574,12 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
                                 INP_transparent_inner_cube
                             ),
-                            "left"
+                            "inner_left"
                         )
                     );
 
@@ -580,12 +592,12 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
                                 INP_transparent_inner_cube
                             ),
-                            "right"
+                            "inner_right"
                         )
                     );
 
@@ -598,12 +610,12 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
                                 INP_transparent_inner_cube
                             ),
-                            "down"
+                            "inner_down"
                         )
                     );
 
@@ -616,12 +628,12 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
                                 INP_transparent_inner_cube
                             ),
-                            "up"
+                            "inner_up"
                         )
                     );
 
@@ -634,12 +646,12 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
                                 INP_transparent_inner_cube
                             ),
-                            "front"
+                            "inner_front"
                         )
                     );
 
@@ -652,12 +664,12 @@ add_inner_outline_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
                                 INP_transparent_inner_cube
                             ),
-                            "back"
+                            "inner_back"
                         )
                     );
             }
@@ -917,16 +929,25 @@ create_grid_plane = () => {
 
     for (i = start_x; i <= end_x; i += 1)
         for (i2 = -1; i2 < 2; i2 += 2)
-            planes_x.push( new Plane(1, 0, 0, -(i + rubik_half_length * i2)) );
+            if (i2 == -1)
+                planes_x.push(new Plane(1, 0, 0, -(i + rubik_half_length * i2), "orange"));
+            else
+                planes_x.push(new Plane(1, 0, 0, -(i + rubik_half_length * i2), "red"));
 
     for (j = start_y; j <= end_y; j += 1)
         for (j2 = -1; j2 < 2; j2 += 2)
-            planes_y.push( new Plane(0, 1, 0, -(j + rubik_half_length * j2)) );
+            if (j2 == -1)
+                planes_y.push(new Plane(0, 1, 0, -(j + rubik_half_length * j2), "yellow"));
+            else
+                planes_y.push(new Plane(0, 1, 0, -(j + rubik_half_length * j2), "white"));
 
     for (k = start_z; k <= end_z; k += 1)
         for (k2 = -1; k2 < 2; k2 += 2)
-            planes_z.push( new Plane(0, 0, 1, -(k + rubik_half_length * k2)) );
-
+            if (k2 == -1)
+                planes_z.push(new Plane(0, 0, 1, -(k + rubik_half_length * k2), "green") );
+            else
+                planes_z.push(new Plane(0, 0, 1, -(k + rubik_half_length * k2), "blue"));
+            
     for (i = 0; i < planes_x.length; i += 1) {
         for (j = 0; j < planes_y.length; j += 1) {
             for (k = 0; k < planes_z.length; k += 1) {
@@ -966,14 +987,11 @@ create_grid_plane = () => {
         }
     }
 
-    vertice_indices = [0, 1, 2, 0, 2, 1, 3, 1, 2, 3, 2, 1, 4, 5, 6, 4, 6, 5, 7, 5, 6, 7, 6, 5, 8, 9, 10, 8, 10, 9, 11, 9, 10, 11, 10, 9, 12, 13, 14, 12, 14, 13, 15, 13, 14, 15, 14, 13, 16, 17, 18, 16, 18, 17, 19, 17, 18, 19, 18, 17, 20, 21, 22, 20, 22, 21, 23, 21, 22, 23, 22, 21];
+    // vertice_indices = [0, 1, 2, 0, 2, 1, 3, 1, 2, 3, 2, 1, 4, 5, 6, 4, 6, 5, 7, 5, 6, 7, 6, 5, 8, 9, 10, 8, 10, 9, 11, 9, 10, 11, 10, 9, 12, 13, 14, 12, 14, 13, 15, 13, 14, 15, 14, 13, 16, 17, 18, 16, 18, 17, 19, 17, 18, 19, 18, 17, 20, 21, 22, 20, 22, 21, 23, 21, 22, 23, 22, 21];
 
     add_cubies_to_rubik();
-    
-    console.log( sub_vertices );
-    console.log( vertice_indices );
 
-    vertices = [].concat(...sub_vertices.map(vertex => vertex.to_string()))
+    // vertices = [].concat(...sub_vertices.map(vertex => vertex.to_string()))
 }
 
 create_vertex_base_on_rendering = () => {

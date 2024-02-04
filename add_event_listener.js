@@ -2,7 +2,7 @@ create_rubik_cube = () => {
     get_input_data();
     setup_webgl_canvas();
     init_rubik_parameter();
-    // create_grid_plane();
+    create_grid_plane();
     create_rubik_control_set();
     add_control_set_to_html();
     add_buffer_data();

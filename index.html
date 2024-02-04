@@ -291,7 +291,7 @@
                     </div>
                     <div class="input-block">
                         <label for="sticker-size">Sticker size:</label>
-                        <input id="sticker-size" type="number" min="0" max="1" value="0.9" step="0.9" size="4" onchange="create_rubik_cube()">
+                        <input id="sticker-size" type="number" min="0" max="1" value="0.925" step="0.01" size="4" onchange="create_rubik_cube()">
                     </div>
                 </div>
             </div>
@@ -303,15 +303,15 @@
                 <div class="dropdown-content">
                     <div class="input-block">
                         <label for="orientation-x">Rubik Orientation X:</label>
-                        <input id="orientation-x" type="number" min="-360" max="360" value="-0.7" step="0.1" size="4" onchange="create_rubik_cube()">
+                        <input id="orientation-x" type="number" min="-360" max="360" value="-0.7" step="0.01" size="4" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="orientation-y">Rubik Orientation Y:</label>
-                        <input id="orientation-y" type="number" min="-360" max="360" value="-0.6" size="4" onchange="create_rubik_cube()">
+                        <input id="orientation-y" type="number" min="-360" max="360" value="-0.65" step="0.01" size="4" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="orientation-z">Rubik Orientation Z:</label>
-                        <input id="orientation-z" type="number" min="-360" max="360" value="0" size="4" onchange="create_rubik_cube()">
+                        <input id="orientation-z" type="number" min="-360" max="360" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
                     </div>
                 </div>
             </div>
@@ -371,7 +371,7 @@
                     </div>
                     <div class="input-block">
                         <label for="render-inner-outline-cube">Render Inner Outline Cubes:</label>
-                        <input id="render-inner-outline-cube" type="checkbox" onchange="create_rubik_cube()">
+                        <input id="render-inner-outline-cube" type="checkbox" checked onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="render-inner-cube">Render Inner Cubes:</label>
@@ -467,32 +467,54 @@
                 <div class="dropdown-content">
                     <div class="input-block">
                         <label for="top-color">Top color:</label>
-                        <input id="top-color" type="color" value="#FFFFFF" onchange="create_rubik_cube()">
+                        <input id="top-color" type="color" value="#121212" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="bottom-color">Bottom color:</label>
-                        <input id="bottom-color" type="color" value="#FFFF00" onchange="create_rubik_cube()">
+                        <input id="bottom-color" type="color" value="#121212" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="front-color">Front color:</label>
-                        <input id="front-color" type="color" value="#00FF00" onchange="create_rubik_cube()">
+                        <input id="front-color" type="color" value="#121212" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="back-color">Back color:</label>
-                        <input id="back-color" type="color" value="#0000FF" onchange="create_rubik_cube()">
+                        <input id="back-color" type="color" value="#121212" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="right-color">Right color:</label>
-                        <input id="right-color" type="color" value="#FF0000" onchange="create_rubik_cube()">
+                        <input id="right-color" type="color" value="#121212" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
                         <label for="left-color">Left color:</label>
-                        <input id="left-color" type="color" value="#FFA700" onchange="create_rubik_cube()">
+                        <input id="left-color" type="color" value="#121212" onchange="create_rubik_cube()">
+                    </div>
+
+                    <div class="input-block">
+                        <label for="inner-top-color">Inner Top color:</label>
+                        <input id="inner-top-color" type="color" value="#FFFFFF" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
-                        <label for="inner-color">Inner color:</label>
-                        <input id="inner-color" type="color" value="#191919" onchange="create_rubik_cube()">
+                        <label for="inner-bottom-color">Inner Bottom color:</label>
+                        <input id="inner-bottom-color" type="color" value="#FFFF00" onchange="create_rubik_cube()">
                     </div>
+                    <div class="input-block">
+                        <label for="inner-front-color">Inner Front color:</label>
+                        <input id="inner-front-color" type="color" value="#00FF00" onchange="create_rubik_cube()">
+                    </div>
+                    <div class="input-block">
+                        <label for="inner-back-color">Inner Back color:</label>
+                        <input id="inner-back-color" type="color" value="#0000FF" onchange="create_rubik_cube()">
+                    </div>
+                    <div class="input-block">
+                        <label for="inner-right-color">Inner Right color:</label>
+                        <input id="inner-right-color" type="color" value="#FF0000" onchange="create_rubik_cube()">
+                    </div>
+                    <div class="input-block">
+                        <label for="inner-left-color">Inner Left color:</label>
+                        <input id="inner-left-color" type="color" value="#FFA700" onchange="create_rubik_cube()">
+                    </div>
+
                     <div class="input-block">
                         <label for="transparent">Sticker Transparency:</label>
                         <input id="transparent" type="number" min="0" max="255" value="255" size="2" onchange="create_rubik_cube()">
