@@ -89,3 +89,8 @@ document.querySelector("#hide-control").addEventListener("click", () => {
     document.querySelector("main").style.width = "100%";
     document.querySelector("#toggle-control").innerHTML = "Show control";
 });
+
+document.querySelector("#swap-color").addEventListener("click", () => {
+    swap_color();
+    create_rubik_cube();
+});

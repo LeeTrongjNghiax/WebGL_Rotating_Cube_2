@@ -1031,7 +1031,7 @@ init_rubik_parameter = () => {
     count = 0;
 
     create_vertex_base_on_rendering();
-    // create_grid_plane();
+    create_grid_plane();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
@@ -1511,4 +1511,27 @@ scrambling = () => {
     loop_rotate_face_till_90_deg(
         document.querySelector( "#rotate-" + controller.name )
     );
+}
+
+swap_color = () => {
+    let TEMP_COLOR_up    = document.querySelector("#top-color").value   ;
+    let TEMP_COLOR_down  = document.querySelector("#bottom-color").value;
+    let TEMP_COLOR_front = document.querySelector("#front-color").value ;
+    let TEMP_COLOR_back  = document.querySelector("#back-color").value  ;
+    let TEMP_COLOR_right = document.querySelector("#right-color").value ;
+    let TEMP_COLOR_left  = document.querySelector("#left-color").value  ;
+
+    document.querySelector("#top-color").value    = document.querySelector("#inner-top-color").value   ;
+    document.querySelector("#bottom-color").value = document.querySelector("#inner-bottom-color").value;
+    document.querySelector("#front-color").value  = document.querySelector("#inner-front-color").value ;
+    document.querySelector("#back-color").value   = document.querySelector("#inner-back-color").value  ;
+    document.querySelector("#right-color").value  = document.querySelector("#inner-right-color").value ;
+    document.querySelector("#left-color").value   = document.querySelector("#inner-left-color").value  ;
+
+    document.querySelector("#inner-top-color").value    = TEMP_COLOR_up;
+    document.querySelector("#inner-bottom-color").value = TEMP_COLOR_down;
+    document.querySelector("#inner-front-color").value  = TEMP_COLOR_front;
+    document.querySelector("#inner-back-color").value   = TEMP_COLOR_back;
+    document.querySelector("#inner-right-color").value  = TEMP_COLOR_right;
+    document.querySelector("#inner-left-color").value   = TEMP_COLOR_left;
 }
