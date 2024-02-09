@@ -241,6 +241,8 @@ let planes_x;
 let planes_y;
 let planes_z;
 
+let max_distance = 0;
+
 get_input_data = () => {
     ELEM_show_fps = document.querySelector("#fps");
     ELEM_canvas = document.querySelector('#game-surface');
@@ -1007,11 +1009,17 @@ create_grid_plane = () => {
             //
             if (i == start_x && i2 == -1) 
                 planes_x.push(
-                    new Plane(MAT_plane_matrix[0], MAT_plane_matrix[1], MAT_plane_matrix[2], -(i + rubik_half_length * i2 - INP_sticker_gap + INP_translate_x), new Color(
-                        INP_COLOR_right[0],
-                        INP_COLOR_right[1],
-                        INP_COLOR_right[2],
-                    ), `right`, i)
+                    new Plane(
+                        MAT_plane_matrix[0],
+                        MAT_plane_matrix[1],
+                        MAT_plane_matrix[2],
+                        -(i + rubik_half_length * i2 - INP_sticker_gap + INP_translate_x),
+                        new Color(
+                            INP_COLOR_right[0],
+                            INP_COLOR_right[1],
+                            INP_COLOR_right[2],
+                        ), `right`, i
+                    )
                 );
 
             //
@@ -1020,36 +1028,52 @@ create_grid_plane = () => {
             if ((i == start_x && i2 == -1) || (i == end_x && i2 == 1))
                 if (i2 == -1)
                     planes_x.push(
-                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 + one_minus_sticker_size + INP_translate_x), new Color(
-                            INP_COLOR_inner_right[0],
-                            INP_COLOR_inner_right[1],
-                            INP_COLOR_inner_right[2],
-                        ), `inner_right`, i)
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2 + one_minus_sticker_size + INP_translate_x),
+                            new Color(
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
+                            ), `inner_right`, i
+                        )
                     );
                 else
                     planes_x.push(
-                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x), new Color(
-                            INP_COLOR_inner_left[0],
-                            INP_COLOR_inner_left[1],
-                            INP_COLOR_inner_left[2],
-                        ), `inner_left`, i)
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x),
+                            new Color(
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
+                            ), `inner_left`, i
+                        )
                     );
             else
                 if (i2 == -1)
                     planes_x.push(
-                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 + one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_right[0],
-                            INP_COLOR_inner_right[1],
-                            INP_COLOR_inner_right[2],
-                        ), `inner_right`, i)
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2 + one_minus_sticker_size),
+                            new Color(
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
+                            ), `inner_right`, i
+                        )
                     );
                 else
                     planes_x.push(
-                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_left[0],
-                            INP_COLOR_inner_left[1],
-                            INP_COLOR_inner_left[2],
-                        ), `inner_left`, i)
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2 - one_minus_sticker_size),
+                            new Color(
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
+                            ), `inner_left`, i
+                        )
                     );
                 
             //
@@ -1077,12 +1101,28 @@ create_grid_plane = () => {
             //
             if (i == end_x && i2 == 1) 
                 planes_x.push(
-                    new Plane(MAT_plane_matrix[0], MAT_plane_matrix[1], MAT_plane_matrix[2], -(i + rubik_half_length * i2 + INP_sticker_gap + INP_translate_x), new Color(
-                        INP_COLOR_left[0],
-                        INP_COLOR_left[1],
-                        INP_COLOR_left[2],
-                    ), `left`, i)
+                    new Plane(
+                        MAT_plane_matrix[0],
+                        MAT_plane_matrix[1],
+                        MAT_plane_matrix[2],
+                        -(i + rubik_half_length * i2 + INP_sticker_gap + INP_translate_x),
+                        new Color(
+                            INP_COLOR_left[0],
+                            INP_COLOR_left[1],
+                            INP_COLOR_left[2],
+                        ), `left`, i
+                    )
                 );
+
+            max_distance = Math.max(
+                max_distance, 
+                (i + rubik_half_length * i2 - INP_sticker_gap + INP_translate_x), 
+                (i + rubik_half_length * i2 + one_minus_sticker_size + INP_translate_x), 
+                (i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x), 
+                (i + rubik_half_length * i2 + one_minus_sticker_size), 
+                (i + rubik_half_length * i2 - one_minus_sticker_size), 
+                (i + rubik_half_length * i2 + INP_sticker_gap + INP_translate_x)
+            );
         }
 
     for (j = start_y; j <= end_y; j += 1)
@@ -1168,6 +1208,16 @@ create_grid_plane = () => {
                         INP_COLOR_up[2],
                     ), `up`, j)
                 );  
+            
+            max_distance = Math.max(
+                max_distance, 
+                (j + rubik_half_length * j2 - INP_sticker_gap + INP_translate_y), 
+                (j + rubik_half_length * j2 + one_minus_sticker_size + INP_translate_y), 
+                (j + rubik_half_length * j2 - one_minus_sticker_size + INP_translate_y), 
+                (j + rubik_half_length * j2 + one_minus_sticker_size), 
+                (j + rubik_half_length * j2 - one_minus_sticker_size), 
+                (j + rubik_half_length * j2 + INP_sticker_gap + INP_translate_y)
+            );
         }
 
     for (k = start_z; k <= end_z; k += 1)
@@ -1253,6 +1303,16 @@ create_grid_plane = () => {
                         INP_COLOR_back[2],
                     ), `back`, k)
                 );
+            
+            max_distance = Math.max(
+                max_distance, 
+                (k + rubik_half_length * k2 - INP_sticker_gap + INP_translate_z), 
+                (k + rubik_half_length * k2 + one_minus_sticker_size + INP_translate_z), 
+                (k + rubik_half_length * k2 - one_minus_sticker_size + INP_translate_z), 
+                (k + rubik_half_length * k2 + one_minus_sticker_size), 
+                (k + rubik_half_length * k2 - one_minus_sticker_size), 
+                (k + rubik_half_length * k2 + INP_sticker_gap + INP_translate_z)
+            );
         }
                 
     for (i = 0; i < planes_x.length; i += 1) 
@@ -1399,13 +1459,13 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
 
         // Cover extended sticker position when current layer position is outside
         if (i == start && i != end)
-            sticker_start = rubik.sticker_gap;
+            sticker_start = max_distance;
         else if (i != start && i == end)
-            sticker_end = rubik.sticker_gap;
+            sticker_end = max_distance;
         // If current layer is the start and end layer (size = 1)
         else if (i == start && i == end) {
-            sticker_start = rubik.sticker_gap;
-            sticker_end = rubik.sticker_gap;
+            sticker_start = max_distance;
+            sticker_end = max_distance;
         }
 
         plane1 = new Plane();
