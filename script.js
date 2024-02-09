@@ -417,533 +417,6 @@ init_vertex_cubie_face = () => {
     faces = [];
 }
 
-//
-// Old school
-//
-
-/*
-
-add_cubies_to_rubik = () => {
-    sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
-
-    number_of_face = sub_vertices.length / number_of_vertex_per_face;
-    for (i3 = 0; i3 < number_of_face; i3++)
-        faces[i3] = new Face();
-
-    for (i3 = 0; i3 < number_of_face; i3 += 1) {
-        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
-
-        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) 
-            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
-
-        vertice_indices.push(
-            count + 0,
-            count + 1,
-            count + 2,
-
-            count + 0,
-            count + 2,
-            count + 1,
-
-            count + 3,
-            count + 1,
-            count + 2,
-
-            count + 3,
-            count + 2,
-            count + 1,
-        );
-
-        count += number_of_vertex_per_face;
-        cubie.add_face(faces[i3]);
-    }
-
-    rubik.add_cubie(cubie);
-}
-
-add_sticker_vertex = (i, j, k) => {
-    init_vertex_cubie_face();
-    
-    for (i2 = -1; i2 < 2; i2 += 2) {
-        for (j2 = -1; j2 < 2; j2 += 2) {
-            for (k2 = -1; k2 < 2; k2 += 2) {
-
-                if (i2 == -1 && i == start_x)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 - INP_sticker_gap,
-                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_right[0],
-                                INP_COLOR_right[1],
-                                INP_COLOR_right[2],
-                                INP_transparent_sticker
-                            ),
-                            "left"
-                        )
-                    );
-
-                if (i2 == 1 && i == end_x)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 + INP_sticker_gap,
-                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_left[0],
-                                INP_COLOR_left[1],
-                                INP_COLOR_left[2],
-                                INP_transparent_sticker
-                            ),
-                            "right"
-                        )
-                    );
-
-                if (j2 == -1 && j == start_y)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - INP_sticker_gap,
-                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_down[0],
-                                INP_COLOR_down[1],
-                                INP_COLOR_down[2],
-                                INP_transparent_sticker
-                            ),
-                            "down"
-                        )
-                    );
-
-                if (j2 == 1 && j == end_y)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 + INP_sticker_gap,
-                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_up[0],
-                                INP_COLOR_up[1],
-                                INP_COLOR_up[2],
-                                INP_transparent_sticker
-                            ),
-                            "up"
-                        )
-                    );
-
-                if (k2 == -1 && k == start_z)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - INP_sticker_gap,
-                            ),
-                            new Color(
-                                INP_COLOR_front[0],
-                                INP_COLOR_front[1],
-                                INP_COLOR_front[2],
-                                INP_transparent_sticker
-                            ),
-                            "front"
-                        )
-                    );
-
-                if (k2 == 1 && k == end_z)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 - (INP_sticker_size % 1) * i2,
-                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 + INP_sticker_gap,
-                            ),
-                            new Color(
-                                INP_COLOR_back[0],
-                                INP_COLOR_back[1],
-                                INP_COLOR_back[2],
-                                INP_transparent_sticker
-                            ),
-                            "back"
-                        )
-                    );
-            }
-        }
-    }
-
-    add_cubies_to_rubik();
-}
-
-add_inner_outline_vertex = (i, j, k) => {
-    init_vertex_cubie_face();
-
-    for (i2 = -1; i2 < 2; i2 += 2) {
-        for (j2 = -1; j2 < 2; j2 += 2) {
-            for (k2 = -1; k2 < 2; k2 += 2) {
-
-                if (i2 == -1 && i == start_x)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner_right[0],
-                                INP_COLOR_inner_right[1],
-                                INP_COLOR_inner_right[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "inner_left"
-                        )
-                    );
-
-                if (i2 == 1 && i == end_x)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner_left[0],
-                                INP_COLOR_inner_left[1],
-                                INP_COLOR_inner_left[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "inner_right"
-                        )
-                    );
-
-                if (j2 == -1 && j == start_y)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner_down[0],
-                                INP_COLOR_inner_down[1],
-                                INP_COLOR_inner_down[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "inner_down"
-                        )
-                    );
-
-                if (j2 == 1 && j == end_y)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner_up[0],
-                                INP_COLOR_inner_up[1],
-                                INP_COLOR_inner_up[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "inner_up"
-                        )
-                    );
-
-                if (k2 == -1 && k == start_z)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner_front[0],
-                                INP_COLOR_inner_front[1],
-                                INP_COLOR_inner_front[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "inner_front"
-                        )
-                    );
-
-                if (k2 == 1 && k == end_z)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner_back[0],
-                                INP_COLOR_inner_back[1],
-                                INP_COLOR_inner_back[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "inner_back"
-                        )
-                    );
-            }
-        }
-    }
-
-    add_cubies_to_rubik();
-}
-
-add_inner_vertex = (i, j, k) => {
-    init_vertex_cubie_face();
-
-    for (i2 = -1; i2 < 2; i2 += 2) {
-        for (j2 = -1; j2 < 2; j2 += 2) {
-            for (k2 = -1; k2 < 2; k2 += 2) {
-
-                if (i2 == -1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "left"
-                        )
-                    );
-            
-                if (i2 == 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "left"
-                        )
-                    );
-
-                if (j2 == -1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "down"
-                        )
-                    );
-
-                if (j2 == 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "up"
-                        )
-                    );
-
-                if (k2 == -1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "front"
-                        )
-                    );
-
-                if (k2 == 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "back"
-                        )
-                    );
-            }
-        }
-    }
-
-    add_cubies_to_rubik();
-}
-
-add_inner_plane_vertex = (i, j, k) => {
-    init_vertex_cubie_face();
-
-    for (i2 = -1; i2 < 2; i2 += 2) {
-        for (j2 = -1; j2 < 2; j2 += 2) {
-            for (k2 = -1; k2 < 2; k2 += 2) {
-
-                if (i2 == -1 && i == start_x + 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "left"
-                        )
-                    );
-                else if (i2 == 1 && i == end_x - 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "left"
-                        )
-                    );
-
-                if (j2 == -1 && j == start_y + 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "down"
-                        )
-                    );
-                else if (j2 == 1 && j == end_y - 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "up"
-                        )
-                    );
-
-                if (k2 == -1 && k == start_z + 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "front"
-                        )
-                    );
-                else if (k2 == 1 && k == end_z - 1)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2,
-                                j + rubik_half_length * j2,
-                                k + rubik_half_length * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
-                                INP_transparent_inner_cube
-                            ),
-                            "back"
-                        )
-                    );
-            }
-        }
-    }
-
-    add_cubies_to_rubik();
-}
-
-*/
-
 add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
     let plane_equation = new Float32Array(9);
     plane_equation[0] = planes_x[i].a;
@@ -984,7 +457,7 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
     );
 }
 
-create_grid_plane = () => {
+create_sticker_planes = () => {
     init_vertex_cubie_face();
 
     planes_x = [];
@@ -1024,6 +497,10 @@ create_grid_plane = () => {
 
             //
             // Add planes that pass through 2 opposite stickers
+            //
+
+            //
+            // If the current plant is the outer plane
             //
             if ((i == start_x && i2 == -1) || (i == end_x && i2 == 1))
                 if (i2 == -1)
@@ -1079,22 +556,59 @@ create_grid_plane = () => {
             //
             // Add inner cubies
             //
-            // if (i2 == -1) 
-            //     planes_x.push(
-            //         new Plane(1, 0, 0, -(i + rubik_half_length * i2), new Color(
-            //             INP_COLOR_inner_right[0],
-            //             INP_COLOR_inner_right[1],
-            //             INP_COLOR_inner_right[2],
-            //         ), `inner_right`) 
-            //     );
-            // else 
-            //     planes_x.push(
-            //         new Plane(1, 0, 0, -(i + rubik_half_length * i2), new Color(
-            //             INP_COLOR_inner_left[0],
-            //             INP_COLOR_inner_left[1],
-            //             INP_COLOR_inner_left[2],
-            //         ), `inner_left`)
-            //     );
+
+            //
+            // If the current plant is the outer plane
+            //
+            if ((i == start_x && i2 == -1) || (i == end_x && i2 == 1))
+                if (i2 == -1) 
+                    planes_x.push(
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2 + one_minus_sticker_size + INP_translate_x),
+                            new Color(
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
+                            ), `inner_cubie_right`, i
+                        ) 
+                    );
+                else 
+                    planes_x.push(
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x),
+                            new Color(
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
+                            ), `inner_cubie_left`, i
+                        )
+                    );
+            else
+                if (i2 == -1) 
+                    planes_x.push(
+                        new Plane(
+                            1, 0, 0, -(i + rubik_half_length * i2),
+                            new Color(
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
+                            ), `inner_cubie_right`, i
+                        ) 
+                    );
+                else 
+                    planes_x.push(
+                        new Plane(
+                            1, 0, 0,
+                            -(i + rubik_half_length * i2),
+                            new Color(
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
+                            ), `inner_cubie_left`, i
+                        )
+                    );
             
             //
             // Add sticker end
@@ -1142,71 +656,135 @@ create_grid_plane = () => {
             //
             // Add planes that pass through 2 opposite stickers
             //
+
+            //
+            // If the current plant is the outer plane
+            //
             if ((j == start_y && j2 == -1) || (j == end_y && j2 == 1))
                 if (j2 == -1)
                     planes_y.push(
-                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 + one_minus_sticker_size + INP_translate_y), new Color(
-                            INP_COLOR_inner_down[0],
-                            INP_COLOR_inner_down[1],
-                            INP_COLOR_inner_down[2],
-                        ), `inner_down`, j)
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2 + one_minus_sticker_size + INP_translate_y),
+                            new Color(
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
+                            ), `inner_down`, j
+                        )
                     );
                 else
                     planes_y.push(
-                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 - one_minus_sticker_size + INP_translate_y), new Color(
-                            INP_COLOR_inner_up[0],
-                            INP_COLOR_inner_up[1],
-                            INP_COLOR_inner_up[2],
-                        ), `inner_up`, j)
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2 - one_minus_sticker_size + INP_translate_y),
+                            new Color(
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
+                            ), `inner_up`, j
+                        )
                     );
             else
                 if (j2 == -1)
                     planes_y.push(
-                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 + one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_down[0],
-                            INP_COLOR_inner_down[1],
-                            INP_COLOR_inner_down[2],
-                        ), `inner_down`, j)
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2 + one_minus_sticker_size),
+                            new Color(
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
+                            ), `inner_down`, j
+                        )
                     );
                 else
                     planes_y.push(
-                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 - one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_up[0],
-                            INP_COLOR_inner_up[1],
-                            INP_COLOR_inner_up[2],
-                        ), `inner_up`, j)
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2 - one_minus_sticker_size),
+                            new Color(
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
+                            ), `inner_up`, j
+                        )
                     );
                     
             //
             // Add inner cubies
             //
-            // if (j2 == -1) 
-            //     planes_y.push(
-            //         new Plane(0, 1, 0, -(j + rubik_half_length * j2), new Color(
-            //             INP_COLOR_inner_down[0],
-            //             INP_COLOR_inner_down[1],
-            //             INP_COLOR_inner_down[2],
-            //         ), `inner_down`) 
-            //     );
-            // else 
-            //     planes_y.push(
-            //         new Plane(0, 1, 0, -(j + rubik_half_length * j2), new Color(
-            //             INP_COLOR_inner_up[0],
-            //             INP_COLOR_inner_up[1],
-            //             INP_COLOR_inner_up[2],
-            //         ), `inner_up`)
-            //     );
-                        
+
+            //
+            // If the current plant is the outer plane
+            //
+            if ((j == start_y && j2 == -1) || (j == end_y && j2 == 1))
+                if (j2 == -1) 
+                    planes_y.push(
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2 + one_minus_sticker_size + INP_translate_y),
+                            new Color(
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
+                            ), `inner_cubie_down`, j
+                        ) 
+                    );
+                else 
+                    planes_y.push(
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2 - one_minus_sticker_size + INP_translate_y),
+                            new Color(
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
+                            ), `inner_cubie_up`, j
+                        )
+                    );
+            else
+                if (j2 == -1) 
+                    planes_y.push(
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2),
+                            new Color(
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
+                            ), `inner_cubie_down`, j
+                        ) 
+                    );
+                else 
+                    planes_y.push(
+                        new Plane(
+                            0, 1, 0,
+                            -(j + rubik_half_length * j2),
+                            new Color(
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
+                            ), `inner_cubie_up`, j
+                        )
+                    );
+
             //
             // Add sticker end
             //
             if (j == end_y && j2 == 1) 
                 planes_y.push(
-                    new Plane(MAT_plane_matrix[3], MAT_plane_matrix[4], MAT_plane_matrix[5], -(j + rubik_half_length * j2 + INP_sticker_gap + INP_translate_y), new Color(
-                        INP_COLOR_up[0],
-                        INP_COLOR_up[1],
-                        INP_COLOR_up[2],
-                    ), `up`, j)
+                    new Plane(
+                        MAT_plane_matrix[3],
+                        MAT_plane_matrix[4],
+                        MAT_plane_matrix[5],
+                        -(j + rubik_half_length * j2 + INP_sticker_gap + INP_translate_y),
+                        new Color(
+                            INP_COLOR_up[0],
+                            INP_COLOR_up[1],
+                            INP_COLOR_up[2],
+                        ), `up`, j
+                    )
                 );  
             
             max_distance = Math.max(
@@ -1227,11 +805,17 @@ create_grid_plane = () => {
             //
             if (k == start_z && k2 == -1) 
                 planes_z.push(
-                    new Plane(MAT_plane_matrix[6], MAT_plane_matrix[7], MAT_plane_matrix[8], -(k + rubik_half_length * k2 - INP_sticker_gap + INP_translate_z), new Color(
-                        INP_COLOR_front[0],
-                        INP_COLOR_front[1],
-                        INP_COLOR_front[2],
-                    ), `front`, k)
+                    new Plane(
+                        MAT_plane_matrix[6],
+                        MAT_plane_matrix[7],
+                        MAT_plane_matrix[8],
+                        -(k + rubik_half_length * k2 - INP_sticker_gap + INP_translate_z),
+                        new Color(
+                            INP_COLOR_front[0],
+                            INP_COLOR_front[1],
+                            INP_COLOR_front[2],
+                        ), `front`, k
+                    )
                 );
             
             //
@@ -1240,57 +824,111 @@ create_grid_plane = () => {
             if ((k == start_z && k2 == -1) || (k == end_z && k2 == 1))
                 if (k2 == -1)
                     planes_z.push(
-                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 + one_minus_sticker_size + INP_translate_z), new Color(
-                            INP_COLOR_inner_front[0],
-                            INP_COLOR_inner_front[1],
-                            INP_COLOR_inner_front[2],
-                        ), `inner_front`, k)
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2 + one_minus_sticker_size + INP_translate_z),
+                            new Color(
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
+                            ), `inner_front`, k
+                        )
                     );
                 else
                     planes_z.push(
-                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 - one_minus_sticker_size + INP_translate_z), new Color(
-                            INP_COLOR_inner_back[0],
-                            INP_COLOR_inner_back[1],
-                            INP_COLOR_inner_back[2],
-                        ), `inner_back`, k)
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2 - one_minus_sticker_size + INP_translate_z),
+                            new Color(
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
+                            ), `inner_back`, k
+                        )
                     );
             else
                 if (k2 == -1)
                     planes_z.push(
-                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 + one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_front[0],
-                            INP_COLOR_inner_front[1],
-                            INP_COLOR_inner_front[2],
-                        ), `inner_front`, k)
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2 + one_minus_sticker_size),
+                            new Color(
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
+                            ), `inner_front`, k
+                        )
                     );
                 else
                     planes_z.push(
-                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 - one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_back[0],
-                            INP_COLOR_inner_back[1],
-                            INP_COLOR_inner_back[2],
-                        ), `inner_back`, k)
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2 - one_minus_sticker_size),
+                            new Color(
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
+                            ), `inner_back`, k
+                        )
                     );
                 
             //
             // Add inner cubies
             //
-            // if (k2 == -1) 
-            //     planes_z.push(
-            //         new Plane(0, 0, 1, -(k + rubik_half_length * k2), new Color(
-            //             INP_COLOR_inner_front[0],
-            //             INP_COLOR_inner_front[1],
-            //             INP_COLOR_inner_front[2],
-            //         ), `inner_front`)
-            //     );
-            // else 
-            //     planes_z.push(
-            //         new Plane(0, 0, 1, -(k + rubik_half_length * k2), new Color(
-            //             INP_COLOR_inner_back[0],
-            //             INP_COLOR_inner_back[1],
-            //             INP_COLOR_inner_back[2],
-            //         ), `inner_back`)
-            //     );
+
+            //
+            // If the current plant is the outer plane
+            //
+            if ((k == start_z && k2 == -1) || (k == end_z && k2 == 1))
+                if (k2 == -1) 
+                    planes_z.push(
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2 + one_minus_sticker_size + INP_translate_z),
+                            new Color(
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
+                            ), `inner_cubie_front`, k
+                        )
+                    );
+                else 
+                    planes_z.push(
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2 - one_minus_sticker_size + INP_translate_z),
+                            new Color(
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
+                            ), `inner_cubie_back`, k
+                        )
+                    );
+            else
+                if (k2 == -1) 
+                    planes_z.push(
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2),
+                            new Color(
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
+                            ), `inner_cubie_front`, k
+                        )
+                    );
+                else 
+                    planes_z.push(
+                        new Plane(
+                            0, 0, 1,
+                            -(k + rubik_half_length * k2),
+                            new Color(
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
+                            ), `inner_cubie_back`, k
+                        )
+                    );
             
             //
             // Add sticker end
@@ -1314,33 +952,47 @@ create_grid_plane = () => {
                 (k + rubik_half_length * k2 + INP_sticker_gap + INP_translate_z)
             );
         }
-                
+    
     for (i = 0; i < planes_x.length; i += 1) 
         for (j = 0; j < planes_y.length; j += 1) {
             for (k = 0; k < planes_z.length; k += 1) {
-                //
-                // Check if 3 planes intersect a sticker vertex
-                //
                 if (
-                    (i == 0 || i == planes_x.length - 1) &&
-                    (j != 0 && j != planes_y.length - 1) &&
-                    (k != 0 && k != planes_z.length - 1) 
-                )
+                    !planes_x[i].color_name.includes("inner_cubie") &&
+                    !planes_y[j].color_name.includes("inner_cubie") &&
+                    !planes_z[k].color_name.includes("inner_cubie") 
+                ) {
+                    //
+                    // Check if 3 planes intersect a sticker vertex
+                    //
+                    if (
+                        (i == 0 || i == planes_x.length - 1) &&
+                        (j != 0 && j != planes_y.length - 1) &&
+                        (k != 0 && k != planes_z.length - 1) 
+                    )
+                        add_vertex_from_3_intersected_planes(i, j, k, planes_x[i]);
+
+                    if (
+                        (i != 0 && i != planes_x.length - 1) &&
+                        (j == 0 || j == planes_y.length - 1) &&
+                        (k != 0 && k != planes_z.length - 1) 
+                    )
+                        add_vertex_from_3_intersected_planes(i, j, k, planes_y[j]);
+
+                    if (
+                        (i != 0 && i != planes_x.length - 1) &&
+                        (j != 0 && j != planes_y.length - 1) &&
+                        (k == 0 || k == planes_z.length - 1) 
+                    )
+                        add_vertex_from_3_intersected_planes(i, j, k, planes_z[k]);
+                } else if (
+                    planes_x[i].color_name.includes("inner_cubie") &&
+                    planes_y[j].color_name.includes("inner_cubie") &&
+                    planes_z[k].color_name.includes("inner_cubie") 
+                ) {
                     add_vertex_from_3_intersected_planes(i, j, k, planes_x[i]);
-
-                if (
-                    (i != 0 && i != planes_x.length - 1) &&
-                    (j == 0 || j == planes_y.length - 1) &&
-                    (k != 0 && k != planes_z.length - 1) 
-                )
                     add_vertex_from_3_intersected_planes(i, j, k, planes_y[j]);
-
-                if (
-                    (i != 0 && i != planes_x.length - 1) &&
-                    (j != 0 && j != planes_y.length - 1) &&
-                    (k == 0 || k == planes_z.length - 1) 
-                )
-                    add_vertex_from_3_intersected_planes(i, j, k, planes_z[k]);                
+                    add_vertex_from_3_intersected_planes(i, j, k, planes_z[k]);
+                }
             }
         }
 
@@ -1385,7 +1037,7 @@ create_grid_plane = () => {
 
                     count += number_of_vertex_per_face;
 
-                    if ( JSON.stringify(faces[i3].absolute_position) === JSON.stringify(cubie.absolute_position) )
+                    if (JSON.stringify(faces[i3].absolute_position) === JSON.stringify(cubie.absolute_position)) 
                         cubie.add_face(faces[i3]);
                 }
 
@@ -1394,32 +1046,14 @@ create_grid_plane = () => {
         }
     }
 
+    number_of_face = null;
+    number_of_vertex_per_face = null;
     MAT_plane_matrix = null;
     planes_x = null;
     planes_y = null;
     planes_z = null;
     faces = null;
     cubie = null;
-}
-
-create_vertex_base_on_rendering = () => {
-    for (i = start_x; i <= end_x; i += 1) {
-        for (j = start_y; j <= end_y; j += 1) {
-            for (k = start_z; k <= end_z; k += 1) {
-                if (INP_is_render_outer_cube)
-                    add_sticker_vertex(i, j, k);
-
-                if (INP_is_render_inner_outline_cube)
-                    add_inner_outline_vertex(i, j, k);
-
-                if (INP_is_render_inner_cube)
-                    add_inner_vertex(i, j, k);
-
-                if (INP_is_render_inner_plane)
-                    add_inner_plane_vertex(i, j, k);
-            }
-        }
-    }
 }
 
 init_rubik_parameter = () => {
@@ -1439,7 +1073,7 @@ init_rubik_parameter = () => {
     count = 0;
 
     // create_vertex_base_on_rendering();
-    create_grid_plane();
+    create_sticker_planes();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
