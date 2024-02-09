@@ -415,6 +415,12 @@ init_vertex_cubie_face = () => {
     faces = [];
 }
 
+//
+// Old school
+//
+
+/*
+
 add_cubies_to_rubik = () => {
     sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
 
@@ -934,6 +940,8 @@ add_inner_plane_vertex = (i, j, k) => {
     add_cubies_to_rubik();
 }
 
+*/
+
 add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
     let plane_equation = new Float32Array(9);
     plane_equation[0] = planes_x[i].a;
@@ -981,6 +989,17 @@ create_grid_plane = () => {
     planes_y = [];
     planes_z = [];
 
+    let MAT_plane_matrix = new Float32Array(16);
+    MAT_plane_matrix[0] = 1;
+    MAT_plane_matrix[1] = 0;
+    MAT_plane_matrix[2] = 0;
+    MAT_plane_matrix[3] = 0;
+    MAT_plane_matrix[4] = 1;
+    MAT_plane_matrix[5] = 0;
+    MAT_plane_matrix[6] = 0;
+    MAT_plane_matrix[7] = 0;
+    MAT_plane_matrix[8] = 1;
+
     for (i = start_x; i <= end_x; i += 1)
         for (i2 = -1; i2 < 2; i2 += 2) {
             //
@@ -988,11 +1007,11 @@ create_grid_plane = () => {
             //
             if (i == start_x && i2 == -1) 
                 planes_x.push(
-                    new Plane(1, 0, 0, -(i + rubik_half_length * i2 - INP_sticker_gap + INP_translate_x), new Color(
-                        INP_COLOR_left[0],
-                        INP_COLOR_left[1],
-                        INP_COLOR_left[2],
-                    ), `left`, i)
+                    new Plane(MAT_plane_matrix[0], MAT_plane_matrix[1], MAT_plane_matrix[2], -(i + rubik_half_length * i2 - INP_sticker_gap + INP_translate_x), new Color(
+                        INP_COLOR_right[0],
+                        INP_COLOR_right[1],
+                        INP_COLOR_right[2],
+                    ), `right`, i)
                 );
 
             //
@@ -1002,35 +1021,35 @@ create_grid_plane = () => {
                 if (i2 == -1)
                     planes_x.push(
                         new Plane(1, 0, 0, -(i + rubik_half_length * i2 + one_minus_sticker_size + INP_translate_x), new Color(
-                            INP_COLOR_inner_left[0],
-                            INP_COLOR_inner_left[1],
-                            INP_COLOR_inner_left[2],
-                        ), `inner_left`, i)
-                    );
-                else
-                    planes_x.push(
-                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x), new Color(
                             INP_COLOR_inner_right[0],
                             INP_COLOR_inner_right[1],
                             INP_COLOR_inner_right[2],
                         ), `inner_right`, i)
+                    );
+                else
+                    planes_x.push(
+                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x), new Color(
+                            INP_COLOR_inner_left[0],
+                            INP_COLOR_inner_left[1],
+                            INP_COLOR_inner_left[2],
+                        ), `inner_left`, i)
                     );
             else
                 if (i2 == -1)
                     planes_x.push(
                         new Plane(1, 0, 0, -(i + rubik_half_length * i2 + one_minus_sticker_size), new Color(
-                            INP_COLOR_inner_left[0],
-                            INP_COLOR_inner_left[1],
-                            INP_COLOR_inner_left[2],
-                        ), `inner_left`, i)
-                    );
-                else
-                    planes_x.push(
-                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size), new Color(
                             INP_COLOR_inner_right[0],
                             INP_COLOR_inner_right[1],
                             INP_COLOR_inner_right[2],
                         ), `inner_right`, i)
+                    );
+                else
+                    planes_x.push(
+                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_left[0],
+                            INP_COLOR_inner_left[1],
+                            INP_COLOR_inner_left[2],
+                        ), `inner_left`, i)
                     );
                 
             //
@@ -1039,18 +1058,18 @@ create_grid_plane = () => {
             // if (i2 == -1) 
             //     planes_x.push(
             //         new Plane(1, 0, 0, -(i + rubik_half_length * i2), new Color(
-            //             INP_COLOR_inner_left[0],
-            //             INP_COLOR_inner_left[1],
-            //             INP_COLOR_inner_left[2],
-            //         ), `inner_left`) 
+            //             INP_COLOR_inner_right[0],
+            //             INP_COLOR_inner_right[1],
+            //             INP_COLOR_inner_right[2],
+            //         ), `inner_right`) 
             //     );
             // else 
             //     planes_x.push(
             //         new Plane(1, 0, 0, -(i + rubik_half_length * i2), new Color(
-            //             INP_COLOR_inner_right[0],
-            //             INP_COLOR_inner_right[1],
-            //             INP_COLOR_inner_right[2],
-            //         ), `inner_right`)
+            //             INP_COLOR_inner_left[0],
+            //             INP_COLOR_inner_left[1],
+            //             INP_COLOR_inner_left[2],
+            //         ), `inner_left`)
             //     );
             
             //
@@ -1058,11 +1077,11 @@ create_grid_plane = () => {
             //
             if (i == end_x && i2 == 1) 
                 planes_x.push(
-                    new Plane(1, 0, 0, -(i + rubik_half_length * i2 + INP_sticker_gap + INP_translate_x), new Color(
-                        INP_COLOR_right[0],
-                        INP_COLOR_right[1],
-                        INP_COLOR_right[2],
-                    ), `right`, i)
+                    new Plane(MAT_plane_matrix[0], MAT_plane_matrix[1], MAT_plane_matrix[2], -(i + rubik_half_length * i2 + INP_sticker_gap + INP_translate_x), new Color(
+                        INP_COLOR_left[0],
+                        INP_COLOR_left[1],
+                        INP_COLOR_left[2],
+                    ), `left`, i)
                 );
         }
 
@@ -1073,7 +1092,7 @@ create_grid_plane = () => {
             //
             if (j == start_y && j2 == -1) 
                 planes_y.push(
-                    new Plane(0, 1, 0, -(j + rubik_half_length * j2 - INP_sticker_gap + INP_translate_y), new Color(
+                    new Plane(MAT_plane_matrix[3], MAT_plane_matrix[4], MAT_plane_matrix[5], -(j + rubik_half_length * j2 - INP_sticker_gap + INP_translate_y), new Color(
                         INP_COLOR_down[0],
                         INP_COLOR_down[1],
                         INP_COLOR_down[2],
@@ -1143,7 +1162,7 @@ create_grid_plane = () => {
             //
             if (j == end_y && j2 == 1) 
                 planes_y.push(
-                    new Plane(0, 1, 0, -(j + rubik_half_length * j2 + INP_sticker_gap + INP_translate_y), new Color(
+                    new Plane(MAT_plane_matrix[3], MAT_plane_matrix[4], MAT_plane_matrix[5], -(j + rubik_half_length * j2 + INP_sticker_gap + INP_translate_y), new Color(
                         INP_COLOR_up[0],
                         INP_COLOR_up[1],
                         INP_COLOR_up[2],
@@ -1158,7 +1177,7 @@ create_grid_plane = () => {
             //
             if (k == start_z && k2 == -1) 
                 planes_z.push(
-                    new Plane(0, 0, 1, -(k + rubik_half_length * k2 - INP_sticker_gap + INP_translate_z), new Color(
+                    new Plane(MAT_plane_matrix[6], MAT_plane_matrix[7], MAT_plane_matrix[8], -(k + rubik_half_length * k2 - INP_sticker_gap + INP_translate_z), new Color(
                         INP_COLOR_front[0],
                         INP_COLOR_front[1],
                         INP_COLOR_front[2],
@@ -1228,7 +1247,7 @@ create_grid_plane = () => {
             //
             if (k == end_z && k2 == 1) 
                 planes_z.push(
-                    new Plane(0, 0, 1, -(k + rubik_half_length * k2 + INP_sticker_gap + INP_translate_z), new Color(
+                    new Plane(MAT_plane_matrix[6], MAT_plane_matrix[7], MAT_plane_matrix[8], -(k + rubik_half_length * k2 + INP_sticker_gap + INP_translate_z), new Color(
                         INP_COLOR_back[0],
                         INP_COLOR_back[1],
                         INP_COLOR_back[2],
@@ -1236,7 +1255,7 @@ create_grid_plane = () => {
                 );
         }
                 
-    for (i = 0; i < planes_x.length; i += 1) {
+    for (i = 0; i < planes_x.length; i += 1) 
         for (j = 0; j < planes_y.length; j += 1) {
             for (k = 0; k < planes_z.length; k += 1) {
                 //
@@ -1264,8 +1283,6 @@ create_grid_plane = () => {
                     add_vertex_from_3_intersected_planes(i, j, k, planes_z[k]);                
             }
         }
-    }
-
 
     sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
 
@@ -1316,6 +1333,13 @@ create_grid_plane = () => {
             }
         }
     }
+
+    MAT_plane_matrix = null;
+    planes_x = null;
+    planes_y = null;
+    planes_z = null;
+    faces = null;
+    cubie = null;
 }
 
 create_vertex_base_on_rendering = () => {
