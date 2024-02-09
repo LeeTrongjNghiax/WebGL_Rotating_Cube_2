@@ -1,5 +1,3 @@
-/*
-
 add_cubies_to_rubik = () => {
     sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
 
@@ -296,9 +294,9 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
                                 INP_transparent_inner_cube
                             ),
                             "left"
@@ -314,12 +312,12 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
                                 INP_transparent_inner_cube
                             ),
-                            "left"
+                            "right"
                         )
                     );
 
@@ -332,9 +330,9 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
                                 INP_transparent_inner_cube
                             ),
                             "down"
@@ -350,9 +348,9 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
                                 INP_transparent_inner_cube
                             ),
                             "up"
@@ -368,9 +366,9 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
                                 INP_transparent_inner_cube
                             ),
                             "front"
@@ -386,9 +384,9 @@ add_inner_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
                                 INP_transparent_inner_cube
                             ),
                             "back"
@@ -417,9 +415,9 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_left[0],
+                                INP_COLOR_inner_left[1],
+                                INP_COLOR_inner_left[2],
                                 INP_transparent_inner_cube
                             ),
                             "left"
@@ -434,12 +432,12 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_right[0],
+                                INP_COLOR_inner_right[1],
+                                INP_COLOR_inner_right[2],
                                 INP_transparent_inner_cube
                             ),
-                            "left"
+                            "right"
                         )
                     );
 
@@ -452,9 +450,9 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_down[0],
+                                INP_COLOR_inner_down[1],
+                                INP_COLOR_inner_down[2],
                                 INP_transparent_inner_cube
                             ),
                             "down"
@@ -469,9 +467,9 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_up[0],
+                                INP_COLOR_inner_up[1],
+                                INP_COLOR_inner_up[2],
                                 INP_transparent_inner_cube
                             ),
                             "up"
@@ -487,9 +485,9 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_front[0],
+                                INP_COLOR_inner_front[1],
+                                INP_COLOR_inner_front[2],
                                 INP_transparent_inner_cube
                             ),
                             "front"
@@ -504,9 +502,9 @@ add_inner_plane_vertex = (i, j, k) => {
                                 k + rubik_half_length * k2,
                             ),
                             new Color(
-                                INP_COLOR_inner[0],
-                                INP_COLOR_inner[1],
-                                INP_COLOR_inner[2],
+                                INP_COLOR_inner_back[0],
+                                INP_COLOR_inner_back[1],
+                                INP_COLOR_inner_back[2],
                                 INP_transparent_inner_cube
                             ),
                             "back"
@@ -538,5 +536,3 @@ create_vertex_base_on_rendering = () => {
         }
     }
 }
-
-*/
