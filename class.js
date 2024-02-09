@@ -1,10 +1,12 @@
 class Plane {
-    constructor(a = 0, b = 0, c = 0, d = 0, color = "") {
+    constructor(a = 0, b = 0, c = 0, d = 0, color = new Color(), color_name = "", center = 0) {
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
         this.color = color;
+        this.color_name = color_name;
+        this.center = center;
     }
 
     get_length_of_normal_vector() {
@@ -24,7 +26,7 @@ class Plane {
 }
 
 class Color {
-    constructor(r = 0, g = 0, b = 0, a = 0) {
+    constructor(r = 0, g = 0, b = 0, a = 1) {
         this.r = r;
         this.g = g;
         this.b = b;
@@ -49,10 +51,11 @@ class Position {
 }
 
 class Vertex {
-    constructor(relative_position, color, color_name) {
+    constructor(relative_position, color, color_name, absolute_position) {
         this.relative_position = relative_position;
         this.color = color;
         this.color_name = color_name;
+        this.absolute_position = absolute_position;
     }
 
     to_string() {

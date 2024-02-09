@@ -47,6 +47,11 @@ let INP_rubik_size_z;
 let INP_rubik_length;
 let INP_sticker_gap;
 let INP_sticker_size;
+
+let INP_translate_x;
+let INP_translate_y;
+let INP_translate_z;
+
 let INP_is_render_outer_cube;
 let INP_is_render_inner_outline_cube;
 let INP_is_render_inner_cube;
@@ -230,6 +235,12 @@ let vertices;
 let vertice_indices;
 let vertice_indices_length;
 
+let one_minus_sticker_size;
+
+let planes_x;
+let planes_y;
+let planes_z;
+
 get_input_data = () => {
     ELEM_show_fps = document.querySelector("#fps");
     ELEM_canvas = document.querySelector('#game-surface');
@@ -240,6 +251,12 @@ get_input_data = () => {
     INP_rubik_length = +document.querySelector("#length").value || 1;
     INP_sticker_gap = +document.querySelector("#sticker-gap").value || 0;
     INP_sticker_size = +document.querySelector("#sticker-size").value || 1;
+    one_minus_sticker_size = (10 - (INP_sticker_size * 10)) / 10;
+    
+    INP_translate_x = +document.querySelector("#translate-x").value || 0;
+    INP_translate_y = +document.querySelector("#translate-y").value || 0;
+    INP_translate_z = +document.querySelector("#translate-z").value || 0;
+
     INP_is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
     INP_is_render_inner_cube = document.querySelector("#render-inner-cube").checked;
     INP_is_render_inner_outline_cube = document.querySelector("#render-inner-outline-cube").checked;
@@ -408,9 +425,8 @@ add_cubies_to_rubik = () => {
     for (i3 = 0; i3 < number_of_face; i3 += 1) {
         faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
 
-        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) {
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) 
             faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
-        }
 
         vertice_indices.push(
             count + 0,
@@ -918,80 +934,388 @@ add_inner_plane_vertex = (i, j, k) => {
     add_cubies_to_rubik();
 }
 
+add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
+    let plane_equation = new Float32Array(9);
+    plane_equation[0] = planes_x[i].a;
+    plane_equation[1] = planes_x[i].b;
+    plane_equation[2] = planes_x[i].c;
+
+    plane_equation[3] = planes_y[j].a;
+    plane_equation[4] = planes_y[j].b;
+    plane_equation[5] = planes_y[j].c;
+
+    plane_equation[6] = planes_z[k].a;
+    plane_equation[7] = planes_z[k].b;
+    plane_equation[8] = planes_z[k].c;
+
+    let inverse = new Float32Array(9);
+    invert(inverse, plane_equation);
+
+    let d_vector = new Float32Array(3);
+    d_vector[0] = -planes_x[i].d;
+    d_vector[1] = -planes_y[j].d;
+    d_vector[2] = -planes_z[k].d;
+    
+    let result_vector = new Float32Array(3);
+
+    transformMat3(result_vector, d_vector, inverse);
+
+    sub_vertices.push(
+        new Vertex(
+            new Position(
+                result_vector[0],
+                result_vector[1],
+                result_vector[2]
+            ),
+            plane.color,
+            plane.color_name + `_x_${planes_x[i].center}_y_${planes_y[j].center}_z_${planes_z[k].center}`, 
+            new Position(planes_x[i].center, planes_y[j].center, planes_z[k].center)
+        ), 
+    );
+}
+
 create_grid_plane = () => {
     init_vertex_cubie_face();
 
-    let planes_x = [];
-    let planes_y = [];
-    let planes_z = [];
-
-    let sub_vertices = [];
+    planes_x = [];
+    planes_y = [];
+    planes_z = [];
 
     for (i = start_x; i <= end_x; i += 1)
-        for (i2 = -1; i2 < 2; i2 += 2)
-            if (i2 == -1)
-                planes_x.push(new Plane(1, 0, 0, -(i + rubik_half_length * i2), "orange"));
+        for (i2 = -1; i2 < 2; i2 += 2) {
+            //
+            // Add sticker start
+            //
+            if (i == start_x && i2 == -1) 
+                planes_x.push(
+                    new Plane(1, 0, 0, -(i + rubik_half_length * i2 - INP_sticker_gap + INP_translate_x), new Color(
+                        INP_COLOR_left[0],
+                        INP_COLOR_left[1],
+                        INP_COLOR_left[2],
+                    ), `left`, i)
+                );
+
+            //
+            // Add planes that pass through 2 opposite stickers
+            //
+            if ((i == start_x && i2 == -1) || (i == end_x && i2 == 1))
+                if (i2 == -1)
+                    planes_x.push(
+                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 + one_minus_sticker_size + INP_translate_x), new Color(
+                            INP_COLOR_inner_left[0],
+                            INP_COLOR_inner_left[1],
+                            INP_COLOR_inner_left[2],
+                        ), `inner_left`, i)
+                    );
+                else
+                    planes_x.push(
+                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size + INP_translate_x), new Color(
+                            INP_COLOR_inner_right[0],
+                            INP_COLOR_inner_right[1],
+                            INP_COLOR_inner_right[2],
+                        ), `inner_right`, i)
+                    );
             else
-                planes_x.push(new Plane(1, 0, 0, -(i + rubik_half_length * i2), "red"));
+                if (i2 == -1)
+                    planes_x.push(
+                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 + one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_left[0],
+                            INP_COLOR_inner_left[1],
+                            INP_COLOR_inner_left[2],
+                        ), `inner_left`, i)
+                    );
+                else
+                    planes_x.push(
+                        new Plane(1, 0, 0, -(i + rubik_half_length * i2 - one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_right[0],
+                            INP_COLOR_inner_right[1],
+                            INP_COLOR_inner_right[2],
+                        ), `inner_right`, i)
+                    );
+                
+            //
+            // Add inner cubies
+            //
+            // if (i2 == -1) 
+            //     planes_x.push(
+            //         new Plane(1, 0, 0, -(i + rubik_half_length * i2), new Color(
+            //             INP_COLOR_inner_left[0],
+            //             INP_COLOR_inner_left[1],
+            //             INP_COLOR_inner_left[2],
+            //         ), `inner_left`) 
+            //     );
+            // else 
+            //     planes_x.push(
+            //         new Plane(1, 0, 0, -(i + rubik_half_length * i2), new Color(
+            //             INP_COLOR_inner_right[0],
+            //             INP_COLOR_inner_right[1],
+            //             INP_COLOR_inner_right[2],
+            //         ), `inner_right`)
+            //     );
+            
+            //
+            // Add sticker end
+            //
+            if (i == end_x && i2 == 1) 
+                planes_x.push(
+                    new Plane(1, 0, 0, -(i + rubik_half_length * i2 + INP_sticker_gap + INP_translate_x), new Color(
+                        INP_COLOR_right[0],
+                        INP_COLOR_right[1],
+                        INP_COLOR_right[2],
+                    ), `right`, i)
+                );
+        }
 
     for (j = start_y; j <= end_y; j += 1)
-        for (j2 = -1; j2 < 2; j2 += 2)
-            if (j2 == -1)
-                planes_y.push(new Plane(0, 1, 0, -(j + rubik_half_length * j2), "yellow"));
+        for (j2 = -1; j2 < 2; j2 += 2) {
+            //
+            // Add sticker start
+            //
+            if (j == start_y && j2 == -1) 
+                planes_y.push(
+                    new Plane(0, 1, 0, -(j + rubik_half_length * j2 - INP_sticker_gap + INP_translate_y), new Color(
+                        INP_COLOR_down[0],
+                        INP_COLOR_down[1],
+                        INP_COLOR_down[2],
+                    ), `down`, j)
+                );
+            
+            //
+            // Add planes that pass through 2 opposite stickers
+            //
+            if ((j == start_y && j2 == -1) || (j == end_y && j2 == 1))
+                if (j2 == -1)
+                    planes_y.push(
+                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 + one_minus_sticker_size + INP_translate_y), new Color(
+                            INP_COLOR_inner_down[0],
+                            INP_COLOR_inner_down[1],
+                            INP_COLOR_inner_down[2],
+                        ), `inner_down`, j)
+                    );
+                else
+                    planes_y.push(
+                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 - one_minus_sticker_size + INP_translate_y), new Color(
+                            INP_COLOR_inner_up[0],
+                            INP_COLOR_inner_up[1],
+                            INP_COLOR_inner_up[2],
+                        ), `inner_up`, j)
+                    );
             else
-                planes_y.push(new Plane(0, 1, 0, -(j + rubik_half_length * j2), "white"));
+                if (j2 == -1)
+                    planes_y.push(
+                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 + one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_down[0],
+                            INP_COLOR_inner_down[1],
+                            INP_COLOR_inner_down[2],
+                        ), `inner_down`, j)
+                    );
+                else
+                    planes_y.push(
+                        new Plane(0, 1, 0, -(j + rubik_half_length * j2 - one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_up[0],
+                            INP_COLOR_inner_up[1],
+                            INP_COLOR_inner_up[2],
+                        ), `inner_up`, j)
+                    );
+                    
+            //
+            // Add inner cubies
+            //
+            // if (j2 == -1) 
+            //     planes_y.push(
+            //         new Plane(0, 1, 0, -(j + rubik_half_length * j2), new Color(
+            //             INP_COLOR_inner_down[0],
+            //             INP_COLOR_inner_down[1],
+            //             INP_COLOR_inner_down[2],
+            //         ), `inner_down`) 
+            //     );
+            // else 
+            //     planes_y.push(
+            //         new Plane(0, 1, 0, -(j + rubik_half_length * j2), new Color(
+            //             INP_COLOR_inner_up[0],
+            //             INP_COLOR_inner_up[1],
+            //             INP_COLOR_inner_up[2],
+            //         ), `inner_up`)
+            //     );
+                        
+            //
+            // Add sticker end
+            //
+            if (j == end_y && j2 == 1) 
+                planes_y.push(
+                    new Plane(0, 1, 0, -(j + rubik_half_length * j2 + INP_sticker_gap + INP_translate_y), new Color(
+                        INP_COLOR_up[0],
+                        INP_COLOR_up[1],
+                        INP_COLOR_up[2],
+                    ), `up`, j)
+                );  
+        }
 
     for (k = start_z; k <= end_z; k += 1)
-        for (k2 = -1; k2 < 2; k2 += 2)
-            if (k2 == -1)
-                planes_z.push(new Plane(0, 0, 1, -(k + rubik_half_length * k2), "green") );
-            else
-                planes_z.push(new Plane(0, 0, 1, -(k + rubik_half_length * k2), "blue"));
+        for (k2 = -1; k2 < 2; k2 += 2) {
+            //
+            // Add sticker start
+            //
+            if (k == start_z && k2 == -1) 
+                planes_z.push(
+                    new Plane(0, 0, 1, -(k + rubik_half_length * k2 - INP_sticker_gap + INP_translate_z), new Color(
+                        INP_COLOR_front[0],
+                        INP_COLOR_front[1],
+                        INP_COLOR_front[2],
+                    ), `front`, k)
+                );
             
+            //
+            // Add planes that pass through 2 opposite stickers
+            //
+            if ((k == start_z && k2 == -1) || (k == end_z && k2 == 1))
+                if (k2 == -1)
+                    planes_z.push(
+                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 + one_minus_sticker_size + INP_translate_z), new Color(
+                            INP_COLOR_inner_front[0],
+                            INP_COLOR_inner_front[1],
+                            INP_COLOR_inner_front[2],
+                        ), `inner_front`, k)
+                    );
+                else
+                    planes_z.push(
+                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 - one_minus_sticker_size + INP_translate_z), new Color(
+                            INP_COLOR_inner_back[0],
+                            INP_COLOR_inner_back[1],
+                            INP_COLOR_inner_back[2],
+                        ), `inner_back`, k)
+                    );
+            else
+                if (k2 == -1)
+                    planes_z.push(
+                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 + one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_front[0],
+                            INP_COLOR_inner_front[1],
+                            INP_COLOR_inner_front[2],
+                        ), `inner_front`, k)
+                    );
+                else
+                    planes_z.push(
+                        new Plane(0, 0, 1, -(k + rubik_half_length * k2 - one_minus_sticker_size), new Color(
+                            INP_COLOR_inner_back[0],
+                            INP_COLOR_inner_back[1],
+                            INP_COLOR_inner_back[2],
+                        ), `inner_back`, k)
+                    );
+                
+            //
+            // Add inner cubies
+            //
+            // if (k2 == -1) 
+            //     planes_z.push(
+            //         new Plane(0, 0, 1, -(k + rubik_half_length * k2), new Color(
+            //             INP_COLOR_inner_front[0],
+            //             INP_COLOR_inner_front[1],
+            //             INP_COLOR_inner_front[2],
+            //         ), `inner_front`)
+            //     );
+            // else 
+            //     planes_z.push(
+            //         new Plane(0, 0, 1, -(k + rubik_half_length * k2), new Color(
+            //             INP_COLOR_inner_back[0],
+            //             INP_COLOR_inner_back[1],
+            //             INP_COLOR_inner_back[2],
+            //         ), `inner_back`)
+            //     );
+            
+            //
+            // Add sticker end
+            //
+            if (k == end_z && k2 == 1) 
+                planes_z.push(
+                    new Plane(0, 0, 1, -(k + rubik_half_length * k2 + INP_sticker_gap + INP_translate_z), new Color(
+                        INP_COLOR_back[0],
+                        INP_COLOR_back[1],
+                        INP_COLOR_back[2],
+                    ), `back`, k)
+                );
+        }
+                
     for (i = 0; i < planes_x.length; i += 1) {
         for (j = 0; j < planes_y.length; j += 1) {
             for (k = 0; k < planes_z.length; k += 1) {
-                let plane_equation = new Float32Array(9);
+                //
+                // Check if 3 planes intersect a sticker vertex
+                //
+                if (
+                    (i == 0 || i == planes_x.length - 1) &&
+                    (j != 0 && j != planes_y.length - 1) &&
+                    (k != 0 && k != planes_z.length - 1) 
+                )
+                    add_vertex_from_3_intersected_planes(i, j, k, planes_x[i]);
 
-                plane_equation[0] = planes_x[i].a;
-                plane_equation[1] = planes_x[i].b;
-                plane_equation[2] = planes_x[i].c;
+                if (
+                    (i != 0 && i != planes_x.length - 1) &&
+                    (j == 0 || j == planes_y.length - 1) &&
+                    (k != 0 && k != planes_z.length - 1) 
+                )
+                    add_vertex_from_3_intersected_planes(i, j, k, planes_y[j]);
 
-                plane_equation[3] = planes_y[j].a;
-                plane_equation[4] = planes_y[j].b;
-                plane_equation[5] = planes_y[j].c;
-
-                plane_equation[6] = planes_z[k].a;
-                plane_equation[7] = planes_z[k].b;
-                plane_equation[8] = planes_z[k].c;
-
-                let inverse = new Float32Array(9);
-                invert(inverse, plane_equation);
-
-                let d_vector = new Float32Array(3);
-                d_vector[0] = -planes_x[i].d;
-                d_vector[1] = -planes_y[j].d;
-                d_vector[2] = -planes_z[k].d;
-
-                let result_vector = new Float32Array(3);
-
-                transformMat3(result_vector, d_vector, inverse);
-
-                sub_vertices.push(
-                    new Vertex(
-                        new Position(result_vector[0], result_vector[1], result_vector[2]), 
-                        new Color(1, 0, 0, 1)
-                    ), 
-                );
+                if (
+                    (i != 0 && i != planes_x.length - 1) &&
+                    (j != 0 && j != planes_y.length - 1) &&
+                    (k == 0 || k == planes_z.length - 1) 
+                )
+                    add_vertex_from_3_intersected_planes(i, j, k, planes_z[k]);                
             }
         }
     }
 
-    // vertice_indices = [0, 1, 2, 0, 2, 1, 3, 1, 2, 3, 2, 1, 4, 5, 6, 4, 6, 5, 7, 5, 6, 7, 6, 5, 8, 9, 10, 8, 10, 9, 11, 9, 10, 11, 10, 9, 12, 13, 14, 12, 14, 13, 15, 13, 14, 15, 14, 13, 16, 17, 18, 16, 18, 17, 19, 17, 18, 19, 18, 17, 20, 21, 22, 20, 22, 21, 23, 21, 22, 23, 22, 21];
 
-    add_cubies_to_rubik();
+    sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
 
-    // vertices = [].concat(...sub_vertices.map(vertex => vertex.to_string()))
+    number_of_face = sub_vertices.length / number_of_vertex_per_face;
+
+    for (i3 = 0; i3 < number_of_face; i3++) {
+        faces[i3] = new Face();
+        faces[i3].color = sub_vertices[number_of_vertex_per_face * i3].color_name;
+        faces[i3].absolute_position = sub_vertices[number_of_vertex_per_face * i3].absolute_position;
+
+        for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) 
+            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+    }
+
+    for (i = start_x; i <= end_x; i += 1) {
+        for (j = start_y; j <= end_y; j += 1) {
+            for (k = start_z; k <= end_z; k += 1) {
+                cubie = new Cubie();
+                cubie.absolute_position = new Position(i, j, k);            
+
+                for (i3 = 0; i3 < number_of_face; i3 += 1) {
+                    
+                    vertice_indices.push(
+                        count + 0,
+                        count + 1,
+                        count + 2,
+
+                        count + 0,
+                        count + 2,
+                        count + 1,
+
+                        count + 3,
+                        count + 1,
+                        count + 2,
+
+                        count + 3,
+                        count + 2,
+                        count + 1,
+                    );
+
+                    count += number_of_vertex_per_face;
+
+                    if ( JSON.stringify(faces[i3].absolute_position) === JSON.stringify(cubie.absolute_position) )
+                        cubie.add_face(faces[i3]);
+                }
+
+                rubik.add_cubie(cubie);
+            }
+        }
+    }
 }
 
 create_vertex_base_on_rendering = () => {
@@ -1024,13 +1348,13 @@ init_rubik_parameter = () => {
     end_z = (INP_rubik_size_z - 1) / 2;
     start_z = -end_z;
     
-    rubik.INP_sticker_gap = INP_sticker_gap;
+    rubik.sticker_gap = INP_sticker_gap;
 
     vertices = [];
     vertice_indices = [];
     count = 0;
 
-    create_vertex_base_on_rendering();
+    // create_vertex_base_on_rendering();
     create_grid_plane();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
@@ -1051,13 +1375,13 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
 
         // Cover extended sticker position when current layer position is outside
         if (i == start && i != end)
-            sticker_start = rubik.INP_sticker_gap;
+            sticker_start = rubik.sticker_gap;
         else if (i != start && i == end)
-            sticker_end = rubik.INP_sticker_gap;
+            sticker_end = rubik.sticker_gap;
         // If current layer is the start and end layer (size = 1)
         else if (i == start && i == end) {
-            sticker_start = rubik.INP_sticker_gap;
-            sticker_end = rubik.INP_sticker_gap;
+            sticker_start = rubik.sticker_gap;
+            sticker_end = rubik.sticker_gap;
         }
 
         plane1 = new Plane();
@@ -1358,6 +1682,8 @@ loop_rotate_face_till_90_deg = e => {
             control = rubik.controls[i];
             break;
         }
+
+    // console.log(control);
     
     // Set the finish flag
     is_rotation_finish = false;
