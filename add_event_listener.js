@@ -9,7 +9,7 @@ create_rubik_cube = () => {
     set_up_support_matrix();
     add_uniforms_to_shader();
     draw();
-
+    
     document.querySelector("#toggle-rotate").disabled = false;
     document.querySelector("#toggle-movement-control").disabled = false;
 }
