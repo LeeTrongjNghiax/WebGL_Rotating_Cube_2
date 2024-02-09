@@ -1378,8 +1378,8 @@ init_rubik_parameter = () => {
     vertice_indices = [];
     count = 0;
 
-    // create_vertex_base_on_rendering();
-    create_grid_plane();
+    create_vertex_base_on_rendering();
+    // create_grid_plane();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
