@@ -1682,8 +1682,6 @@ loop_rotate_face_till_90_deg = e => {
             control = rubik.controls[i];
             break;
         }
-
-    // console.log(control);
     
     // Set the finish flag
     is_rotation_finish = false;
