@@ -105,6 +105,8 @@ let INP_COLOR_inner_left  = [1.0, 0.5, 0.0];
 
 let INP_shader_program_version;
 
+let INP_generation_method;
+
 //
 // Shader buffers
 //
@@ -343,6 +345,8 @@ clear_all_data = () => {
     INP_COLOR_inner_left  = [1.0, 0.5, 0.0];
 
     INP_shader_program_version = null;
+
+    INP_generation_method = null;
 
     //
     // Shader buffers
@@ -597,6 +601,7 @@ get_input_data = () => {
     INP_transparent_inner_cube = +document.querySelector("#transparent-inner-cube").value / 255 || 1.0;
 
     INP_shader_program_version = document.querySelector("#shader-program-version").checked;
+    INP_generation_method = document.querySelector("#generation-method").checked;
 
     if (INP_shader_program_version) {
         INP_vertex_shader_text = document.querySelector("#vs300").innerHTML;
@@ -1341,8 +1346,10 @@ init_rubik_parameter = () => {
     planes_y = [];
     planes_z = [];
 
-    // create_vertex_base_on_rendering();
-    create_planes();
+    if (INP_generation_method)
+        create_vertex_base_on_rendering();
+    else
+        create_planes();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
