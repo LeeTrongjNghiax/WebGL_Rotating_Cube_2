@@ -78,6 +78,7 @@ canvas {
 }
 
 #controller {
+    max-width: 80vw;
     position: absolute;
     height: 100%;
     overflow: scroll;

@@ -1357,6 +1357,8 @@ init_rubik_parameter = () => {
 }
 
 create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", distance = DELTA, have_all_cubies = false) => {
+    max_distance = rubik.sticker_gap;
+    
     // Remove redundant controller
     if (start == end && have_all_cubies == false)
         return;
