@@ -409,7 +409,7 @@
                     </div>
                     <div class="input-block">
                         <label for="render-inner-cube">Render Inner Cubes:</label>
-                        <input id="render-inner-cube" type="checkbox" checked>
+                        <input id="render-inner-cube" type="checkbox">
                     </div>
                     <div class="input-block">
                         <label for="render-inner-plane">Render Inner Planes:</label>
@@ -465,11 +465,11 @@
                     </div>
                     <div class="input-block">
                         <label for="smooth-rotation">Smooth rotation per frame:</label>
-                        <input id="smooth-rotation" type="number" min="0" max="100" value="1" size="2">
+                        <input id="smooth-rotation" type="number" min="0" max="100" value="10" size="2">
                     </div>
                     <div class="input-block">
                         <label for="angle-rotated-ratio">Angle rotated ratio per frame:</label>
-                        <input id="angle-rotated-ratio" type="number" min="0" max="360" value="15" size="2">
+                        <input id="angle-rotated-ratio" type="number" min="0" max="360" value="25" size="2">
                     </div>
                 </div>
             </div>
@@ -501,27 +501,33 @@
                 <div class="dropdown-content">
                     <div class="input-block">
                         <label for="top-color">Top color:</label>
-                        <input id="top-color" type="color" value="#C0C0C0" list="color-datalist">
+                        <!-- FFFFFF -->
+                        <input id="top-color" type="color" value="#FFFFFF" list="color-datalist">
                     </div>
                     <div class="input-block">
                         <label for="bottom-color">Bottom color:</label>
-                        <input id="bottom-color" type="color" value="#C0C0C0" list="color-datalist">
+                        <!-- FFFF00 -->
+                        <input id="bottom-color" type="color" value="#FFFF00" list="color-datalist">
                     </div>
                     <div class="input-block">
                         <label for="front-color">Front color:</label>
-                        <input id="front-color" type="color" value="#C0C0C0" list="color-datalist">
+                        <!-- 00FF00 -->
+                        <input id="front-color" type="color" value="#00FF00" list="color-datalist">
                     </div>
                     <div class="input-block">
                         <label for="back-color">Back color:</label>
-                        <input id="back-color" type="color" value="#C0C0C0" list="color-datalist">
+                        <!-- 0000FF -->
+                        <input id="back-color" type="color" value="#0000FF" list="color-datalist">
                     </div>
                     <div class="input-block">
                         <label for="right-color">Right color:</label>
-                        <input id="right-color" type="color" value="#C0C0C0" list="color-datalist">
+                        <!-- FF0000 -->
+                        <input id="right-color" type="color" value="#FF0000" list="color-datalist">
                     </div>
                     <div class="input-block">
                         <label for="left-color">Left color:</label>
-                        <input id="left-color" type="color" value="#C0C0C0" list="color-datalist">
+                        <!-- FFA700 -->
+                        <input id="left-color" type="color" value="#FFA700" list="color-datalist">
                     </div>
 
                     <div class="input-block">
