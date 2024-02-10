@@ -1,4 +1,5 @@
 create_rubik_cube = () => {
+    clear_all_data();
     get_input_data();
     setup_webgl_canvas();
     init_rubik_parameter();

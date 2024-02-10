@@ -263,6 +263,261 @@ let result_vector;
 let plane_upper_limit;
 let plane_lower_limit;
 
+clear_all_data = () => {
+    SHADER_vertex = null;
+    SHADER_fragment = null;
+
+    //
+    // HTML Elements
+    //
+
+    ELEM_canvas = null;
+    ELEM_draw_mode = null;
+    ELEM_rotate_button = null;
+    ELEM_show_fps = null;
+
+    //
+    // Inputs
+    //
+
+    INP_vertex_shader_text = null;
+    INP_fragment_shader_text = null;
+    INP_rubik_size_x = null;
+    INP_rubik_size_y = null;
+    INP_rubik_size_z = null;
+    INP_rubik_length = null;
+    INP_sticker_gap = null;
+    INP_sticker_size = null;
+
+    INP_translate_x = null;
+    INP_translate_y = null;
+    INP_translate_z = null;
+
+    INP_is_render_outer_cube = null;
+    INP_is_render_inner_outline_cube = null;
+    INP_is_render_inner_cube = null;
+    INP_is_render_inner_plane = null;
+
+    INP_rubik_orientation_x = null;
+    INP_rubik_orientation_y = null;
+    INP_rubik_orientation_z = null;
+
+    INP_rubik_orientation_matrix_x = null;
+    INP_rubik_orientation_matrix_y = null;
+    INP_rubik_orientation_matrix_z = null;
+
+    INP_rotate_angle_x = null;
+    INP_rotate_angle_y = null;
+    INP_rotate_angle_z = null;
+    INP_angle_per_second = null;
+    INP_update_angle_method = null;
+    INP_smooth_rotation = null;
+    INP_angle_rotated_ratio = null;
+
+    INP_fovy = null;
+    INP_aspect_ratio = null;
+    INP_near = null;
+    INP_far = null;
+
+    INP_draw_mode_value = null;
+    INP_point_size = null;
+
+    INP_camera_position = null;
+    INP_camera_look_at = null;
+    INP_up_axis = null;
+
+    INP_transparent_sticker = 1.0    ;
+    INP_transparent_inner_cube = 1.0 ;
+    INP_COLOR_up    = [1.0, 1.0, 1.0];
+    INP_COLOR_down  = [1.0, 1.0, 0.0];
+    INP_COLOR_front = [0.0, 1.0, 0.0];
+    INP_COLOR_back  = [0.0, 0.0, 1.0];
+    INP_COLOR_right = [1.0, 0.0, 0.0];
+    INP_COLOR_left  = [1.0, 0.5, 0.0];
+
+    INP_COLOR_inner_up    = [1.0, 1.0, 1.0];
+    INP_COLOR_inner_down  = [1.0, 1.0, 0.0];
+    INP_COLOR_inner_front = [0.0, 1.0, 0.0];
+    INP_COLOR_inner_back  = [0.0, 0.0, 1.0];
+    INP_COLOR_inner_right = [1.0, 0.0, 0.0];
+    INP_COLOR_inner_left  = [1.0, 0.5, 0.0];
+
+    INP_shader_program_version = null;
+
+    //
+    // Shader buffers
+    //
+
+    SHADER_BUFFER_vectex = null;
+    SHADER_BUFFER_vectex_index = null;
+
+    // //
+    // // Attributes location
+    // //
+
+    ATTR_LOC_position = null;
+    ATTR_LOC_color = null;
+
+    // //
+    // // Uniforms location
+    // //
+
+    UNI_LOC_point_size = null;
+    UNI_LOC_mat_world = null;
+    UNI_LOC_mat_view = null;
+    UNI_LOC_mat_projection = null;
+    UNI_LOC_axis_vector = null;
+    UNI_LOC_rad = null;
+    UNI_LOC_plane1 = null;
+    UNI_LOC_plane2 = null;
+
+    // //
+    // // Matrices
+    // //
+
+    MAT_world = null;
+    MAT_view = null;
+    MAT_projection = null;
+
+    MAT_x_rotation = null;
+    MAT_y_rotation = null;
+    MAT_z_rotation = null;
+    MAT_identity = null;
+
+    // //
+    // // Index
+    // //
+
+    i = null;
+    j = null;
+    k = null;
+    i2 = null;
+    j2 = null;
+    k2 = null
+    count = null;
+    i3 = null;
+
+    // //
+    // // In the init
+    // //
+
+    rubik_half_length = null;
+    end_x = null;
+    start_x = null;
+    end_y = null;
+    start_y = null;
+    end_z = null;
+    start_z = null;
+
+    // //
+    // // Creating controls set
+    // //
+
+    rotation_name = null;
+    mean = null;
+    sticker_start = null;
+    sticker_end = null;
+    direction = null;
+    suffix = null;
+
+    plane1 = null;
+    plane2 = null;
+    plane1_ = null;
+    plane2_ = null;
+    axis_vector_ = null;
+
+    // //
+    // // count_fps variable
+    // //
+
+    timeMeasurements = [];
+    fps = 0;
+    draw_mode_value = null;
+
+    // //
+    // // loop variable
+    // //
+
+    // // cancelAnimationFrame(request_animation_frame);
+    request_animation_frame = null;
+
+    angle_x = 0;
+    angle_y = 0;
+    angle_z = 0;
+    
+    angle = 0;
+    
+    is_running = false;
+    last_tick = null;
+    current_tick = null;
+    time = null;
+
+    //----------------------------------------------------------------------
+
+    // DO NOT CHANGE
+
+    // control = null;
+
+    // controller_index = null;
+    // controller = null;
+    // is_rotation_finish = true;
+    // is_turning_randomly = false;
+
+    // //
+    // // Rotate loop
+    // //
+
+    // rotate_interval = null;
+    // rad = null;
+    // rad_step = null;
+
+    //----------------------------------------------------------------------
+
+    //
+    //
+    //
+
+    gl = null;
+
+    program = null;
+
+    sub_vertices = null;
+    faces = null;
+    number_of_face = null;
+    number_of_vertex_per_face = 4;
+    cubie = null;
+    rubik = null;
+    vertices = null;
+    vertice_indices = null;
+    vertice_indices_length = null;
+
+    one_minus_sticker_size = null;
+
+    planes_x = null;
+    planes_y = null;
+    planes_z = null;
+
+    max_distance = 0;
+
+    TEMP_COLOR_up = null;
+    TEMP_COLOR_down = null;
+    TEMP_COLOR_front = null;
+    TEMP_COLOR_back = null;
+    TEMP_COLOR_right = null;
+    TEMP_COLOR_left = null;
+
+    plane_equation = null;
+
+    MAT_plane_matrix = null;
+
+    inverse = null;
+    d_vector = null;
+    result_vector = null;
+
+    plane_upper_limit = null;
+    plane_lower_limit = null;
+}
+
 get_input_data = () => {
     ELEM_show_fps = document.querySelector("#fps");
     ELEM_canvas = document.querySelector('#game-surface');
@@ -1064,15 +1319,6 @@ create_planes = () => {
             }
         }
     }
-
-    number_of_face = null;
-    number_of_vertex_per_face = null;
-    MAT_plane_matrix = null;
-    planes_x = null;
-    planes_y = null;
-    planes_z = null;
-    faces = null;
-    cubie = null;
 }
 
 init_rubik_parameter = () => {
@@ -1095,8 +1341,8 @@ init_rubik_parameter = () => {
     planes_y = [];
     planes_z = [];
 
-    create_vertex_base_on_rendering();
-    // create_planes();
+    // create_vertex_base_on_rendering();
+    create_planes();
 
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
@@ -1248,7 +1494,7 @@ add_control_set_to_html = () => {
 }
 
 add_buffer_data = () => {
-    console.log(vertices);
+    // console.log(vertices);
 
     SHADER_BUFFER_vectex = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, SHADER_BUFFER_vectex);
@@ -1425,6 +1671,9 @@ loop_rotate_face_till_90_deg = e => {
             control = rubik.controls[i];
             break;
         }
+    
+    if (control == null)
+        return;
     
     // Set the finish flag
     is_rotation_finish = false;
