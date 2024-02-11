@@ -278,6 +278,26 @@
     
             
             <p>FPS: <span id="fps"></span></p>
+
+
+            <div class="dropdown">
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Predefined Rubik's Cube</p>
+    
+                <div class="dropdown-content">
+                    <div class="input-block">
+                        <label for="predefined-rubik">Predefined Rubik's Cube:</label>
+                        <select name="predefined-rubik" id="predefined-rubik" onchange="change_input(this)">
+                            <option value="none">none</option>
+                            <option value="random">random</option>
+                            <option value="2x2x2">2x2x2</option>
+                            <option value="3x3x3">3x3x3</option>
+                            <option value="4x4x4">4x4x4</option>
+                            <option value="5x5x5">5x5x5</option>
+                            <option value="3x3x3_mirror">3x3x3 Mirror</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
     
     
             <div class="dropdown">
@@ -571,23 +591,15 @@
     
 
             <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Shader Program</p>
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Engines</p>
     
                 <div class="dropdown-content">
                     <div class="input-block">
                         <label for="shader-program-version">Use higher precision shader program version:</label>
                         <input id="shader-program-version" type="checkbox" size="2">
                     </div>
-                </div>
-            </div>
-
-
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Generation Method</p>
-    
-                <div class="dropdown-content">
                     <div class="input-block">
-                        <label for="generation-method">Use method 2:</label>
+                        <label for="generation-method">Use old rubik generator (not support rubik's variant):</label>
                         <input id="generation-method" type="checkbox" size="2">
                     </div>
                 </div>

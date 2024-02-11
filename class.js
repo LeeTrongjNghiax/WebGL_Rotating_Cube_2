@@ -8,21 +8,6 @@ class Plane {
         this.color_name = color_name;
         this.center = center;
     }
-
-    get_length_of_normal_vector() {
-        return Math.sqrt(this.a * this.a + this.b * this.b + this.c * this.c);
-    }
-
-    distance_from_point(point = new Position()) {
-        return Math.abs(this.a * point.x + this.b * point.y + this.c * point.z + this.d) / this.get_length_of_normal_vector()
-    }
-
-    normalize() {
-        this.a /= this.get_length_of_normal_vector();
-        this.b /= this.get_length_of_normal_vector();
-        this.c /= this.get_length_of_normal_vector();
-        this.d /= this.get_length_of_normal_vector();
-    }
 }
 
 class Color {
@@ -58,15 +43,15 @@ class Vertex {
         this.absolute_position = absolute_position;
     }
 
+    get_relative_position() {
+        return this.relative_position;
+    }
+
     to_string() {
         return [
             ...this.relative_position.get_position(),
             ...this.color.get_color(),
         ];
-    }
-
-    get_relative_position() {
-        return this.relative_position;
     }
 }
 
@@ -85,16 +70,16 @@ class Face {
         return this.color;
     }
 
+    get_absolute_position() {
+        return this.absolute_position();
+    }
+
     to_string() {
         return [].concat(
             ...[].concat(
                 ...this.vertices.map(e => e.to_string())
             )
         );
-    }
-
-    get_absolute_position() {
-        return this.absolute_position();
     }
 }
 

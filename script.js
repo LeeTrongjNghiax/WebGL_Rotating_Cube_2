@@ -34,6 +34,7 @@ let SHADER_fragment;
 
 let ELEM_canvas;
 let ELEM_draw_mode;
+let ELEM_predefined_rubik;
 let ELEM_rotate_button;
 let ELEM_show_fps;
 
@@ -41,6 +42,7 @@ let ELEM_show_fps;
 // Inputs
 //
 
+let INP_predefined_rubik;
 let INP_vertex_shader_text;
 let INP_fragment_shader_text;
 let INP_rubik_size_x;
@@ -528,6 +530,9 @@ clear_all_data = () => {
 get_input_data = () => {
     ELEM_show_fps = document.querySelector("#fps");
     ELEM_canvas = document.querySelector('#game-surface');
+
+    ELEM_predefined_rubik = document.querySelector('#predefined-rubik');
+    INP_predefined_rubik = ELEM_predefined_rubik.options[ELEM_predefined_rubik.selectedIndex].value;
 
     INP_rubik_size_x = +document.querySelector("#size-x").value || 2;
     INP_rubik_size_y = +document.querySelector("#size-y").value || 2;
