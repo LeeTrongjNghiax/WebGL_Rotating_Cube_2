@@ -148,7 +148,7 @@ document.addEventListener("resize", () => {
     setup_webgl_canvas();
 });
 
-document.getElementById("toggle-theme").addEventListener('click', () => {
+document.querySelector("#toggle-theme").addEventListener('click', () => {
     if ( document.body.classList.contains("light-mode") ) 
         document.body.classList.replace("light-mode", "dark-mode");
     else
@@ -159,25 +159,33 @@ document.querySelector("#create").addEventListener("click", () => create_rubik_c
 
 document.querySelector("#toggle-rotate").addEventListener("click", e => {
     if (e.target.classList.contains("is_rotating")) {
+        e.target.classList.toggle("is_rotating");
+        e.target.classList.toggle("is_stop_rotating");
         stop();
-        e.target.classList.toggle("is_rotating");
-        e.target.classList.toggle("is_stop_rotating");
-        e.target.innerHTML = "Start animation";
+
+        document.querySelector("#play-icon").style.display = "initial";
+        document.querySelector("#pause-icon").style.display = "none";
     } else {
-        start();
         e.target.classList.toggle("is_stop_rotating");
         e.target.classList.toggle("is_rotating");
-        e.target.innerHTML = "Stop animation";
+        start();
+        
+        document.querySelector("#play-icon").style.display = "none";
+        document.querySelector("#pause-icon").style.display = "initial";
     }
 });
 
 document.querySelector("#scrambling").addEventListener("click", () => {
-    if (document.querySelector("#scrambling").innerHTML == "Start scrambling") {
+    if (document.querySelector("#border-play-icon").style.display != "none") {
         is_turning_randomly = true;
-        document.querySelector("#scrambling").innerHTML = "Stop scrambling"
+
+        document.querySelector("#border-play-icon").style.display = "none";
+        document.querySelector("#border-pause-icon").style.display = "initial";
     } else {
         is_turning_randomly = false;
-        document.querySelector("#scrambling").innerHTML = "Start scrambling"
+
+        document.querySelector("#border-play-icon").style.display = "initial";
+        document.querySelector("#border-pause-icon").style.display = "none";
     }
 });
 
@@ -201,15 +209,16 @@ document.querySelector("#toggle-control").addEventListener("click", e => {
 document.querySelector("#toggle-movement-control").addEventListener("click", e => {
     if (document.querySelector("#movement-controller").style.display == "none") {
 
-        document.querySelector("#movement-controller").style.display = "flex"
-        e.target.innerHTML = "Hide movement control";
-
+        document.querySelector("#movement-controller").style.display = "flex";
+        
+        document.querySelector("#show-icon").style.display = "none";
+        document.querySelector("#hide-icon").style.display = "initial";
     }
     else {
-
         document.querySelector("#movement-controller").style.display = "none"
-        e.target.innerHTML = "Show movement control";
         
+        document.querySelector("#show-icon").style.display = "initial";
+        document.querySelector("#hide-icon").style.display = "none";
     }
 });
 

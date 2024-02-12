@@ -264,11 +264,63 @@
     </datalist>
 
     <div class="button-block">
-        <button id="toggle-theme">Change theme</button>
-        <button id="create">Create rubik's cube</button>
-        <button id="toggle-rotate" class="is_stop_rotating" disabled>Start animation</button>
-        <button id="scrambling">Start scrambling</button>
-        <button id="toggle-movement-control" disabled>Hide movement control</button>
+        <button id="toggle-theme">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <path d="M349.852,343.15c-49.875,49.916-131.083,49.916-181,0c-49.916-49.918-49.916-131.125,0-181.021  c13.209-13.187,29.312-23.25,47.832-29.812c5.834-2.042,12.293-0.562,16.625,3.792c4.376,4.375,5.855,10.833,3.793,16.625  c-12.542,35.375-4,73.666,22.25,99.917c26.209,26.228,64.5,34.75,99.916,22.25c5.792-2.062,12.271-0.582,16.625,3.793  c4.376,4.332,5.834,10.812,3.771,16.625C373.143,313.838,363.06,329.941,349.852,343.15z M191.477,184.754  c-37.438,37.438-37.438,98.354,0,135.771c40,40.021,108.125,36.416,143-8.168c-35.959,2.25-71.375-10.729-97.75-37.084  c-26.375-26.354-39.333-61.771-37.084-97.729C196.769,179.796,194.039,182.192,191.477,184.754z"/>
+            </svg>
+        </button>
+        <button id="create">
+            <svg fill="#ffffff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500.554 500.554" xml:space="preserve">
+                <g>
+	                <path d="M324.782,277.035l-65.068,65.06l84.962,84.953c17.968,17.968,47.078,17.968,65.046,0 c17.974-17.974,17.982-47.077,0.014-65.068L324.782,277.035z"/>
+	                <path d="M125.819,208.207l50.672,50.672l65.068-65.067l-50.664-50.666l61.271-61.279c5.032-5.031,5.032-13.2,0-18.24L240.83,52.299 c-6.227-6.227-15.07-9.099-23.767-7.701l-97.945,15.7c-5.714,0.916-10.987,3.61-15.078,7.693l-4.333,4.341l-3.54-3.549
+		c-5.031-5.031-13.2-5.031-18.232,0L51.45,95.27c-5.039,5.031-5.039,13.2,0,18.232l3.54,3.548L3.774,168.258
+		c-5.031,5.031-5.031,13.2,0,18.232l62.771,62.771c5.031,5.031,13.2,5.031,18.232,0L125.819,208.207z"/>
+	                <path d="M467.096,113.758c-1.78-1.778-4.107-2.672-6.429-2.672c-2.322,0-4.651,0.894-6.429,2.672l-36.114,36.09
+		c-3.168,3.184-7.331,4.767-11.484,4.767c-4.154,0-8.315-1.584-11.485-4.767l-26.423-26.431c-3.068-3.028-4.759-7.167-4.759-11.477
+		s1.692-8.439,4.752-11.491l36.114-36.106c3.549-3.549,3.549-9.311,0-12.852c-8.237-8.229-19.132-12.461-30.103-12.461
+		c-8.535,0-17.114,2.562-24.521,7.795l-19.622,13.86c-18.652,13.161-30.228,34.148-31.454,56.946l-2.322,43.405L90.653,367.213
+		c-16.772,16.78-16.772,43.949,0,60.721c8.393,8.387,19.38,12.587,30.368,12.587c10.987,0,21.966-4.193,30.359-12.579
+		l206.186-206.176l43.389-2.322c22.789-1.22,43.769-12.796,56.938-31.448l13.868-19.628
+		C483.712,151.455,481.732,128.394,467.096,113.758z M123.149,413.453c-10.056,0-18.21-8.153-18.21-18.21
+		c0-10.055,8.153-18.208,18.21-18.208c10.055,0,18.208,8.153,18.208,18.208C141.357,405.3,133.204,413.453,123.149,413.453z"/>
+                </g>
+            </svg>
+        </button>
+        <button id="toggle-rotate" class="is_stop_rotating" disabled>
+            <svg id="play-icon" version="1.1" viewBox="0 0 128 128" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <polygon points="26.5,64 26.5,20.699 64,42.35 101.5,63.999 64,85.65 26.5,107.301 " style="fill:#ffffff;stroke-width:12;stroke-miterlimit:10;"/>
+            </svg>
+
+            <svg id="pause-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g>
+                    <rect height="320" width="79" x="128" y="96"/>
+                    <rect height="320" width="79" x="305" y="96"/>
+                </g>
+            </svg>
+        </button>
+        <button id="scrambling">
+            <svg id="border-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                    <path d="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm0,22A10,10,0,1,1,22,12,10.011,10.011,0,0,1,12,22Z"/>
+                    <path d="M16.173,10.3l-5.113-3.2A2,2,0,0,0,8,8.8V15.2a2,2,0,0,0,3.06,1.7l5.113-3.2a2,2,0,0,0,0-3.392ZM10,15.2V8.8L15.113,12Z"/>
+                </g>
+            </svg>
+
+            <svg id="border-pause-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM7 6h2v8H7V6zm4 0h2v8h-2V6z"/>
+            </svg>
+        </button>
+        <button id="toggle-movement-control" disabled>
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="hide-icon">
+                <path d="M12 19c.946 0 1.81-.103 2.598-.281l-1.757-1.757c-.273.021-.55.038-.841.038-5.351 0-7.424-3.846-7.926-5a8.642 8.642 0 0 1 1.508-2.297L4.184 8.305c-1.538 1.667-2.121 3.346-2.132 3.379a.994.994 0 0 0 0 .633C2.073 12.383 4.367 19 12 19zm0-14c-1.837 0-3.346.396-4.604.981L3.707 2.293 2.293 3.707l18 18 1.414-1.414-3.319-3.319c2.614-1.951 3.547-4.615 3.561-4.657a.994.994 0 0 0 0-.633C21.927 11.617 19.633 5 12 5zm4.972 10.558-2.28-2.28c.19-.39.308-.819.308-1.278 0-1.641-1.359-3-3-3-.459 0-.888.118-1.277.309L8.915 7.501A9.26 9.26 0 0 1 12 7c5.351 0 7.424 3.846 7.926 5-.302.692-1.166 2.342-2.954 3.558z" fill="#FFFFFF"/>
+            </svg>
+
+            <svg enable-version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="show-icon">
+                <path d="M16,7C9.934,7,4.798,10.776,3,16c1.798,5.224,6.934,9,13,9s11.202-3.776,13-9C27.202,10.776,22.066,7,16,7z" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
+                <circle cx="16" cy="16" fill="none" r="5" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
+            </svg>
+        </button>
         <button id="toggle-control">Show control</button>
     </div>
 
@@ -333,20 +385,32 @@
 
 
             <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Variants</p>
+                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Outer Layers Variants</p>
     
                 <div class="dropdown-content">
                     <div class="input-block">
-                        <label for="translate-x">Rubik Translate X:</label>
+                        <label for="translate-x">Translate X:</label>
                         <input id="translate-x" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4">
                     </div>
                     <div class="input-block">
-                        <label for="translate-y">Rubik Translate Y:</label>
+                        <label for="translate-y">Translate Y:</label>
                         <input id="translate-y" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4">
                     </div>
                     <div class="input-block">
-                        <label for="translate-z">Rubik Translate Z:</label>
+                        <label for="translate-z">Translate Z:</label>
                         <input id="translate-z" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4">
+                    </div>
+                    <div class="input-block">
+                        <label for="axis-rotation-x">Axis X rotation:</label>
+                        <input id="axis-rotation-x" type="number" min="-360" max="360" value="0" step="0.01" size="4">
+                    </div>
+                    <div class="input-block">
+                        <label for="axis-rotation-y">Axis Y rotation:</label>
+                        <input id="axis-rotation-y" type="number" min="-360" max="360" value="0" step="0.01" size="4">
+                    </div>
+                    <div class="input-block">
+                        <label for="axis-rotation-z">Axis Z rotation:</label>
+                        <input id="axis-rotation-z" type="number" min="-360" max="360" value="0" step="0.01" size="4">
                     </div>
                 </div>
             </div>

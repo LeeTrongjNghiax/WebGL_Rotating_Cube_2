@@ -6,6 +6,17 @@
     --all-color-transition-time: 0.25s;
 }
 
+svg {
+    width: 50px;
+    height: 50px;
+}
+
+#show-icon, 
+#pause-icon,
+#border-pause-icon {
+    display: none;
+}
+
 .light-mode,
 .light-mode button,
 .light-mode input,
@@ -22,6 +33,14 @@
     transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
 
+.light-mode button svg {
+    fill: var(--dark-color);
+}
+
+/* .light-mode #hide-icon path {
+    fill: var(--dark-color);
+} */
+
 .dark-mode,
 .dark-mode button,
 .dark-mode input,
@@ -37,6 +56,14 @@
     color: var(--light-color);
     transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
+
+.dark-mode button svg {
+    fill: var(--light-color);
+}
+
+/* .dark-mode #hide-icon path {
+    fill: var(--dark-color);
+} */
 
 *,
 button {
@@ -63,10 +90,10 @@ main {
 .button-block {
     width: 100%;
     display: flex;
-    gap: 1rem;
+    /* gap: 1rem; */
 }
 
-.button-block>button {
+.button-block > button {
     width: 100%;
     padding: 0.5rem;
 }
@@ -154,9 +181,9 @@ input {
 }
 
 @media (orientation: portrait) or (width < 760px) {
-    .button-block {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+    svg {
+        width: 30px;
+        height: 30px;
     }
     main {
         flex-direction: column;
