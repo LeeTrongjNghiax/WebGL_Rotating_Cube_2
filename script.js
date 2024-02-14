@@ -56,6 +56,10 @@ let INP_translate_x;
 let INP_translate_y;
 let INP_translate_z;
 
+let INP_axis_rotation_x;
+let INP_axis_rotation_y;
+let INP_axis_rotation_z;
+
 let INP_is_render_outer_cube;
 let INP_is_render_inner_outline_cube;
 let INP_is_render_inner_cube;
@@ -299,6 +303,10 @@ clear_all_data = () => {
     INP_translate_x = null;
     INP_translate_y = null;
     INP_translate_z = null;
+    
+    INP_axis_rotation_x = null;
+    INP_axis_rotation_y = null;
+    INP_axis_rotation_z = null;
 
     INP_is_render_outer_cube = null;
     INP_is_render_inner_outline_cube = null;
@@ -545,6 +553,10 @@ get_input_data = () => {
     INP_translate_x = +document.querySelector("#translate-x").value || 0;
     INP_translate_y = +document.querySelector("#translate-y").value || 0;
     INP_translate_z = +document.querySelector("#translate-z").value || 0;
+
+    INP_axis_rotation_x = +document.querySelector("#axis-rotation-x").value || 0;
+    INP_axis_rotation_y = +document.querySelector("#axis-rotation-y").value || 0;
+    INP_axis_rotation_z = +document.querySelector("#axis-rotation-z").value || 0;
 
     INP_is_render_outer_cube = document.querySelector("#render-outer-cube").checked;
     INP_is_render_inner_cube = document.querySelector("#render-inner-cube").checked;
