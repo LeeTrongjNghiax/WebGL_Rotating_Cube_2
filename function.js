@@ -48,10 +48,21 @@ function normalize(out, a) {
       //TODO: evaluate use of glm_invsqrt here?
         len = 1 / Math.sqrt(len);
     }
+    // console.log( len );
     out[0] = a[0] * len;
     out[1] = a[1] * len;
     out[2] = a[2] * len;
     return out;
+}
+
+function length(a) {
+    let x = a[0];
+    let y = a[1];
+    let z = a[2];
+    let len = x * x + y * y + z * z;
+    
+    if (len > 0)
+        return Math.sqrt(len);
 }
 
 function cross(out, a, b) {
@@ -69,7 +80,7 @@ function cross(out, a, b) {
 
 function dot(a, b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  }
+}
 
 function get_random_int(min, max) {
     min = Math.ceil(min);
@@ -134,6 +145,39 @@ function identity(out) {
     out[15] = 1;
     return out;
 }
+
+function invert_quat(out, a) {
+    let a0 = a[0],
+      a1 = a[1],
+      a2 = a[2],
+      a3 = a[3];
+    let dot = a0 * a0 + a1 * a1 + a2 * a2 + a3 * a3;
+    let invDot = dot ? 1.0 / dot : 0;
+    // TODO: Would be faster to return [0,0,0,0] immediately if dot == 0
+    out[0] = -a0 * invDot;
+    out[1] = -a1 * invDot;
+    out[2] = -a2 * invDot;
+    out[3] = a3 * invDot;
+    return out;
+  }
+
+function fromEuler(out, x, y, z) {
+    let halfToRad = (0.5 * Math.PI) / 180.0;
+    x *= halfToRad;
+    y *= halfToRad;
+    z *= halfToRad;
+    let sx = Math.sin(x);
+    let cx = Math.cos(x);
+    let sy = Math.sin(y);
+    let cy = Math.cos(y);
+    let sz = Math.sin(z);
+    let cz = Math.cos(z);
+    out[0] = sx * cy * cz - cx * sy * sz;
+    out[1] = cx * sy * cz + sx * cy * sz;
+    out[2] = cx * cy * sz - sx * sy * cz;
+    out[3] = cx * cy * cz + sx * sy * sz;
+    return out;
+  }
 
 function rotateX(out, a, b, rad) {
     let p = [],
@@ -246,6 +290,22 @@ function rotate(out, a, rad, axis) {
     }
     return out;
 }
+
+function multiply_quat(out, a, b) {
+    let ax = a[0],
+      ay = a[1],
+      az = a[2],
+      aw = a[3];
+    let bx = b[0],
+      by = b[1],
+      bz = b[2],
+      bw = b[3];
+    out[0] = ax * bw + aw * bx + ay * bz - az * by;
+    out[1] = ay * bw + aw * by + az * bx - ax * bz;
+    out[2] = az * bw + aw * bz + ax * by - ay * bx;
+    out[3] = aw * bw - ax * bx - ay * by - az * bz;
+    return out;
+  }
 
 function multiply(out, a, b) {
     var a00 = a[0],

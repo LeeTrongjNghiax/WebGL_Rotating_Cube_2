@@ -764,17 +764,6 @@ create_sticker_planes = () => {
     planes_y = [];
     planes_z = [];
 
-    MAT_plane_matrix = new Float32Array(16);
-    MAT_plane_matrix[0] = 1;
-    MAT_plane_matrix[1] = 0;
-    MAT_plane_matrix[2] = 0;
-    MAT_plane_matrix[3] = 0;
-    MAT_plane_matrix[4] = 1;
-    MAT_plane_matrix[5] = 0;
-    MAT_plane_matrix[6] = 0;
-    MAT_plane_matrix[7] = 0;
-    MAT_plane_matrix[8] = 1;
-
     for (i = start_x; i <= end_x; i += 1)
         for (i2 = -1; i2 < 2; i2 += 2) {
             //
@@ -1171,17 +1160,6 @@ create_inner_cube_planes = () => {
     planes_y = [];
     planes_z = [];
 
-    MAT_plane_matrix = new Float32Array(16);
-    MAT_plane_matrix[0] = 1;
-    MAT_plane_matrix[1] = 0;
-    MAT_plane_matrix[2] = 0;
-    MAT_plane_matrix[3] = 0;
-    MAT_plane_matrix[4] = 1;
-    MAT_plane_matrix[5] = 0;
-    MAT_plane_matrix[6] = 0;
-    MAT_plane_matrix[7] = 0;
-    MAT_plane_matrix[8] = 1;
-
     for (i = start_x; i <= end_x; i += 1)
         for (i2 = -1; i2 < 2; i2 += 2) {
             if ((i == start_x && i2 == -1) || (i == end_x && i2 == 1))
@@ -1438,6 +1416,56 @@ create_inner_cube_planes = () => {
 }
 
 create_vertex_base_on_planes = () => {
+    let quat = new Float32Array(4);
+    fromEuler(quat, INP_axis_rotation_z, INP_axis_rotation_y, INP_axis_rotation_z);
+
+    let inverted_quat = new Float32Array(4);
+    invert_quat(inverted_quat, quat);
+
+    let x_axis_vector = new Float32Array(4);
+    x_axis_vector[0] = 1;
+    x_axis_vector[1] = 0;
+    x_axis_vector[2] = 0;
+    x_axis_vector[3] = 1;
+
+    let y_axis_vector = new Float32Array(4);
+    y_axis_vector[0] = 0;
+    y_axis_vector[1] = 1;
+    y_axis_vector[2] = 0;
+    y_axis_vector[3] = 1;
+
+    let z_axis_vector = new Float32Array(4);
+    z_axis_vector[0] = 0;
+    z_axis_vector[1] = 0;
+    z_axis_vector[2] = 1;
+    z_axis_vector[3] = 1;
+
+    let rotated_x_axis_vector = new Float32Array(4);
+    let rotated_y_axis_vector = new Float32Array(4);
+    let rotated_z_axis_vector = new Float32Array(4);
+
+    multiply_quat(rotated_x_axis_vector, quat, x_axis_vector);
+    multiply_quat(rotated_x_axis_vector, rotated_x_axis_vector, inverted_quat);
+    
+    multiply_quat(rotated_y_axis_vector, quat, y_axis_vector);
+    multiply_quat(rotated_y_axis_vector, rotated_y_axis_vector, inverted_quat);
+    
+    multiply_quat(rotated_z_axis_vector, quat, z_axis_vector);
+    multiply_quat(rotated_z_axis_vector, rotated_z_axis_vector, inverted_quat);
+
+    MAT_plane_matrix = new Float32Array(9);
+    MAT_plane_matrix[0] = round_to( rotated_x_axis_vector[0] );
+    MAT_plane_matrix[1] = round_to( rotated_x_axis_vector[1] );
+    MAT_plane_matrix[2] = round_to( rotated_x_axis_vector[2] );
+    MAT_plane_matrix[3] = round_to( rotated_y_axis_vector[0] );
+    MAT_plane_matrix[4] = round_to( rotated_y_axis_vector[1] );
+    MAT_plane_matrix[5] = round_to( rotated_y_axis_vector[2] );
+    MAT_plane_matrix[6] = round_to( rotated_z_axis_vector[0] );
+    MAT_plane_matrix[7] = round_to( rotated_z_axis_vector[1] );
+    MAT_plane_matrix[8] = round_to( rotated_z_axis_vector[2] );
+
+    console.log(MAT_plane_matrix);
+
     if (INP_is_render_outer_cube)
         create_sticker_planes();
 
