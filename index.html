@@ -370,11 +370,11 @@
                     </div>
                     <div class="input-block">
                         <label for="length">Rubik Length:</label>
-                        <input id="length" type="number" min="0" max="10" value="0.99999" step="0.1" size="4">
+                        <input id="length" type="number" min="0" max="10" value="0.9999" step="0.1" size="4">
                     </div>
                     <div class="input-block">
                         <label for="sticker-gap">Sticker gap:</label>
-                        <input id="sticker-gap" type="number" min="-10" max="10" value="0.01" step="0.01" size="4">
+                        <input id="sticker-gap" type="number" min="-10" max="10" value="0" step="0.01" size="4">
                     </div>
                     <div class="input-block">
                         <label for="sticker-size">Sticker size:</label>
@@ -401,15 +401,15 @@
                         <input id="translate-z" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4">
                     </div>
                     <div class="input-block">
-                        <label for="axis-rotation-x">Axis X rotation:</label>
+                        <label for="axis-rotation-x">Axis X rotation (degree):</label>
                         <input id="axis-rotation-x" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
-                        <label for="axis-rotation-y">Axis Y rotation:</label>
-                        <input id="axis-rotation-y" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
+                        <label for="axis-rotation-y">Axis Y rotation (degree):</label>
+                        <input id="axis-rotation-y" type="number" min="-360" max="360" value="-28.8" step="1" size="4" onchange="create_rubik_cube()">
                     </div>
                     <div class="input-block">
-                        <label for="axis-rotation-z">Axis Z rotation:</label>
+                        <label for="axis-rotation-z">Axis Z rotation (degree):</label>
                         <input id="axis-rotation-z" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
                     </div>
                 </div>
@@ -449,7 +449,7 @@
                     </div>
                     <div class="input-block">
                         <label for="camera-z">Camera position Z:</label>
-                        <input id="camera-z" type="number" min="-100" max="100" value="-10" size="2">
+                        <input id="camera-z" type="number" min="-100" max="100" value="-12" size="2">
                     </div>
                     <div class="input-block">
                         <label for="look-at-x">Camera look at X:</label>
@@ -664,7 +664,7 @@
                     </div>
                     <div class="input-block">
                         <label for="generation-method">Use old rubik generator (not support rubik's variant):</label>
-                        <input id="generation-method" type="checkbox" size="2">
+                        <input id="generation-method" type="checkbox" size="2" checked>
                     </div>
                 </div>
             </div>
