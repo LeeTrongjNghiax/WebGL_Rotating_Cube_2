@@ -717,7 +717,7 @@ init_vertex_cubie_face = () => {
     faces = [];
 }
 
-add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
+add_vertex_from_3_intersected_planes = (i, j, k, plane, i_center = i, j_center = j, k_center = k) => {
     plane_equation = new Float32Array(9);
     plane_equation[0] = planes_x[i].a;
     plane_equation[3] = planes_x[i].b;
@@ -743,6 +743,14 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
 
     transformMat3(result_vector, d_vector, inverse);
 
+    // for (let i3 = 0; i3 < rubik.controls.length; i3++) {
+    //     rubik.controls[i3].check_if_control_this_vertex(new Position(
+    //         result_vector[0],
+    //         result_vector[1],
+    //         result_vector[2]
+    //     ));
+    // }
+
     sub_vertices.push(
         new Vertex(
             new Position(
@@ -763,7 +771,7 @@ create_sticker_planes = () => {
     planes_x = [];
     planes_y = [];
     planes_z = [];
-
+    
     for (i = start_x; i <= end_x; i += 1)
         for (i2 = -1; i2 < 2; i2 += 2) {
             //
@@ -1122,12 +1130,7 @@ create_sticker_planes = () => {
             }
         }
 
-    // console.log(planes_x);
-    // console.log(planes_y);
-    // console.log(planes_z);
-
     sub_vertices.sort((a, b) => a.color_name.localeCompare(b.color_name));
-    // console.log(sub_vertices);
 
     number_of_face = sub_vertices.length / number_of_vertex_per_face;
 
@@ -1458,7 +1461,7 @@ create_inner_cube_planes = () => {
 
 create_vertex_base_on_planes = () => {
     let quat = new Float32Array(4);
-    fromEuler(quat, INP_axis_rotation_z, INP_axis_rotation_y, INP_axis_rotation_z);
+    fromEuler(quat, INP_axis_rotation_x, INP_axis_rotation_y, INP_axis_rotation_z);
 
     let inverted_quat = new Float32Array(4);
     invert_quat(inverted_quat, quat);
@@ -1527,37 +1530,6 @@ init_rubik_parameter = () => {
     vertices = [];
     vertice_indices = [];
     count = 0;
-
-    if (INP_generation_method) {
-        create_vertex_base_on_rendering();
-        max_distance = INP_sticker_gap;
-    }
-    else {
-        create_vertex_base_on_planes();
-    }
-
-    vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
-
-    // Remove abundant attributes
-    rubik.cubies.map(cubie => {
-        cubie.faces.map(face => {
-            face.color = undefined;
-            delete (face.color);
-
-            face.absolute_position = undefined;
-            delete (face.absolute_position);
-
-            face.vertices.map(vertex => {
-                vertex.absolute_position = undefined;
-                delete (vertex.absolute_position);
-
-                vertex.color_name = undefined;
-                delete (vertex.color_name);
-            })
-        });
-    });
-
-    vertice_indices_length = vertice_indices.length;
 }
 
 create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", distance = DELTA, have_all_cubies = false) => {
@@ -1693,6 +1665,39 @@ create_rubik_control_set = () => {
     create_rubik_control(0, 0, [INP_rubik_size_z, INP_rubik_size_x, INP_rubik_size_y], [null, null, 1], [null, null, "z"], "z", INP_rubik_size_z / 2, true);
 }
 
+create_vertices = () => {
+    if (INP_generation_method) {
+        create_vertex_base_on_rendering();
+        max_distance = INP_sticker_gap;
+    }
+    else {
+        create_vertex_base_on_planes();
+    }
+
+    vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
+
+    // Remove abundant attributes
+    rubik.cubies.map(cubie => {
+        cubie.faces.map(face => {
+            face.color = undefined;
+            delete (face.color);
+
+            face.absolute_position = undefined;
+            delete (face.absolute_position);
+
+            face.vertices.map(vertex => {
+                vertex.absolute_position = undefined;
+                delete (vertex.absolute_position);
+
+                vertex.color_name = undefined;
+                delete (vertex.color_name);
+            })
+        });
+    });
+
+    vertice_indices_length = vertice_indices.length;
+}
+
 add_control_set_to_html = () => {
     document.querySelector("#movement-controller").replaceChildren();
 
@@ -1707,8 +1712,6 @@ add_control_set_to_html = () => {
 }
 
 add_buffer_data = () => {
-    // console.log(vertices);
-
     SHADER_BUFFER_vectex = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, SHADER_BUFFER_vectex);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -1927,7 +1930,7 @@ loop_rotate_face_till_90_deg = e => {
         );
         
         // If it had rotated to the pre-determinated arc
-        if (Math.abs(rad - control.rad) < EPSILON) {
+        if (Math.abs(rad - control.rad) < Number.EPSILON) {
             DEBUG_start_time = performance.now()
 
             // Rotate the coressponding face in the rubik object

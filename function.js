@@ -1,5 +1,3 @@
-const EPSILON = 0.000001;
-
 function create_plane_from_3_points(a = new Position(), b = new Position(), c = new Position()) {
     let v1 = new Float32Array(3);
     v1[0] = b.x - a.x;
@@ -96,10 +94,10 @@ function axis_string_to_number(string) {
 }
 
 function round_to(num) {
-    if (Math.abs(num - 1) < EPSILON)
+    if (Math.abs(num - 1) < Number.EPSILON)
         return 1;
     
-    if (Math.abs(num - 0) < EPSILON)
+    if (Math.abs(num - 0) < Number.EPSILON)
         return 0;
 
     return num;
@@ -245,7 +243,7 @@ function rotate(out, a, rad, axis) {
         b21 = void 0,
         b22 = void 0;
 
-    if (Math.abs(len) < EPSILON) {
+    if (Math.abs(len) < Number.EPSILON) {
         return null;
     }
 
@@ -376,7 +374,7 @@ function lookAt(out, eye, center, up) {
     var centery = center[1];
     var centerz = center[2];
 
-    if (Math.abs(eyex - centerx) < EPSILON && Math.abs(eyey - centery) < EPSILON && Math.abs(eyez - centerz) < EPSILON) {
+    if (Math.abs(eyex - centerx) < Number.EPSILON && Math.abs(eyey - centery) < Number.EPSILON && Math.abs(eyez - centerz) < Number.EPSILON) {
         return identity(out);
     }
 
@@ -468,7 +466,7 @@ function fromRotation(out, rad, axis) {
       z = axis[2];
     let len = Math.hypot(x, y, z);
     let s, c, t;
-    if (len < EPSILON) {
+    if (len < Number.EPSILON) {
       return null;
     }
     len = 1 / len;

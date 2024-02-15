@@ -110,6 +110,24 @@ class Control {
         this.upper_limit = upper_limit;
         this.lower_limit = lower_limit;
     }
+
+    check_if_control_this_vertex(vertex = new Position()) {
+        let dis1 = get_dot_product_of_plane_and_vector(
+            vertex.get_position(),
+            new Plane(this.axis.x, this.axis.y, this.axis.z, this.upper_limit)
+        );
+        let dis2 = get_dot_product_of_plane_and_vector(
+            vertex.get_position(),
+            new Plane(this.axis.x, this.axis.y, this.axis.z, this.lower_limit)
+        );
+
+        let sign1 = Math.sign(dis1);
+        let sign2 = Math.sign(dis2);
+
+        console.log(this.name + " " + vertex.get_position() + " " + (sign1 != sign2));
+
+        return sign1 != sign2;
+    }
 }
 
 class Rubik {
