@@ -1530,6 +1530,8 @@ init_rubik_parameter = () => {
     vertices = [];
     vertice_indices = [];
     count = 0;
+
+    create_vertices();
 }
 
 create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0, 0], rotation_names = ["", "", ""], axis = "x", distance = DELTA, have_all_cubies = false) => {
