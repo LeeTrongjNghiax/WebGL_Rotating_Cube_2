@@ -1932,7 +1932,7 @@ loop_rotate_face_till_90_deg = e => {
         );
         
         // If it had rotated to the pre-determinated arc
-        if (Math.abs(rad - control.rad) < Number.EPSILON) {
+        if (Math.abs(rad - control.rad) < EPSILON) {
             DEBUG_start_time = performance.now()
 
             // Rotate the coressponding face in the rubik object
