@@ -731,6 +731,10 @@ init_vertex_cubie_face = () => {
 }
 
 add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
+    let i_center = 0;
+    let j_center = 0;
+    let k_center = 0;
+
     plane_equation = new Float32Array(9);
     plane_equation[0] = planes_x[i].a;
     plane_equation[3] = planes_x[i].b;
@@ -757,11 +761,30 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
     transformMat3(result_vector, d_vector, inverse);
 
     for (i3 = 0; i3 < rubik.controls.length; i3++) {
-        rubik.controls[i3].check_if_control_this_vertex(new Position(
+        if ( rubik.controls[i3].check_if_control_this_vertex(new Position(
             result_vector[0],
             result_vector[1],
             result_vector[2]
-        ));
+        ))) {
+            if (
+                rubik.controls[i3].axis.x != 0 && 
+                rubik.controls[i3].axis.y == 0 && 
+                rubik.controls[i3].axis.z == 0 
+            )
+                i_center = rubik.controls[i3].index;
+            if (
+                rubik.controls[i3].axis.x == 0 && 
+                rubik.controls[i3].axis.y != 0 && 
+                rubik.controls[i3].axis.z == 0 
+            )
+                j_center = rubik.controls[i3].index;
+            if (
+                rubik.controls[i3].axis.x == 0 && 
+                rubik.controls[i3].axis.y == 0 && 
+                rubik.controls[i3].axis.z != 0 
+            )
+                k_center = rubik.controls[i3].index;
+        }
     }
 
     sub_vertices.push(
@@ -771,8 +794,8 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
                 result_vector[1],
                 result_vector[2]
             ),
-            plane.color,
-            plane.color_name + `x_${planes_x[i].center}_y_${planes_y[j].center}_z_${planes_z[k].center}`, 
+            plane.color, 
+            plane.color_name + `x_${i_center}_y_${j_center}_z_${k_center}`, 
             new Position(planes_x[i].center, planes_y[j].center, planes_z[k].center)
         ), 
     );
@@ -1582,7 +1605,7 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
                     suffix + rotation_name,
                     new Position(plane1.a, plane1.b, plane1.c),
                     QUARTER_OF_CIRCLE * direction,
-                    plane1.d, plane2.d
+                    plane1.d, plane2.d, i
                 )
             );
             rubik.add_control(
@@ -1590,7 +1613,7 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
                     suffix + rotation_name + ROTATE_QUARTER_OF_CIRCLE_REVERSE_SYMBOL,
                     new Position(plane1.a, plane1.b, plane1.c),
                     -QUARTER_OF_CIRCLE * direction,
-                    plane1.d, plane2.d
+                    plane1.d, plane2.d, i
                 )
             );
         }
@@ -1600,7 +1623,7 @@ create_rubik_control = (start = 0, end = 0, size = [0, 0, 0], directions = [0, 0
                 suffix + rotation_name + "2",
                 new Position(plane1.a, plane1.b, plane1.c),
                 HALF_OF_CIRCLE * direction,
-                plane1.d, plane2.d
+                plane1.d, plane2.d, i
             )
         );
     }
@@ -1611,9 +1634,9 @@ create_rubik_control_set = () => {
     create_rubik_control(start_y, end_y, [INP_rubik_size_y, INP_rubik_size_x, INP_rubik_size_z], [-1,  1, -1], ["D", "U", "E"], "y");
     create_rubik_control(start_z, end_z, [INP_rubik_size_z, INP_rubik_size_x, INP_rubik_size_y], [ 1, -1,  1], ["F", "B", "S"], "z");
 
-    create_rubik_control(0, 0, [INP_rubik_size_x, INP_rubik_size_y, INP_rubik_size_z], [null, null, 1], [null, null, "x"], "x", INP_rubik_size_x / 2, true);
-    create_rubik_control(0, 0, [INP_rubik_size_y, INP_rubik_size_x, INP_rubik_size_z], [null, null, 1],  [null, null, "y"], "y", INP_rubik_size_y / 2, true);
-    create_rubik_control(0, 0, [INP_rubik_size_z, INP_rubik_size_x, INP_rubik_size_y], [null, null, 1], [null, null, "z"], "z", INP_rubik_size_z / 2, true);
+    // create_rubik_control(0, 0, [INP_rubik_size_x, INP_rubik_size_y, INP_rubik_size_z], [null, null, 1], [null, null, "x"], "x", INP_rubik_size_x / 2, true);
+    // create_rubik_control(0, 0, [INP_rubik_size_y, INP_rubik_size_x, INP_rubik_size_z], [null, null, 1], [null, null, "y"], "y", INP_rubik_size_y / 2, true);
+    // create_rubik_control(0, 0, [INP_rubik_size_z, INP_rubik_size_x, INP_rubik_size_y], [null, null, 1], [null, null, "z"], "z", INP_rubik_size_z / 2, true);
 }
 
 create_vertices = () => {

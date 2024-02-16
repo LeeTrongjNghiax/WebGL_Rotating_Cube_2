@@ -103,28 +103,30 @@ class Cubie {
 }
 
 class Control {
-    constructor(name, axis = new Position(), rad = Math.PI / 2, upper_limit = 0, lower_limit = 0) {
+    constructor(name, axis = new Position(), rad = Math.PI / 2, upper_limit = 0, lower_limit = 0, index) {
         this.name = name;
         this.axis = axis;
         this.rad = rad;
         this.upper_limit = upper_limit;
         this.lower_limit = lower_limit;
+        this.index = index;
     }
 
     check_if_control_this_vertex(vertex = new Position()) {
         let dis1 = get_dot_product_of_plane_and_vector(
             vertex,
-            new Plane(this.axis.x, this.axis.y, this.axis.z, this.upper_limit)
+            new Plane(this.axis.x, this.axis.y, this.axis.z, this.lower_limit)
         );
         let dis2 = get_dot_product_of_plane_and_vector(
             vertex,
-            new Plane(this.axis.x, this.axis.y, this.axis.z, this.lower_limit)
+            new Plane(this.axis.x, this.axis.y, this.axis.z, this.upper_limit)
         );
 
         let sign1 = Math.sign(dis1);
         let sign2 = Math.sign(dis2);
 
-        // console.log(sign1 != sign2);
+        // if (sign1 != sign2) 
+        //     console.log("Controller " + this.name + " " + this.index + " " + this.axis.x + " " + this.axis.y + " " + this.axis.z);
 
         return sign1 != sign2;
     }
