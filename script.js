@@ -787,6 +787,9 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
         }
     }
 
+    // console.log("Center " + i_center + " " + j_center + " " + k_center);
+    // console.log("-----------------------------------");
+
     sub_vertices.push(
         new Vertex(
             new Position(
@@ -1650,23 +1653,28 @@ create_vertices = () => {
     vertices = [].concat(...rubik.cubies.map(cubie => cubie.to_string()));
 
     // Remove abundant attributes
-    rubik.cubies.map(cubie => {
-        cubie.faces.map(face => {
-            face.color = undefined;
-            delete (face.color);
+    
+    rubik.cubies.map(
+        cubie => {
+            cubie.faces.map(face => {
+                face.color = undefined;
+                delete (face.color);
 
-            face.absolute_position = undefined;
-            delete (face.absolute_position);
+                face.absolute_position = undefined;
+                delete (face.absolute_position);
 
-            face.vertices.map(vertex => {
-                vertex.absolute_position = undefined;
-                delete (vertex.absolute_position);
+                face.vertices.map(vertex => {
+                    vertex.absolute_position = undefined;
+                    delete (vertex.absolute_position);
 
-                vertex.color_name = undefined;
-                delete (vertex.color_name);
-            })
-        });
-    });
+                    vertex.color_name = undefined;
+                    delete (vertex.color_name);
+                })
+            });
+        }
+    );
+
+    rubik.cubies = rubik.cubies.filter(cubie => cubie.faces.length != 0);
 
     vertice_indices_length = vertice_indices.length;
 }
