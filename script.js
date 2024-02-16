@@ -156,6 +156,20 @@ let MAT_z_rotation;
 let MAT_identity;
 
 //
+// Quaternions
+//
+
+let quat;
+let inverted_quat;
+let x_axis_vector;
+let y_axis_vector;
+let z_axis_vector;
+
+let rotated_x_axis_vector;
+let rotated_y_axis_vector;
+let rotated_z_axis_vector;
+
+//
 // Index
 //
 
@@ -273,6 +287,7 @@ let plane_lower_limit;
 
 let DEBUG_start_time;
 let DEBUG_end_time;
+let DEBUG_text;
 
 clear_all_data = () => {
     SHADER_vertex = null;
@@ -715,7 +730,7 @@ init_vertex_cubie_face = () => {
     faces = [];
 }
 
-add_vertex_from_3_intersected_planes = (i, j, k, plane, i_center = i, j_center = j, k_center = k) => {
+add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
     plane_equation = new Float32Array(9);
     plane_equation[0] = planes_x[i].a;
     plane_equation[3] = planes_x[i].b;
@@ -741,8 +756,7 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane, i_center = i, j_center =
 
     transformMat3(result_vector, d_vector, inverse);
 
-    for (let i3 = 0; i3 < rubik.controls.length; i3++) {
-        console.log();
+    for (i3 = 0; i3 < rubik.controls.length; i3++) {
         rubik.controls[i3].check_if_control_this_vertex(new Position(
             result_vector[0],
             result_vector[1],
@@ -758,7 +772,7 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane, i_center = i, j_center =
                 result_vector[2]
             ),
             plane.color,
-            plane.color_name + `_x_${planes_x[i].center}_y_${planes_y[j].center}_z_${planes_z[k].center}`, 
+            plane.color_name + `x_${planes_x[i].center}_y_${planes_y[j].center}_z_${planes_z[k].center}`, 
             new Position(planes_x[i].center, planes_y[j].center, planes_z[k].center)
         ), 
     );
@@ -1399,33 +1413,33 @@ create_inner_cube_planes = () => {
 }
 
 create_vertex_base_on_planes = () => {
-    let quat = new Float32Array(4);
+    quat = new Float32Array(4);
     fromEuler(quat, INP_axis_rotation_x, INP_axis_rotation_y, INP_axis_rotation_z);
 
-    let inverted_quat = new Float32Array(4);
+    inverted_quat = new Float32Array(4);
     invert_quat(inverted_quat, quat);
 
-    let x_axis_vector = new Float32Array(4);
+    x_axis_vector = new Float32Array(4);
     x_axis_vector[0] = 1;
     x_axis_vector[1] = 0;
     x_axis_vector[2] = 0;
     x_axis_vector[3] = 1;
 
-    let y_axis_vector = new Float32Array(4);
+    y_axis_vector = new Float32Array(4);
     y_axis_vector[0] = 0;
     y_axis_vector[1] = 1;
     y_axis_vector[2] = 0;
     y_axis_vector[3] = 1;
 
-    let z_axis_vector = new Float32Array(4);
+    z_axis_vector = new Float32Array(4);
     z_axis_vector[0] = 0;
     z_axis_vector[1] = 0;
     z_axis_vector[2] = 1;
     z_axis_vector[3] = 1;
 
-    let rotated_x_axis_vector = new Float32Array(4);
-    let rotated_y_axis_vector = new Float32Array(4);
-    let rotated_z_axis_vector = new Float32Array(4);
+    rotated_x_axis_vector = new Float32Array(4);
+    rotated_y_axis_vector = new Float32Array(4);
+    rotated_z_axis_vector = new Float32Array(4);
 
     multiply_quat(rotated_x_axis_vector, quat, x_axis_vector);
     multiply_quat(rotated_x_axis_vector, rotated_x_axis_vector, inverted_quat);
@@ -1818,7 +1832,7 @@ orbit_around_rubik = () => {
 }
 
 loop_rotate_face_till_90_deg = e => {
-    let DEBUG_text = "";
+    DEBUG_text = "";
 
     disable_rotate_function();
     
