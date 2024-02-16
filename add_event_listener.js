@@ -133,6 +133,7 @@ create_rubik_cube = () => {
     setup_webgl_canvas();
     init_rubik_parameter();
     create_rubik_control_set();
+    create_vertices();
     add_control_set_to_html();
     add_buffer_data();
     get_uniforms_in_shader();
