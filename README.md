@@ -7,6 +7,7 @@
 
 ## Knowledges
 - Basic knowlegde of HTML, CSS and JavaScript
+- Basic knowledge of canvas, 2d game development with collision detection, frame rate, game loop and spawning entities
 - Basic knowledge of 
   - WebGL API
   - Perspective, clipping planes, field of view, far place, near place
