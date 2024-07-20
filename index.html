@@ -2,684 +2,675 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>WebGL Rotating Cube 2</title>
+  <title>WebGL Rotating Cube 2</title>
 
-    <script id="vs" type="x-shader/x-vertex">
-        precision lowp float;
+  <script id="vs" type="x-shader/x-vertex">
+    precision lowp float;
 
-        attribute vec3 vertPosition; 
-        attribute vec4 vertColor; 
-        
-        varying lowp vec4 fragColor; 
-        
-        uniform lowp float pointSize; 
-        uniform mat4 mWorld; 
-        uniform mat4 mView; 
-        uniform mat4 mProj; 
+    attribute vec3 vertPosition; 
+    attribute vec4 vertColor; 
+    
+    varying lowp vec4 fragColor; 
+    
+    uniform lowp float pointSize; 
+    uniform mat4 mWorld; 
+    uniform mat4 mView; 
+    uniform mat4 mProj; 
 
-        uniform vec3 axis_vec; 
-        uniform float rad; 
-        uniform vec4 plane1; 
-        uniform vec4 plane2; 
+    uniform vec3 axis_vec; 
+    uniform float rad; 
+    uniform vec4 plane1; 
+    uniform vec4 plane2; 
 
-        mat4 create_identity_matrix() {
-            mat4 iden;
-            iden[0] = vec4(1.0,  .0,  .0,  .0);
-            iden[1] = vec4( .0, 1.0,  .0,  .0);
-            iden[2] = vec4( .0,  .0, 1.0,  .0);
-            iden[3] = vec4( .0,  .0,  .0, 1.0);
-            return iden;
-        }
+    mat4 create_identity_matrix() {
+      mat4 iden;
+      iden[0] = vec4(1.0,  .0,  .0,  .0);
+      iden[1] = vec4( .0, 1.0,  .0,  .0);
+      iden[2] = vec4( .0,  .0, 1.0,  .0);
+      iden[3] = vec4( .0,  .0,  .0, 1.0);
+      return iden;
+    }
 
-        float get_dot_product_of_plane_and_vector(vec3 point, vec4 plane) {
-            return dot(point.xyz, plane.xyz) + plane.w;
-        }
+    float get_dot_product_of_plane_and_vector(vec3 point, vec4 plane) {
+      return dot(point.xyz, plane.xyz) + plane.w;
+    }
 
-        bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
-            float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
-            float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
+    bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
+      float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
+      float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
 
-            float sign1 = sign(dis1);
-            float sign2 = sign(dis2);
+      float sign1 = sign(dis1);
+      float sign2 = sign(dis2);
 
-            if (sign1 != sign2)
-                return true;
+      if (sign1 != sign2)
+        return true;
 
-            return false;
-        }
+      return false;
+    }
 
-        mat4 create_rotation_matrix_around_axis(vec3 axis, float rad) {
-            vec3 unit_vec = axis;
+    mat4 create_rotation_matrix_around_axis(vec3 axis, float rad) {
+      vec3 unit_vec = axis;
 
-            // Check if axis is a unit vector
-            if (length(axis) > 1.0)
-                // It not then normalize it
-                unit_vec = normalize(axis);
+      // Check if axis is a unit vector
+      if (length(axis) > 1.0)
+        // It not then normalize it
+        unit_vec = normalize(axis);
 
-            float sin_rad = sin(rad);
-            float cos_rad = cos(rad);
-            float one_minus_cos_rad = 1.0 - cos_rad;
-            float x_sin_rad = unit_vec.x * sin_rad;
-            float y_sin_rad = unit_vec.y * sin_rad;
-            float z_sin_rad = unit_vec.z * sin_rad;
-            float x_y = unit_vec.x * unit_vec.y;
-            float y_z = unit_vec.y * unit_vec.z;
-            float x_z = unit_vec.x * unit_vec.z;
+      float sin_rad = sin(rad);
+      float cos_rad = cos(rad);
+      float one_minus_cos_rad = 1.0 - cos_rad;
+      float x_sin_rad = unit_vec.x * sin_rad;
+      float y_sin_rad = unit_vec.y * sin_rad;
+      float z_sin_rad = unit_vec.z * sin_rad;
+      float x_y = unit_vec.x * unit_vec.y;
+      float y_z = unit_vec.y * unit_vec.z;
+      float x_z = unit_vec.x * unit_vec.z;
 
-            float r00 = cos_rad + (unit_vec.x * unit_vec.x) * one_minus_cos_rad;
-            float r01 = x_y * one_minus_cos_rad - z_sin_rad;
-            float r02 = x_z * one_minus_cos_rad + y_sin_rad;
+      float r00 = cos_rad + (unit_vec.x * unit_vec.x) * one_minus_cos_rad;
+      float r01 = x_y * one_minus_cos_rad - z_sin_rad;
+      float r02 = x_z * one_minus_cos_rad + y_sin_rad;
 
-            float r10 = x_y * one_minus_cos_rad + z_sin_rad;
-            float r11 = cos_rad + (unit_vec.y * unit_vec.y) * one_minus_cos_rad;
-            float r12 = y_z * one_minus_cos_rad - x_sin_rad;
+      float r10 = x_y * one_minus_cos_rad + z_sin_rad;
+      float r11 = cos_rad + (unit_vec.y * unit_vec.y) * one_minus_cos_rad;
+      float r12 = y_z * one_minus_cos_rad - x_sin_rad;
 
-            float r20 = x_z * one_minus_cos_rad - y_sin_rad;
-            float r21 = y_z * one_minus_cos_rad + x_sin_rad;
-            float r22 = cos_rad + (unit_vec.z * unit_vec.z) * one_minus_cos_rad;
+      float r20 = x_z * one_minus_cos_rad - y_sin_rad;
+      float r21 = y_z * one_minus_cos_rad + x_sin_rad;
+      float r22 = cos_rad + (unit_vec.z * unit_vec.z) * one_minus_cos_rad;
 
-            mat4 rot_matrix;
-            rot_matrix[0] = vec4(r00, r01, r02, 0.0);
-            rot_matrix[1] = vec4(r10, r11, r12, 0.0);
-            rot_matrix[2] = vec4(r20, r21, r22, 0.0);
-            rot_matrix[3] = vec4(0.0, 0.0, 0.0, 1.0);
+      mat4 rot_matrix;
+      rot_matrix[0] = vec4(r00, r01, r02, 0.0);
+      rot_matrix[1] = vec4(r10, r11, r12, 0.0);
+      rot_matrix[2] = vec4(r20, r21, r22, 0.0);
+      rot_matrix[3] = vec4(0.0, 0.0, 0.0, 1.0);
 
-            return rot_matrix;
-        }
+      return rot_matrix;
+    }
 
-        mat4 check_vertex(vec4 plane1, vec4 plane2, vec3 vertex, vec3 axis_vector, float rad) {
-            if ( check_if_point_between_2_planes(vertex, plane1, plane2) )
-                return create_rotation_matrix_around_axis(axis_vector, rad);
-            else 
-                return create_identity_matrix();
-        }
-        
-        void main() { 
-            fragColor = vertColor;
-            gl_PointSize = pointSize;
+    mat4 check_vertex(vec4 plane1, vec4 plane2, vec3 vertex, vec3 axis_vector, float rad) {
+      if ( check_if_point_between_2_planes(vertex, plane1, plane2) )
+        return create_rotation_matrix_around_axis(axis_vector, rad);
+      else 
+        return create_identity_matrix();
+    }
+    
+    void main() { 
+      fragColor = vertColor;
+      gl_PointSize = pointSize;
 
-            mat4 rot = check_vertex(
-                plane1, 
-                plane2, 
-                vertPosition, 
-                axis_vec, 
-                rad
-            );
+      mat4 rot = check_vertex(
+        plane1, 
+        plane2, 
+        vertPosition, 
+        axis_vec, 
+        rad
+      );
 
-            gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
-        }
-    </script>
+      gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
+    }
+  </script>
 
-    <script id="fs" type="x-shader/x-fragment">
-        precision lowp float;
+  <script id="fs" type="x-shader/x-fragment">
+    precision lowp float;
 
-        varying lowp vec4 fragColor; 
-        
-        void main() { 
-            gl_FragColor = fragColor; 
-        }
-    </script>
+    varying lowp vec4 fragColor; 
+    
+    void main() { 
+      gl_FragColor = fragColor; 
+    }
+  </script>
 
-    <script id="vs300" type="x-shader/x-vertex">#version 300 es 
-        precision highp float;
+  <script id="vs300" type="x-shader/x-vertex">#version 300 es 
+    precision highp float;
 
-        in vec3 vertPosition; 
-        in vec4 vertColor; 
-        
-        out lowp vec4 fragColor; 
-        
-        uniform lowp float pointSize; 
-        uniform mat4 mWorld; 
-        uniform mat4 mView; 
-        uniform mat4 mProj; 
+    in vec3 vertPosition; 
+    in vec4 vertColor; 
+    
+    out lowp vec4 fragColor; 
+    
+    uniform lowp float pointSize; 
+    uniform mat4 mWorld; 
+    uniform mat4 mView; 
+    uniform mat4 mProj; 
 
-        uniform vec3 axis_vec; 
-        uniform float rad; 
-        uniform vec4 plane1; 
-        uniform vec4 plane2; 
+    uniform vec3 axis_vec; 
+    uniform float rad; 
+    uniform vec4 plane1; 
+    uniform vec4 plane2; 
 
-        mat4 create_identity_matrix() {
-            mat4 iden;
-            iden[0] = vec4(1.0,  .0,  .0,  .0);
-            iden[1] = vec4( .0, 1.0,  .0,  .0);
-            iden[2] = vec4( .0,  .0, 1.0,  .0);
-            iden[3] = vec4( .0,  .0,  .0, 1.0);
-            return iden;
-        }
+    mat4 create_identity_matrix() {
+      mat4 iden;
+      iden[0] = vec4(1.0,  .0,  .0,  .0);
+      iden[1] = vec4( .0, 1.0,  .0,  .0);
+      iden[2] = vec4( .0,  .0, 1.0,  .0);
+      iden[3] = vec4( .0,  .0,  .0, 1.0);
+      return iden;
+    }
 
-        float get_dot_product_of_plane_and_vector(vec3 point, vec4 plane) {
-            return dot(point.xyz, plane.xyz) + plane.w;
-        }
+    float get_dot_product_of_plane_and_vector(vec3 point, vec4 plane) {
+      return dot(point.xyz, plane.xyz) + plane.w;
+    }
 
-        bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
-            float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
-            float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
+    bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
+    float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
+    float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
 
-            float sign1 = sign(dis1);
-            float sign2 = sign(dis2);
+    float sign1 = sign(dis1);
+    float sign2 = sign(dis2);
 
-            if (sign1 != sign2)
-                return true;
+    if (sign1 != sign2)
+        return true;
 
-            return false;
-        }
+    return false;
+    }
 
-        mat4 create_rotation_matrix_around_axis(vec3 axis, float rad) {
-            vec3 unit_vec = axis;
+    mat4 create_rotation_matrix_around_axis(vec3 axis, float rad) {
+      vec3 unit_vec = axis;
 
-            // Check if axis is a unit vector
-            if (length(axis) > 1.0)
-                // It not then normalize it
-                unit_vec = normalize(axis);
+      // Check if axis is a unit vector
+      if (length(axis) > 1.0)
+          // It not then normalize it
+          unit_vec = normalize(axis);
 
-            float sin_rad = sin(rad);
-            float cos_rad = cos(rad);
-            float one_minus_cos_rad = 1.0 - cos_rad;
-            float x_sin_rad = unit_vec.x * sin_rad;
-            float y_sin_rad = unit_vec.y * sin_rad;
-            float z_sin_rad = unit_vec.z * sin_rad;
-            float x_y = unit_vec.x * unit_vec.y;
-            float y_z = unit_vec.y * unit_vec.z;
-            float x_z = unit_vec.x * unit_vec.z;
+      float sin_rad = sin(rad);
+      float cos_rad = cos(rad);
+      float one_minus_cos_rad = 1.0 - cos_rad;
+      float x_sin_rad = unit_vec.x * sin_rad;
+      float y_sin_rad = unit_vec.y * sin_rad;
+      float z_sin_rad = unit_vec.z * sin_rad;
+      float x_y = unit_vec.x * unit_vec.y;
+      float y_z = unit_vec.y * unit_vec.z;
+      float x_z = unit_vec.x * unit_vec.z;
 
-            float r00 = cos_rad + (unit_vec.x * unit_vec.x) * one_minus_cos_rad;
-            float r01 = x_y * one_minus_cos_rad - z_sin_rad;
-            float r02 = x_z * one_minus_cos_rad + y_sin_rad;
+      float r00 = cos_rad + (unit_vec.x * unit_vec.x) * one_minus_cos_rad;
+      float r01 = x_y * one_minus_cos_rad - z_sin_rad;
+      float r02 = x_z * one_minus_cos_rad + y_sin_rad;
 
-            float r10 = x_y * one_minus_cos_rad + z_sin_rad;
-            float r11 = cos_rad + (unit_vec.y * unit_vec.y) * one_minus_cos_rad;
-            float r12 = y_z * one_minus_cos_rad - x_sin_rad;
+      float r10 = x_y * one_minus_cos_rad + z_sin_rad;
+      float r11 = cos_rad + (unit_vec.y * unit_vec.y) * one_minus_cos_rad;
+      float r12 = y_z * one_minus_cos_rad - x_sin_rad;
 
-            float r20 = x_z * one_minus_cos_rad - y_sin_rad;
-            float r21 = y_z * one_minus_cos_rad + x_sin_rad;
-            float r22 = cos_rad + (unit_vec.z * unit_vec.z) * one_minus_cos_rad;
+      float r20 = x_z * one_minus_cos_rad - y_sin_rad;
+      float r21 = y_z * one_minus_cos_rad + x_sin_rad;
+      float r22 = cos_rad + (unit_vec.z * unit_vec.z) * one_minus_cos_rad;
 
-            mat4 rot_matrix;
-            rot_matrix[0] = vec4(r00, r01, r02, 0.0);
-            rot_matrix[1] = vec4(r10, r11, r12, 0.0);
-            rot_matrix[2] = vec4(r20, r21, r22, 0.0);
-            rot_matrix[3] = vec4(0.0, 0.0, 0.0, 1.0);
+      mat4 rot_matrix;
+      rot_matrix[0] = vec4(r00, r01, r02, 0.0);
+      rot_matrix[1] = vec4(r10, r11, r12, 0.0);
+      rot_matrix[2] = vec4(r20, r21, r22, 0.0);
+      rot_matrix[3] = vec4(0.0, 0.0, 0.0, 1.0);
 
-            return rot_matrix;
-        }
+      return rot_matrix;
+    }
 
-        mat4 check_vertex(vec4 plane1, vec4 plane2, vec3 vertex, vec3 axis_vector, float rad) {
-            if ( check_if_point_between_2_planes(vertex, plane1, plane2) )
-                return create_rotation_matrix_around_axis(axis_vector, rad);
-            else 
-                return create_identity_matrix();
-        }
-        
-        void main() { 
-            fragColor = vertColor;
-            gl_PointSize = pointSize;
+    mat4 check_vertex(vec4 plane1, vec4 plane2, vec3 vertex, vec3 axis_vector, float rad) {
+      if ( check_if_point_between_2_planes(vertex, plane1, plane2) )
+        return create_rotation_matrix_around_axis(axis_vector, rad);
+      else 
+        return create_identity_matrix();
+    }
+    
+    void main() { 
+      fragColor = vertColor;
+      gl_PointSize = pointSize;
 
-            mat4 rot = check_vertex(
-                plane1, 
-                plane2, 
-                vertPosition, 
-                axis_vec, 
-                rad
-            );
+      mat4 rot = check_vertex(
+        plane1, 
+        plane2, 
+        vertPosition, 
+        axis_vec, 
+        rad
+      );
 
-            gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
-        }
-    </script>
+      gl_Position = mProj * mView * mWorld * rot * vec4(vertPosition, 1.0);
+    }
+  </script>
 
-    <script id="fs300" type="x-shader/x-fragment">#version 300 es 
-        precision highp float; 
+  <script id="fs300" type="x-shader/x-fragment">#version 300 es 
+    precision highp float; 
 
-        in vec4 fragColor; 
-        out vec4 outFragColor; 
-        
-        void main() { 
-            outFragColor = fragColor; 
-        }
-    </script>
+    in vec4 fragColor; 
+    out vec4 outFragColor; 
+      
+    void main() { 
+      outFragColor = fragColor; 
+    }
+  </script>
 
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 
-    <script src="class.js"></script>
-    <script src="function.js"></script>
-    <script src="script.js" defer></script>
-    <script src="archive_scripts.js" defer></script>
-    <script src="add_event_listener.js" defer></script>
+  <script src="class.js"></script>
+  <script src="function.js"></script>
+  <script src="script.js" defer></script>
+  <script src="archive_scripts.js" defer></script>
+  <script src="add_event_listener.js" defer></script>
 </head>
 
 <body class="dark-mode">
 
-    <datalist id="color-datalist">
-        <option value="#FFFFFF">White</option>
-        <option value="#FFFF00">Yellow</option>
-        <option value="#00FF00">Green</option>
-        <option value="#0000FF">Blue</option>
-        <option value="#FF0000">Red</option>
-        <option value="#FFA700">Orange</option>
-        <option value="#C0C0C0">Silver</option>
-        <option value="#000000">Black</option>
-        <option value="#121212">Dark Gray</option>
-    </datalist>
+  <datalist id="color-datalist">
+    <option value="#FFFFFF">White</option>
+    <option value="#FFFF00">Yellow</option>
+    <option value="#00FF00">Green</option>
+    <option value="#0000FF">Blue</option>
+    <option value="#FF0000">Red</option>
+    <option value="#FFA700">Orange</option>
+    <option value="#C0C0C0">Silver</option>
+    <option value="#000000">Black</option>
+    <option value="#121212">Dark Gray</option>
+  </datalist>
 
-    <div class="button-block">
-        <button id="toggle-theme">
-            <svg version="1.1" viewBox="100 100 312 312" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <path d="M349.852,343.15c-49.875,49.916-131.083,49.916-181,0c-49.916-49.918-49.916-131.125,0-181.021  c13.209-13.187,29.312-23.25,47.832-29.812c5.834-2.042,12.293-0.562,16.625,3.792c4.376,4.375,5.855,10.833,3.793,16.625  c-12.542,35.375-4,73.666,22.25,99.917c26.209,26.228,64.5,34.75,99.916,22.25c5.792-2.062,12.271-0.582,16.625,3.793  c4.376,4.332,5.834,10.812,3.771,16.625C373.143,313.838,363.06,329.941,349.852,343.15z M191.477,184.754  c-37.438,37.438-37.438,98.354,0,135.771c40,40.021,108.125,36.416,143-8.168c-35.959,2.25-71.375-10.729-97.75-37.084  c-26.375-26.354-39.333-61.771-37.084-97.729C196.769,179.796,194.039,182.192,191.477,184.754z"/>
-            </svg>
-        </button>
-        <button id="create">
-            <svg fill="#ffffff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500.554 500.554" xml:space="preserve">
-                <g>
-	                <path d="M324.782,277.035l-65.068,65.06l84.962,84.953c17.968,17.968,47.078,17.968,65.046,0 c17.974-17.974,17.982-47.077,0.014-65.068L324.782,277.035z"/>
-	                <path d="M125.819,208.207l50.672,50.672l65.068-65.067l-50.664-50.666l61.271-61.279c5.032-5.031,5.032-13.2,0-18.24L240.83,52.299 c-6.227-6.227-15.07-9.099-23.767-7.701l-97.945,15.7c-5.714,0.916-10.987,3.61-15.078,7.693l-4.333,4.341l-3.54-3.549
-		c-5.031-5.031-13.2-5.031-18.232,0L51.45,95.27c-5.039,5.031-5.039,13.2,0,18.232l3.54,3.548L3.774,168.258
-		c-5.031,5.031-5.031,13.2,0,18.232l62.771,62.771c5.031,5.031,13.2,5.031,18.232,0L125.819,208.207z"/>
-	                <path d="M467.096,113.758c-1.78-1.778-4.107-2.672-6.429-2.672c-2.322,0-4.651,0.894-6.429,2.672l-36.114,36.09
-		c-3.168,3.184-7.331,4.767-11.484,4.767c-4.154,0-8.315-1.584-11.485-4.767l-26.423-26.431c-3.068-3.028-4.759-7.167-4.759-11.477
-		s1.692-8.439,4.752-11.491l36.114-36.106c3.549-3.549,3.549-9.311,0-12.852c-8.237-8.229-19.132-12.461-30.103-12.461
-		c-8.535,0-17.114,2.562-24.521,7.795l-19.622,13.86c-18.652,13.161-30.228,34.148-31.454,56.946l-2.322,43.405L90.653,367.213
-		c-16.772,16.78-16.772,43.949,0,60.721c8.393,8.387,19.38,12.587,30.368,12.587c10.987,0,21.966-4.193,30.359-12.579
-		l206.186-206.176l43.389-2.322c22.789-1.22,43.769-12.796,56.938-31.448l13.868-19.628
-		C483.712,151.455,481.732,128.394,467.096,113.758z M123.149,413.453c-10.056,0-18.21-8.153-18.21-18.21
-		c0-10.055,8.153-18.208,18.21-18.208c10.055,0,18.208,8.153,18.208,18.208C141.357,405.3,133.204,413.453,123.149,413.453z"/>
-                </g>
-            </svg>
-        </button>
-        <button id="toggle-rotate" class="is_stop_rotating" disabled>
-            <svg id="play-icon" version="1.1" viewBox="0 0 128 128" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <polygon points="26.5,64 26.5,20.699 64,42.35 101.5,63.999 64,85.65 26.5,107.301 " style="stroke-width:12;stroke-miterlimit:10;"/>
-            </svg>
+  <div class="button-block">
+    <button id="toggle-theme">
+      <svg version="1.1" viewBox="100 100 312 312" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <path d="M349.852,343.15c-49.875,49.916-131.083,49.916-181,0c-49.916-49.918-49.916-131.125,0-181.021  c13.209-13.187,29.312-23.25,47.832-29.812c5.834-2.042,12.293-0.562,16.625,3.792c4.376,4.375,5.855,10.833,3.793,16.625  c-12.542,35.375-4,73.666,22.25,99.917c26.209,26.228,64.5,34.75,99.916,22.25c5.792-2.062,12.271-0.582,16.625,3.793  c4.376,4.332,5.834,10.812,3.771,16.625C373.143,313.838,363.06,329.941,349.852,343.15z M191.477,184.754  c-37.438,37.438-37.438,98.354,0,135.771c40,40.021,108.125,36.416,143-8.168c-35.959,2.25-71.375-10.729-97.75-37.084  c-26.375-26.354-39.333-61.771-37.084-97.729C196.769,179.796,194.039,182.192,191.477,184.754z"/>
+      </svg>
+    </button>
+    <button id="create">
+      <svg fill="#ffffff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500.554 500.554" xml:space="preserve">
+        <g>
+          <path d="M324.782,277.035l-65.068,65.06l84.962,84.953c17.968,17.968,47.078,17.968,65.046,0 c17.974-17.974,17.982-47.077,0.014-65.068L324.782,277.035z"/>
+          <path d="M125.819,208.207l50.672,50.672l65.068-65.067l-50.664-50.666l61.271-61.279c5.032-5.031,5.032-13.2,0-18.24L240.83,52.299 c-6.227-6.227-15.07-9.099-23.767-7.701l-97.945,15.7c-5.714,0.916-10.987,3.61-15.078,7.693l-4.333,4.341l-3.54-3.549 c-5.031-5.031-13.2-5.031-18.232,0L51.45,95.27c-5.039,5.031-5.039,13.2,0,18.232l3.54,3.548L3.774,168.258 c-5.031,5.031-5.031,13.2,0,18.232l62.771,62.771c5.031,5.031,13.2,5.031,18.232,0L125.819,208.207z"/>
+          <path d="M467.096,113.758c-1.78-1.778-4.107-2.672-6.429-2.672c-2.322,0-4.651,0.894-6.429,2.672l-36.114,36.09 c-3.168,3.184-7.331,4.767-11.484,4.767c-4.154,0-8.315-1.584-11.485-4.767l-26.423-26.431c-3.068-3.028-4.759-7.167-4.759-11.477 s1.692-8.439,4.752-11.491l36.114-36.106c3.549-3.549,3.549-9.311,0-12.852c-8.237-8.229-19.132-12.461-30.103-12.461 c-8.535,0-17.114,2.562-24.521,7.795l-19.622,13.86c-18.652,13.161-30.228,34.148-31.454,56.946l-2.322,43.405L90.653,367.213 c-16.772,16.78-16.772,43.949,0,60.721c8.393,8.387,19.38,12.587,30.368,12.587c10.987,0,21.966-4.193,30.359-12.579 l206.186-206.176l43.389-2.322c22.789-1.22,43.769-12.796,56.938-31.448l13.868-19.628 C483.712,151.455,481.732,128.394,467.096,113.758z M123.149,413.453c-10.056,0-18.21-8.153-18.21-18.21 c0-10.055,8.153-18.208,18.21-18.208c10.055,0,18.208,8.153,18.208,18.208C141.357,405.3,133.204,413.453,123.149,413.453z"/>
+        </g>
+      </svg>
+    </button>
+    <button id="toggle-rotate" class="is_stop_rotating" disabled>
+      <svg id="play-icon" version="1.1" viewBox="0 0 128 128" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <polygon points="26.5,64 26.5,20.699 64,42.35 101.5,63.999 64,85.65 26.5,107.301 " style="stroke-width:12;stroke-miterlimit:10;"/>
+      </svg>
 
-            <svg id="pause-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <g>
-                    <rect height="320" width="79" x="128" y="96"/>
-                    <rect height="320" width="79" x="305" y="96"/>
-                </g>
-            </svg>
-        </button>
-        <button id="scrambling">
-            <svg id="border-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <g>
-                    <path d="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm0,22A10,10,0,1,1,22,12,10.011,10.011,0,0,1,12,22Z"/>
-                    <path d="M16.173,10.3l-5.113-3.2A2,2,0,0,0,8,8.8V15.2a2,2,0,0,0,3.06,1.7l5.113-3.2a2,2,0,0,0,0-3.392ZM10,15.2V8.8L15.113,12Z"/>
-                </g>
-            </svg>
+      <svg id="pause-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g>
+          <rect height="320" width="79" x="128" y="96"/>
+          <rect height="320" width="79" x="305" y="96"/>
+        </g>
+      </svg>
+    </button>
+    <button id="scrambling">
+      <svg id="border-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <path d="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm0,22A10,10,0,1,1,22,12,10.011,10.011,0,0,1,12,22Z"/>
+          <path d="M16.173,10.3l-5.113-3.2A2,2,0,0,0,8,8.8V15.2a2,2,0,0,0,3.06,1.7l5.113-3.2a2,2,0,0,0,0-3.392ZM10,15.2V8.8L15.113,12Z"/>
+        </g>
+      </svg>
 
-            <svg id="border-pause-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM7 6h2v8H7V6zm4 0h2v8h-2V6z"/>
-            </svg>
-        </button>
-        <button id="toggle-movement-control" disabled>
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="hide-icon">
-                <path d="M12 19c.946 0 1.81-.103 2.598-.281l-1.757-1.757c-.273.021-.55.038-.841.038-5.351 0-7.424-3.846-7.926-5a8.642 8.642 0 0 1 1.508-2.297L4.184 8.305c-1.538 1.667-2.121 3.346-2.132 3.379a.994.994 0 0 0 0 .633C2.073 12.383 4.367 19 12 19zm0-14c-1.837 0-3.346.396-4.604.981L3.707 2.293 2.293 3.707l18 18 1.414-1.414-3.319-3.319c2.614-1.951 3.547-4.615 3.561-4.657a.994.994 0 0 0 0-.633C21.927 11.617 19.633 5 12 5zm4.972 10.558-2.28-2.28c.19-.39.308-.819.308-1.278 0-1.641-1.359-3-3-3-.459 0-.888.118-1.277.309L8.915 7.501A9.26 9.26 0 0 1 12 7c5.351 0 7.424 3.846 7.926 5-.302.692-1.166 2.342-2.954 3.558z"/>
-            </svg>
+      <svg id="border-pause-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM7 6h2v8H7V6zm4 0h2v8h-2V6z"/>
+      </svg>
+    </button>
+    <button id="toggle-movement-control" disabled>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="hide-icon">
+        <path d="M12 19c.946 0 1.81-.103 2.598-.281l-1.757-1.757c-.273.021-.55.038-.841.038-5.351 0-7.424-3.846-7.926-5a8.642 8.642 0 0 1 1.508-2.297L4.184 8.305c-1.538 1.667-2.121 3.346-2.132 3.379a.994.994 0 0 0 0 .633C2.073 12.383 4.367 19 12 19zm0-14c-1.837 0-3.346.396-4.604.981L3.707 2.293 2.293 3.707l18 18 1.414-1.414-3.319-3.319c2.614-1.951 3.547-4.615 3.561-4.657a.994.994 0 0 0 0-.633C21.927 11.617 19.633 5 12 5zm4.972 10.558-2.28-2.28c.19-.39.308-.819.308-1.278 0-1.641-1.359-3-3-3-.459 0-.888.118-1.277.309L8.915 7.501A9.26 9.26 0 0 1 12 7c5.351 0 7.424 3.846 7.926 5-.302.692-1.166 2.342-2.954 3.558z"/>
+      </svg>
 
-            <svg enable-version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="show-icon">
-                <path d="M16,7C9.934,7,4.798,10.776,3,16c1.798,5.224,6.934,9,13,9s11.202-3.776,13-9C27.202,10.776,22.066,7,16,7z" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
-                <circle cx="16" cy="16" fill="none" r="5" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
-            </svg>
-        </button>
-        <button id="toggle-control">Show control</button>
-    </div>
+      <svg enable-version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="show-icon">
+        <path d="M16,7C9.934,7,4.798,10.776,3,16c1.798,5.224,6.934,9,13,9s11.202-3.776,13-9C27.202,10.776,22.066,7,16,7z" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
+        <circle cx="16" cy="16" fill="none" r="5" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
+      </svg>
+    </button>
+    <button id="toggle-control">Show control</button>
+  </div>
 
-    <main>
-        <div id="controller">
-            <button id="hide-control">Hide control</button>
+  <main>
+    <div id="controller">
+      <button id="hide-control">Hide control</button>
     
             
-            <p>FPS: <span id="fps"></span></p>
+      <p>FPS: <span id="fps"></span></p>
 
 
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Predefined Rubik's Cube</p>
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Predefined Rubik's Cube</p>
     
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="predefined-rubik">Predefined Rubik's Cube:</label>
-                        <select name="predefined-rubik" id="predefined-rubik" onchange="change_input(this)">
-                            <option value="none">none</option>
-                            <option value="random">random</option>
-                            <option value="2x2x2">2x2x2</option>
-                            <option value="3x3x3">3x3x3</option>
-                            <option value="4x4x4">4x4x4</option>
-                            <option value="5x5x5">5x5x5</option>
-                            <option value="3x3x3_mirror">3x3x3 Mirror</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-    
-    
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="size-x">Rubik Size X:</label>
-                        <input id="size-x" type="number" min="1" max="100" value="3" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="size-y">Rubik Size Y:</label>
-                        <input id="size-y" type="number" min="1" max="100" value="3" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="size-z">Rubik Size Z:</label>
-                        <input id="size-z" type="number" min="1" max="100" value="3" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="length">Rubik Length:</label>
-                        <input id="length" type="number" min="0" max="10" value="0.9999" step="0.1" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="sticker-gap">Sticker gap:</label>
-                        <input id="sticker-gap" type="number" min="-10" max="10" value="0" step="0.01" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="sticker-size">Sticker size:</label>
-                        <input id="sticker-size" type="number" min="0" max="1" value="0.95" step="0.01" size="4">
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Outer Layers Variants</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="translate-x">Translate X:</label>
-                        <input id="translate-x" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
-                    </div>
-                    <div class="input-block">
-                        <label for="translate-y">Translate Y:</label>
-                        <input id="translate-y" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
-                    </div>
-                    <div class="input-block">
-                        <label for="translate-z">Translate Z:</label>
-                        <input id="translate-z" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
-                    </div>
-                    <div class="input-block">
-                        <label for="axis-rotation-x">Axis X rotation (degree):</label>
-                        <input id="axis-rotation-x" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
-                    </div>
-                    <div class="input-block">
-                        <label for="axis-rotation-y">Axis Y rotation (degree):</label>
-                        <input id="axis-rotation-y" type="number" min="-360" max="360" value="-28.8" step="1" size="4" onchange="create_rubik_cube()">
-                    </div>
-                    <div class="input-block">
-                        <label for="axis-rotation-z">Axis Z rotation (degree):</label>
-                        <input id="axis-rotation-z" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
-                    </div>
-                </div>
-            </div>
-    
-    
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Orientation</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="orientation-x">Rubik Orientation X:</label>
-                        <input id="orientation-x" type="number" min="-360" max="360" value="-0.7" step="0.01" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="orientation-y">Rubik Orientation Y:</label>
-                        <input id="orientation-y" type="number" min="-360" max="360" value="-0.6" step="0.01" size="4">
-                    </div>
-                    <div class="input-block">
-                        <label for="orientation-z">Rubik Orientation Z:</label>
-                        <input id="orientation-z" type="number" min="-360" max="360" value="0" step="0.01" size="4">
-                    </div>
-                </div>
-            </div>
-
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Camera</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="camera-x">Camera position X:</label>
-                        <input id="camera-x" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="camera-y">Camera position Y:</label>
-                        <input id="camera-y" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="camera-z">Camera position Z:</label>
-                        <input id="camera-z" type="number" min="-100" max="100" value="-12" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="look-at-x">Camera look at X:</label>
-                        <input id="look-at-x" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="look-at-y">Camera look at Y:</label>
-                        <input id="look-at-y" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="look-at-z">Camera look at Z:</label>
-                        <input id="look-at-z" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="up-axis-x">Up axis X:</label>
-                        <input id="up-axis-x" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="up-axis-y">Up axis Y:</label>
-                        <input id="up-axis-y" type="number" min="-100" max="100" value="1" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="up-axis-z">Up axis Z:</label>
-                        <input id="up-axis-z" type="number" min="-100" max="100" value="0" size="2">
-                    </div>
-                </div>
-            </div>
-    
-    
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rendering</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="render-outer-cube">Render Stickers:</label>
-                        <input id="render-outer-cube" type="checkbox" checked>
-                    </div>
-                    <div class="input-block">
-                        <label for="render-inner-outline-cube">Render Inner Outline Cubes:</label>
-                        <input id="render-inner-outline-cube" type="checkbox">
-                    </div>
-                    <div class="input-block">
-                        <label for="render-inner-cube">Render Inner Cubes:</label>
-                        <input id="render-inner-cube" type="checkbox">
-                    </div>
-                    <div class="input-block">
-                        <label for="render-inner-plane">Render Inner Planes:</label>
-                        <input id="render-inner-plane" type="checkbox">
-                    </div>
-                    <div class="input-block">
-                        <label for="draw-mode">Draw mode:</label>
-                        <select name="draw-mode" id="draw-mode">
-                            <option value="points">Points</option>
-                            <option value="lines">Lines</option>
-                            <option value="line_loop">Line Loop</option>
-                            <option value="line_strip">Line Strip</option>
-                            <option selected value="triangles">Triangles</option>
-                            <option value="triangle_strip">Triangle Strip</option>
-                            <option value="triangle_fan">Triangle Fan</option>
-                        </select>
-                    </div>
-                    <div class="input-block">
-                        <label for="point-size">Point size:</label>
-                        <input id="point-size" type="number" min="0" max="1000" value="1" size="2">
-                    </div>
-                </div>
-            </div>
-    
-    
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Animation</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="rotate-angle-x">Rotate angle X speed:</label>
-                        <input id="rotate-angle-x" type="number" min="-10" max="10" value="0" step="0.1" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="rotate-angle-y">Rotate angle Y speed:</label>
-                        <input id="rotate-angle-y" type="number" min="-10" max="10" value="0" step="0.1" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="rotate-angle-z">Rotate angle Z speed:</label>
-                        <input id="rotate-angle-z" type="number" min="-10" max="10" value="0" step="0.1" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="update-angle-1">Update angle per frame method 1:</label>
-                        <input id="update-angle-1" name="update-angle-method" value="method1" type="radio" checked>
-                    </div>
-                    <div class="input-block">
-                        <label for="update-angle-2">Update angle per frame method 2:</label>
-                        <input id="update-angle-2" name="update-angle-method" value="method2" type="radio">
-                    </div>
-                    <div class="input-block">
-                        <label for="angle-per-second">Angle per frame for method 2:</label>
-                        <input id="angle-per-second" type="number" min="-360" max="360" value="90" step="0.1" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="smooth-rotation">Smooth rotation per frame:</label>
-                        <input id="smooth-rotation" type="number" min="0" max="100" value="10" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="angle-rotated-ratio">Angle rotated ratio per frame:</label>
-                        <input id="angle-rotated-ratio" type="number" min="0" max="360" value="25" size="2">
-                    </div>
-                </div>
-            </div>
-    
-    
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Scene</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="fovy">Field of view y (degree):</label>
-                        <input id="fovy" type="number" min="-360" max="360" value="45" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="near">Near plane:</label>
-                        <input id="near" type="number" min="-10" max="10" value="0.1" step="0.1" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="far">Far plane:</label>
-                        <input id="far" type="number" min="-1000" max="1000" value="100" step="10" size="2">
-                    </div>
-                </div>
-            </div>
-    
-    
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik's Color</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="top-color">Top color:</label>
-                        <!-- FFFFFF -->
-                        <input id="top-color" type="color" value="#FFFFFF" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="bottom-color">Bottom color:</label>
-                        <!-- FFFF00 -->
-                        <input id="bottom-color" type="color" value="#FFFF00" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="front-color">Front color:</label>
-                        <!-- 00FF00 -->
-                        <input id="front-color" type="color" value="#00FF00" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="back-color">Back color:</label>
-                        <!-- 0000FF -->
-                        <input id="back-color" type="color" value="#0000FF" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="right-color">Right color:</label>
-                        <!-- FF0000 -->
-                        <input id="right-color" type="color" value="#FF0000" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="left-color">Left color:</label>
-                        <!-- FFA700 -->
-                        <input id="left-color" type="color" value="#FFA700" list="color-datalist">
-                    </div>
-
-                    <div class="input-block">
-                        <label for="inner-top-color">Inner Top color:</label>
-                        <input id="inner-top-color" type="color" value="#121212" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="inner-bottom-color">Inner Bottom color:</label>
-                        <input id="inner-bottom-color" type="color" value="#121212" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="inner-front-color">Inner Front color:</label>
-                        <input id="inner-front-color" type="color" value="#121212" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="inner-back-color">Inner Back color:</label>
-                        <input id="inner-back-color" type="color" value="#121212" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="inner-right-color">Inner Right color:</label>
-                        <input id="inner-right-color" type="color" value="#121212" list="color-datalist">
-                    </div>
-                    <div class="input-block">
-                        <label for="inner-left-color">Inner Left color:</label>
-                        <input id="inner-left-color" type="color" value="#121212" list="color-datalist">
-                    </div>
-
-                    <div class="input-block">
-                        <label for="transparent">Sticker Transparency:</label>
-                        <input id="transparent" type="number" min="0" max="255" value="255" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="transparent-inner-cube">Inner Cube Transparency:</label>
-                        <input id="transparent-inner-cube" type="number" min="0" max="255" value="255" size="2">
-                    </div>
-                    <div class="input-block">
-                        <button id="swap-color">Swap sticker colors and inner colors</button>
-                    </div>
-                </div>
-            </div>
-    
-
-            <div class="dropdown">
-                <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Engines</p>
-    
-                <div class="dropdown-content">
-                    <div class="input-block">
-                        <label for="shader-program-version">Use higher precision shader program version:</label>
-                        <input id="shader-program-version" type="checkbox" size="2">
-                    </div>
-                    <div class="input-block">
-                        <label for="generation-method">Use old rubik generator (not support rubik's variant):</label>
-                        <input id="generation-method" type="checkbox" size="2" checked>
-                    </div>
-                </div>
-            </div>
-    
-    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="predefined-rubik">Predefined Rubik's Cube:</label>
+            <select name="predefined-rubik" id="predefined-rubik" onchange="change_input(this)">
+              <option value="none">none</option>
+              <option value="random">random</option>
+              <option value="2x2x2">2x2x2</option>
+              <option value="3x3x3">3x3x3</option>
+              <option value="4x4x4">4x4x4</option>
+              <option value="5x5x5">5x5x5</option>
+              <option value="3x3x3_mirror">3x3x3 Mirror</option>
+            </select>
+          </div>
         </div>
+      </div>
+    
+    
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="size-x">Rubik Size X:</label>
+            <input id="size-x" type="number" min="1" max="100" value="3" size="4">
+          </div>
+          <div class="input-block">
+            <label for="size-y">Rubik Size Y:</label>
+            <input id="size-y" type="number" min="1" max="100" value="3" size="4">
+          </div>
+          <div class="input-block">
+            <label for="size-z">Rubik Size Z:</label>
+            <input id="size-z" type="number" min="1" max="100" value="3" size="4">
+          </div>
+          <div class="input-block">
+            <label for="length">Rubik Length:</label>
+            <input id="length" type="number" min="0" max="10" value="0.9999" step="0.1" size="4">
+          </div>
+          <div class="input-block">
+            <label for="sticker-gap">Sticker gap:</label>
+            <input id="sticker-gap" type="number" min="-10" max="10" value="0" step="0.01" size="4">
+          </div>
+          <div class="input-block">
+            <label for="sticker-size">Sticker size:</label>
+            <input id="sticker-size" type="number" min="0" max="1" value="0.95" step="0.01" size="4">
+          </div>
+        </div>
+      </div>
 
 
-        <canvas id="game-surface">
-            Your browser does not support HTML5
-        </canvas>
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Outer Layers Variants</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="translate-x">Translate X:</label>
+            <input id="translate-x" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
+          </div>
+          <div class="input-block">
+            <label for="translate-y">Translate Y:</label>
+            <input id="translate-y" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
+          </div>
+          <div class="input-block">
+            <label for="translate-z">Translate Z:</label>
+            <input id="translate-z" type="number" min="-0.9" max="0.9" value="0" step="0.01" size="4" onchange="create_rubik_cube()">
+          </div>
+          <div class="input-block">
+            <label for="axis-rotation-x">Axis X rotation (degree):</label>
+            <input id="axis-rotation-x" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
+          </div>
+          <div class="input-block">
+            <label for="axis-rotation-y">Axis Y rotation (degree):</label>
+            <input id="axis-rotation-y" type="number" min="-360" max="360" value="-28.8" step="1" size="4" onchange="create_rubik_cube()">
+          </div>
+          <div class="input-block">
+            <label for="axis-rotation-z">Axis Z rotation (degree):</label>
+            <input id="axis-rotation-z" type="number" min="-360" max="360" value="0" step="1" size="4" onchange="create_rubik_cube()">
+          </div>
+        </div>
+      </div>
+    
+    
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik Orientation</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="orientation-x">Rubik Orientation X:</label>
+            <input id="orientation-x" type="number" min="-360" max="360" value="-0.7" step="0.01" size="4">
+          </div>
+          <div class="input-block">
+            <label for="orientation-y">Rubik Orientation Y:</label>
+            <input id="orientation-y" type="number" min="-360" max="360" value="-0.6" step="0.01" size="4">
+          </div>
+          <div class="input-block">
+            <label for="orientation-z">Rubik Orientation Z:</label>
+            <input id="orientation-z" type="number" min="-360" max="360" value="0" step="0.01" size="4">
+          </div>
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Camera</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="camera-x">Camera position X:</label>
+            <input id="camera-x" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+          <div class="input-block">
+            <label for="camera-y">Camera position Y:</label>
+            <input id="camera-y" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+          <div class="input-block">
+            <label for="camera-z">Camera position Z:</label>
+            <input id="camera-z" type="number" min="-100" max="100" value="-12" size="2">
+          </div>
+          <div class="input-block">
+            <label for="look-at-x">Camera look at X:</label>
+            <input id="look-at-x" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+          <div class="input-block">
+            <label for="look-at-y">Camera look at Y:</label>
+            <input id="look-at-y" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+          <div class="input-block">
+            <label for="look-at-z">Camera look at Z:</label>
+            <input id="look-at-z" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+          <div class="input-block">
+            <label for="up-axis-x">Up axis X:</label>
+            <input id="up-axis-x" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+          <div class="input-block">
+            <label for="up-axis-y">Up axis Y:</label>
+            <input id="up-axis-y" type="number" min="-100" max="100" value="1" size="2">
+          </div>
+          <div class="input-block">
+            <label for="up-axis-z">Up axis Z:</label>
+            <input id="up-axis-z" type="number" min="-100" max="100" value="0" size="2">
+          </div>
+        </div>
+      </div>
+    
+    
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rendering</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="render-outer-cube">Render Stickers:</label>
+            <input id="render-outer-cube" type="checkbox" checked>
+          </div>
+          <div class="input-block">
+            <label for="render-inner-outline-cube">Render Inner Outline Cubes:</label>
+            <input id="render-inner-outline-cube" type="checkbox">
+          </div>
+          <div class="input-block">
+            <label for="render-inner-cube">Render Inner Cubes:</label>
+            <input id="render-inner-cube" type="checkbox">
+          </div>
+          <div class="input-block">
+            <label for="render-inner-plane">Render Inner Planes:</label>
+            <input id="render-inner-plane" type="checkbox">
+          </div>
+          <div class="input-block">
+            <label for="draw-mode">Draw mode:</label>
+            <select name="draw-mode" id="draw-mode">
+              <option value="points">Points</option>
+              <option value="lines">Lines</option>
+              <option value="line_loop">Line Loop</option>
+              <option value="line_strip">Line Strip</option>
+              <option selected value="triangles">Triangles</option>
+              <option value="triangle_strip">Triangle Strip</option>
+              <option value="triangle_fan">Triangle Fan</option>
+            </select>
+          </div>
+          <div class="input-block">
+            <label for="point-size">Point size:</label>
+            <input id="point-size" type="number" min="0" max="1000" value="1" size="2">
+          </div>
+        </div>
+      </div>
+    
+    
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Animation</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="rotate-angle-x">Rotate angle X speed:</label>
+            <input id="rotate-angle-x" type="number" min="-10" max="10" value="0" step="0.1" size="2">
+          </div>
+          <div class="input-block">
+            <label for="rotate-angle-y">Rotate angle Y speed:</label>
+            <input id="rotate-angle-y" type="number" min="-10" max="10" value="0" step="0.1" size="2">
+          </div>
+          <div class="input-block">
+            <label for="rotate-angle-z">Rotate angle Z speed:</label>
+            <input id="rotate-angle-z" type="number" min="-10" max="10" value="0" step="0.1" size="2">
+          </div>
+          <div class="input-block">
+            <label for="update-angle-1">Update angle per frame method 1:</label>
+            <input id="update-angle-1" name="update-angle-method" value="method1" type="radio" checked>
+          </div>
+          <div class="input-block">
+            <label for="update-angle-2">Update angle per frame method 2:</label>
+            <input id="update-angle-2" name="update-angle-method" value="method2" type="radio">
+          </div>
+          <div class="input-block">
+            <label for="angle-per-second">Angle per frame for method 2:</label>
+            <input id="angle-per-second" type="number" min="-360" max="360" value="90" step="0.1" size="2">
+          </div>
+          <div class="input-block">
+            <label for="smooth-rotation">Smooth rotation per frame:</label>
+            <input id="smooth-rotation" type="number" min="0" max="100" value="10" size="2">
+          </div>
+          <div class="input-block">
+            <label for="angle-rotated-ratio">Angle rotated ratio per frame:</label>
+            <input id="angle-rotated-ratio" type="number" min="0" max="360" value="25" size="2">
+          </div>
+        </div>
+      </div>
+    
+    
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Scene</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="fovy">Field of view y (degree):</label>
+            <input id="fovy" type="number" min="-360" max="360" value="45" size="2">
+          </div>
+          <div class="input-block">
+            <label for="near">Near plane:</label>
+            <input id="near" type="number" min="-10" max="10" value="0.1" step="0.1" size="2">
+          </div>
+          <div class="input-block">
+            <label for="far">Far plane:</label>
+            <input id="far" type="number" min="-1000" max="1000" value="100" step="10" size="2">
+          </div>
+        </div>
+      </div>
+    
+    
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Rubik's Color</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="top-color">Top color:</label>
+            <!-- FFFFFF -->
+            <input id="top-color" type="color" value="#FFFFFF" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="bottom-color">Bottom color:</label>
+            <!-- FFFF00 -->
+            <input id="bottom-color" type="color" value="#FFFF00" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="front-color">Front color:</label>
+            <!-- 00FF00 -->
+            <input id="front-color" type="color" value="#00FF00" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="back-color">Back color:</label>
+            <!-- 0000FF -->
+            <input id="back-color" type="color" value="#0000FF" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="right-color">Right color:</label>
+            <!-- FF0000 -->
+            <input id="right-color" type="color" value="#FF0000" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="left-color">Left color:</label>
+            <!-- FFA700 -->
+            <input id="left-color" type="color" value="#FFA700" list="color-datalist">
+          </div>
+
+          <div class="input-block">
+            <label for="inner-top-color">Inner Top color:</label>
+            <input id="inner-top-color" type="color" value="#121212" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="inner-bottom-color">Inner Bottom color:</label>
+            <input id="inner-bottom-color" type="color" value="#121212" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="inner-front-color">Inner Front color:</label>
+            <input id="inner-front-color" type="color" value="#121212" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="inner-back-color">Inner Back color:</label>
+            <input id="inner-back-color" type="color" value="#121212" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="inner-right-color">Inner Right color:</label>
+            <input id="inner-right-color" type="color" value="#121212" list="color-datalist">
+          </div>
+          <div class="input-block">
+            <label for="inner-left-color">Inner Left color:</label>
+            <input id="inner-left-color" type="color" value="#121212" list="color-datalist">
+          </div>
+
+          <div class="input-block">
+            <label for="transparent">Sticker Transparency:</label>
+            <input id="transparent" type="number" min="0" max="255" value="255" size="2">
+          </div>
+          <div class="input-block">
+            <label for="transparent-inner-cube">Inner Cube Transparency:</label>
+            <input id="transparent-inner-cube" type="number" min="0" max="255" value="255" size="2">
+          </div>
+          <div class="input-block">
+            <button id="swap-color">Swap sticker colors and inner colors</button>
+          </div>
+        </div>
+      </div>
     
 
-        <div id="movement-controller"></div>
-    </main>
+      <div class="dropdown">
+        <p class="dropdown-trigger" onclick="show_drop_down(this)"><span>▽</span> Engines</p>
+    
+        <div class="dropdown-content">
+          <div class="input-block">
+            <label for="shader-program-version">Use higher precision shader program version:</label>
+            <input id="shader-program-version" type="checkbox" size="2">
+          </div>
+          <div class="input-block">
+            <label for="generation-method">Use old rubik generator (not support rubik's variant):</label>
+            <input id="generation-method" type="checkbox" size="2" checked>
+          </div>
+        </div>
+      </div>
+    
+    
+    </div>
+
+
+    <canvas id="game-surface">
+      Your browser does not support HTML5
+    </canvas>
+    
+
+    <div id="movement-controller"></div>
+  </main>
 
 </body>
 
