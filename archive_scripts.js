@@ -45,39 +45,39 @@ add_sticker_vertex = (i, j, k) => {
 
         if (i2 == -1 && i == start_x)
           sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 - INP_sticker_gap,
-                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_right[0],
-                                INP_COLOR_right[1],
-                                INP_COLOR_right[2],
-                                INP_transparent_sticker
-                            ),
-                            "left"
-                        )
-                    );
+            new Vertex(
+              new Position(
+                i + rubik_half_length * i2 - INP_sticker_gap,
+                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
+                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
+              ),
+              new Color(
+                INP_COLOR_right[0],
+                INP_COLOR_right[1],
+                INP_COLOR_right[2],
+                INP_transparent_sticker
+              ),
+              "left"
+            )
+          );
 
-                if (i2 == 1 && i == end_x)
-                    sub_vertices.push(
-                        new Vertex(
-                            new Position(
-                                i + rubik_half_length * i2 + INP_sticker_gap,
-                                j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
-                                k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
-                            ),
-                            new Color(
-                                INP_COLOR_left[0],
-                                INP_COLOR_left[1],
-                                INP_COLOR_left[2],
-                                INP_transparent_sticker
-                            ),
-                            "right"
-                        )
-                    );
+          if (i2 == 1 && i == end_x)
+            sub_vertices.push(
+              new Vertex(
+                new Position(
+                  i + rubik_half_length * i2 + INP_sticker_gap,
+                  j + rubik_half_length * j2 - (INP_sticker_size % 1) * j2,
+                  k + rubik_half_length * k2 - (INP_sticker_size % 1) * k2,
+                ),
+              new Color(
+                INP_COLOR_left[0],
+                INP_COLOR_left[1],
+                INP_COLOR_left[2],
+                INP_transparent_sticker
+              ),
+              "right"
+            )
+          );
 
                 if (j2 == -1 && j == start_y)
                     sub_vertices.push(

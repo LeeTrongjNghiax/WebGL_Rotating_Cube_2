@@ -151,10 +151,16 @@ document.addEventListener("resize", () => {
 });
 
 document.querySelector("#toggle-theme").addEventListener('click', () => {
-  if ( document.body.classList.contains("light-mode") ) 
+  if ( document.body.classList.contains("light-mode") ) {
     document.body.classList.replace("light-mode", "dark-mode");
-  else
+    document.querySelector("#light-theme").style.display = "initial";
+    document.querySelector("#dark-theme").style.display = "none";
+  }
+  else {
     document.body.classList.replace("dark-mode", "light-mode");
+    document.querySelector("#light-theme").style.display = "none";
+    document.querySelector("#dark-theme").style.display = "initial";
+  }
 });
 
 document.querySelector("#create").addEventListener("click", () => create_rubik_cube());
@@ -196,14 +202,16 @@ document.querySelector("#toggle-control").addEventListener("click", e => {
 
     document.querySelector("#controller").style.left = "-100%";
     document.querySelector("main").style.width = "100%";
-    e.target.innerHTML = "Show control";
+    document.querySelector("#more-control").style.display = "none";
+    document.querySelector("#less-control").style.display = "initial";
 
   }
   else {
 
     document.querySelector("#controller").style.left = "0px";
     document.querySelector("main").style.width ="75%";
-    e.target.innerHTML = "Hide control";
+    document.querySelector("#more-control").style.display = "initial";
+    document.querySelector("#less-control").style.display = "none";
       
   }
 });
@@ -227,7 +235,8 @@ document.querySelector("#toggle-movement-control").addEventListener("click", e =
 document.querySelector("#hide-control").addEventListener("click", () => {
   document.querySelector("#controller").style.left = "-100%";
   document.querySelector("main").style.width = "100%";
-  document.querySelector("#toggle-control").innerHTML = "Show control";
+  document.querySelector("#more-control").style.display = "initial";
+  document.querySelector("#less-control").style.display = "none";
 });
 
 document.querySelector("#swap-color").addEventListener("click", () => {

@@ -11,6 +11,8 @@ svg {
   height: 50px;
 }
 
+#less-control, 
+#dark-theme, 
 #show-icon, 
 #pause-icon,
 #border-pause-icon {
@@ -33,14 +35,6 @@ svg {
   transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
 }
 
-.light-mode button svg {
-  fill: var(--dark-color);
-}
-
-.light-mode #hide-icon path {
-  fill: var(--dark-color);
-}
-
 .light-mode #show-icon path, 
 .light-mode #show-icon circle {
   stroke: var(--dark-color);
@@ -60,14 +54,6 @@ svg {
   background: var(--dark-color-semi-tran);
   color: var(--light-color);
   transition: color var(--all-color-transition-time), background var(--all-color-transition-time);
-}
-
-.dark-mode button svg {
-  fill: var(--light-color);
-}
-
-.dark-mode #hide-icon path {
-  fill: var(--light-color);
 }
 
 .dark-mode #hide-icon path, 
