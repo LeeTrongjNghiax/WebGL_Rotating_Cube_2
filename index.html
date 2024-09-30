@@ -155,16 +155,16 @@
     }
 
     bool check_if_point_between_2_planes(vec3 point, vec4 plane1, vec4 plane2) {
-      float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
-      float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
+    float dis1 = get_dot_product_of_plane_and_vector(point, plane1);
+    float dis2 = get_dot_product_of_plane_and_vector(point, plane2);
 
-      float sign1 = sign(dis1);
-      float sign2 = sign(dis2);
+    float sign1 = sign(dis1);
+    float sign2 = sign(dis2);
 
-      if (sign1 != sign2)
+    if (sign1 != sign2)
         return true;
 
-      return false;
+    return false;
     }
 
     mat4 create_rotation_matrix_around_axis(vec3 axis, float rad) {
@@ -172,8 +172,8 @@
 
       // Check if axis is a unit vector
       if (length(axis) > 1.0)
-        // It not then normalize it
-        unit_vec = normalize(axis);
+          // It not then normalize it
+          unit_vec = normalize(axis);
 
       float sin_rad = sin(rad);
       float cos_rad = cos(rad);
