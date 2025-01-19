@@ -1,6 +1,8 @@
 const EPSILON = 0.000001;
 
-function create_plane_from_3_points(a = new Position(), b = new Position(), c = new Position()) {
+function create_plane_from_3_points(
+  a = new Position(), b = new Position(), c = new Position()
+) {
   let v1 = new Float32Array(3);
   v1[0] = b.x - a.x;
   v1[1] = b.y - a.y;
@@ -24,7 +26,9 @@ function create_plane_from_3_points(a = new Position(), b = new Position(), c = 
   return new Plane(normal[0], normal[1], normal[2], d);
 }
 
-function get_dot_product_of_plane_and_vector(point = new Position(), plane = new Plane()) {
+function get_dot_product_of_plane_and_vector(
+  point = new Position(), plane = new Plane()
+) {
   let point2 = new Float32Array(3);
   point2[0] = point.x;
   point2[1] = point.y;
@@ -45,10 +49,9 @@ function normalize(out, a) {
   let len = x * x + y * y + z * z;
   
   if (len > 0) {
-    //TODO: evaluate use of glm_invsqrt here?
     len = 1 / Math.sqrt(len);
   }
-  // console.log( len );
+
   out[0] = a[0] * len;
   out[1] = a[1] * len;
   out[2] = a[2] * len;
@@ -153,7 +156,7 @@ function invert_quat(out, a) {
       a3 = a[3];
   let dot = a0 * a0 + a1 * a1 + a2 * a2 + a3 * a3;
   let invDot = dot ? 1.0 / dot : 0;
-  // TODO: Would be faster to return [0,0,0,0] immediately if dot == 0
+
   out[0] = -a0 * invDot;
   out[1] = -a1 * invDot;
   out[2] = -a2 * invDot;
