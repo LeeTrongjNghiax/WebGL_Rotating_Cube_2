@@ -57,7 +57,7 @@ This drawer contain these options:
 ![image](how_to_use/step8.png)
 ![image](how_to_use/step9.png)
 
-If the image is to biyou can go to camera section and decrese camera position z for better viewing (remember to do step 2 each change)
+If the image is to big you can go to camera section and decrese camera position z for better viewing (remember to do step 2 each change)
 
 ![image](how_to_use/step10.png)
 
