@@ -87,7 +87,6 @@ main {
 .button-block {
   width: 100%;
   display: flex;
-  /* gap: 1rem; */
 }
 
 .button-block > button {

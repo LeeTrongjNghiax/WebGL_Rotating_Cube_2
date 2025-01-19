@@ -1,5 +1,7 @@
 class Plane {
-  constructor(a = 0, b = 0, c = 0, d = 0, color = new Color(), color_name = "", center = 0) {
+  constructor(
+    a = 0, b = 0, c = 0, d = 0, color = new Color(), color_name = "", center = 0
+  ) {
     this.a = a;
     this.b = b;
     this.c = c;
@@ -56,7 +58,9 @@ class Vertex {
 }
 
 class Face {
-  constructor(vertices = [], absolute_position = new Position(), color = new Color()) {
+  constructor(
+    vertices = [], absolute_position = new Position(), color = new Color()
+  ) {
     this.vertices = vertices;
     this.absolute_position = absolute_position;
     this.color = color;
@@ -103,7 +107,14 @@ class Cubie {
 }
 
 class Control {
-  constructor(name, axis = new Position(), rad = Math.PI / 2, upper_limit = 0, lower_limit = 0, index) {
+  constructor(
+    name, 
+    axis = new Position(), 
+    rad = Math.PI / 2, 
+    upper_limit = 0, 
+    lower_limit = 0, 
+    index
+  ) {
     this.name = name;
     this.axis = axis;
     this.rad = rad;
@@ -125,9 +136,6 @@ class Control {
     let sign1 = Math.sign(dis1);
     let sign2 = Math.sign(dis2);
 
-    // if (sign1 != sign2) 
-    //     console.log("Controller " + this.name + " " + this.index + " " + this.axis.x + " " + this.axis.y + " " + this.axis.z);
-
     return sign1 != sign2;
   }
 }
@@ -147,7 +155,9 @@ class Rubik {
     this.cubies.push(cubie);
   }
 
-  get_cubies_in_between_2_parallel_planes(plane1 = new Plane(), plane2 = new Plane()) {
+  get_cubies_in_between_2_parallel_planes(
+    plane1 = new Plane(), plane2 = new Plane()
+  ) {
     let result = [];
 
     let dis1;
@@ -156,8 +166,12 @@ class Rubik {
     let sign2;
 
     for (let i = 0; i < this.cubies.length; i++) {
-      dis1 = get_dot_product_of_plane_and_vector(this.cubies[i].get_absolute_position(), plane1);
-      dis2 = get_dot_product_of_plane_and_vector(this.cubies[i].get_absolute_position(), plane2);
+      dis1 = get_dot_product_of_plane_and_vector(
+        this.cubies[i].get_absolute_position(), plane1
+      );
+      dis2 = get_dot_product_of_plane_and_vector(
+        this.cubies[i].get_absolute_position(), plane2
+      );
 
       sign1 = Math.sign(dis1);
       sign2 = Math.sign(dis2);
