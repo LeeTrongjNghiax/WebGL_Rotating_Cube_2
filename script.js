@@ -1393,7 +1393,7 @@ create_inner_cube_planes = () => {
         faces[i3].absolute_position = sub_vertices[number_of_vertex_per_face * i3].absolute_position;
 
         for (j3 = 0; j3 < number_of_vertex_per_face; j3 += 1) 
-            faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
+          faces[i3].vertices.push(sub_vertices[number_of_vertex_per_face * i3 + j3]);
     }
 
     for (i = start_x; i <= end_x; i += 1) {
