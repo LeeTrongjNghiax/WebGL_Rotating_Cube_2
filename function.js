@@ -169,12 +169,14 @@ function fromEuler(out, x, y, z) {
   x *= halfToRad;
   y *= halfToRad;
   z *= halfToRad;
+
   let sx = Math.sin(x);
   let cx = Math.cos(x);
   let sy = Math.sin(y);
   let cy = Math.cos(y);
   let sz = Math.sin(z);
   let cz = Math.cos(z);
+
   out[0] = sx * cy * cz - cx * sy * sz;
   out[1] = cx * sy * cz + sx * cy * sz;
   out[2] = cx * cy * sz - sx * sy * cz;

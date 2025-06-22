@@ -782,13 +782,10 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
             rubik.controls[i3].axis.x == 0 && 
             rubik.controls[i3].axis.y == 0 && 
             rubik.controls[i3].axis.z != 0 
-          )
+          ) 
             k_center = rubik.controls[i3].index;
     }
   }
-
-  // console.log("Center " + i_center + " " + j_center + " " + k_center);
-  // console.log("-----------------------------------");
 
   sub_vertices.push(
     new Vertex(
@@ -798,7 +795,7 @@ add_vertex_from_3_intersected_planes = (i, j, k, plane) => {
         result_vector[2]
       ),
       plane.color, 
-      plane.color_name + `x_${i_center}_y_${j_center}_z_${k_center}`, 
+      plane.color_name + `_x_${i_center}_y_${j_center}_z_${k_center}`, 
       new Position(i_center, j_center, k_center)
     ), 
   );
@@ -1159,29 +1156,32 @@ create_sticker_planes = () => {
         cubie.absolute_position = new Position(i, j, k);            
 
         for (i3 = 0; i3 < number_of_face; i3 += 1) {
-                    
-          vertice_indices.push(
-            count + 0,
-            count + 1,
-            count + 2,
-
-            count + 0,
-            count + 2,
-            count + 1,
-
-            count + 3,
-            count + 1,
-            count + 2,
-
-            count + 3,
-            count + 2,
-            count + 1,
-          );
-
-          count += number_of_vertex_per_face;
-
-          if (JSON.stringify(faces[i3].absolute_position) === JSON.stringify(cubie.absolute_position)) 
+          if (
+            JSON.stringify(faces[i3].absolute_position) === 
+            JSON.stringify(cubie.absolute_position)
+          ) {
             cubie.add_face(faces[i3]);
+                    
+            vertice_indices.push(
+              count + 0,
+              count + 1,
+              count + 2,
+
+              count + 0,
+              count + 2,
+              count + 1,
+
+              count + 3,
+              count + 1,
+              count + 2,
+
+              count + 3,
+              count + 2,
+              count + 1,
+            );
+
+            count += number_of_vertex_per_face;
+          }
         }
 
         rubik.add_cubie(cubie);
@@ -1468,6 +1468,7 @@ create_vertex_base_on_planes = () => {
   rotated_z_axis_vector = new Float32Array(4);
 
   multiply_quat(rotated_x_axis_vector, quat, x_axis_vector);
+  
   multiply_quat(rotated_x_axis_vector, rotated_x_axis_vector, inverted_quat);
   
   multiply_quat(rotated_y_axis_vector, quat, y_axis_vector);
@@ -1654,25 +1655,25 @@ create_vertices = () => {
 
   // Remove abundant attributes
   
-  rubik.cubies.map(
-    cubie => {
-      cubie.faces.map(face => {
-        face.color = undefined;
-        delete (face.color);
+  // rubik.cubies.map(
+  //   cubie => {
+  //     cubie.faces.map(face => {
+  //       face.color = undefined;
+  //       delete (face.color);
 
-        face.absolute_position = undefined;
-        delete (face.absolute_position);
+  //       face.absolute_position = undefined;
+  //       delete (face.absolute_position);
 
-        face.vertices.map(vertex => {
-          vertex.absolute_position = undefined;
-          delete (vertex.absolute_position);
+  //       face.vertices.map(vertex => {
+  //         vertex.absolute_position = undefined;
+  //         delete (vertex.absolute_position);
 
-          vertex.color_name = undefined;
-          delete (vertex.color_name);
-        })
-      });
-    }
-  );
+  //         vertex.color_name = undefined;
+  //         delete (vertex.color_name);
+  //       })
+  //     });
+  //   }
+  // );
 
   rubik.cubies = rubik.cubies.filter(cubie => cubie.faces.length != 0);
 
