@@ -1404,28 +1404,33 @@ create_inner_cube_planes = () => {
 
                 for (i3 = 0; i3 < number_of_face; i3 += 1) {
                     
-                    vertice_indices.push(
-                        count + 0,
-                        count + 1,
-                        count + 2,
 
-                        count + 0,
-                        count + 2,
-                        count + 1,
+                    if (
+                      JSON.stringify(faces[i3].absolute_position) === 
+                      JSON.stringify(cubie.absolute_position)
+                    ) {
+                      cubie.add_face(faces[i3]);
 
-                        count + 3,
-                        count + 1,
-                        count + 2,
+                      vertice_indices.push(
+                          count + 0,
+                          count + 1,
+                          count + 2,
 
-                        count + 3,
-                        count + 2,
-                        count + 1,
-                    );
+                          count + 0,
+                          count + 2,
+                          count + 1,
 
-                    count += number_of_vertex_per_face;
+                          count + 3,
+                          count + 1,
+                          count + 2,
 
-                    if (JSON.stringify(faces[i3].absolute_position) === JSON.stringify(cubie.absolute_position)) 
-                        cubie.add_face(faces[i3]);
+                          count + 3,
+                          count + 2,
+                          count + 1,
+                      );
+
+                      count += number_of_vertex_per_face;
+                    }
                 }
 
                 rubik.add_cubie(cubie);
